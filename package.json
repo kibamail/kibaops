@@ -6,9 +6,13 @@
         "build": "tsc && vite build && vite build --ssr",
         "dev": "vite",
         "typecheck": "tsc --noEmit",
-        "lint": "eslint resources/js --ext .js,.jsx,.ts,.tsx"
+        "lint": "eslint resources/js --ext .js,.jsx,.ts,.tsx",
+        "lint:fix": "eslint resources/js --ext .js,.jsx,.ts,.tsx --fix",
+        "biome:check": "biome check .",
+        "biome:fix": "biome check --write --unsafe ."
     },
     "devDependencies": {
+        "@biomejs/biome": "1.9.4",
         "@headlessui/react": "^2.0.0",
         "@inertiajs/react": "^2.0.0",
         "@tailwindcss/forms": "^0.5.3",
