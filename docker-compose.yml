@@ -4,7 +4,7 @@ services:
     container_name: kibaops_postgres
     restart: unless-stopped
     ports:
-      - "5433:5432"
+      - "5432:5432"
     environment:
       POSTGRES_DB: kibaops
       POSTGRES_USER: kibaops_user
@@ -26,7 +26,7 @@ services:
     container_name: kibaops_redis
     restart: unless-stopped
     ports:
-      - "6380:6379"
+      - "6379:6379"
     command: redis-server --appendonly yes --requirepass kibaops_redis_password
     volumes:
       - redis_data:/data

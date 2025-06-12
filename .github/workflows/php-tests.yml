@@ -53,6 +53,13 @@ jobs:
       run: php artisan key:generate
 
     - name: Configure Database
+      env:
+        DB_CONNECTION: pgsql
+        DB_HOST: localhost
+        DB_PORT: 5432
+        DB_DATABASE: testing
+        DB_USERNAME: postgres
+        DB_PASSWORD: postgres
       run: |
         php artisan config:clear
         php artisan migrate --force
