@@ -1,0 +1,43 @@
+name: Code Style
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  php-cs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        tools: phpcs
+        coverage: none
+
+    - name: Install Composer dependencies
+      run: composer install --no-interaction --no-progress --prefer-dist
+
+    - name: Check PHP code style
+      run: ./vendor/bin/pint --test
+
+  js-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Check JavaScript/TypeScript code style
+      run: npm run lint
