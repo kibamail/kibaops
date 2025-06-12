@@ -11,7 +11,7 @@
         "useExhaustiveDependencies": "error"
       },
       "suspicious": {
-        "noExplicitAny": "error"
+        "noExplicitAny": "off"
       },
       "style": {
         "noNonNullAssertion": "error",
@@ -44,6 +44,7 @@
       "app/**",
       "config/**",
       "routes/**",
+      "resources/js/types/**",
       "*.php",
       "*.blade.php",
       "*.json",

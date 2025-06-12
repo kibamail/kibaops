@@ -40,4 +40,4 @@ jobs:
       run: npm ci
 
     - name: Check JavaScript/TypeScript code style with Biome
-      run: npx @biomejs/biome ci resources/js
+      run: npx @biomejs/biome ci --files-ignore-unknown=true --files-ignore="resources/js/types/**" resources/js

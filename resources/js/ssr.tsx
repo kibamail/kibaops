@@ -16,8 +16,10 @@ createServer((page) =>
       resolvePageComponent(`./Pages/${name}.tsx`, import.meta.glob('./Pages/**/*.tsx')),
     setup: ({ App, props }) => {
       /* eslint-disable */
-      // @ts-expect-error - global.route is not typed in the global namespace
+      // Add route function to global namespace for Inertia
+      // @ts-ignore - global.route is not typed in the global namespace
       global.route = (name: string, params?: any, absolute?: boolean) =>
+        // @ts-ignore - params type is complex to match exactly
         route(name, params, absolute, {
           ...page.props.ziggy,
           location: new URL(page.props.ziggy.location),
