@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('workspaces', WorkspaceController::class);
     Route::resource('workspaces.projects', ProjectController::class);
+    Route::resource('workspaces.memberships', \App\Http\Controllers\Workspaces\WorkspaceMembershipController::class);
 });
 
 require __DIR__.'/auth.php';

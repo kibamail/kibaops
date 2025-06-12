@@ -14,6 +14,7 @@ export interface Workspace {
   user_id: number;
   created_at: string;
   updated_at: string;
+  projects?: Project[];
 }
 
 export interface Project {
@@ -25,9 +26,31 @@ export interface Project {
   updated_at: string;
 }
 
+export interface WorkspaceMembership {
+  id: number;
+  workspace_id: number;
+  user_id: number | null;
+  email: string;
+  created_at: string;
+  updated_at: string;
+  user?: User;
+  workspace?: Workspace;
+  projects?: Project[];
+}
+
+export interface WorkspaceMembershipProject {
+  id: number;
+  workspace_membership_id: number;
+  project_id: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
   auth: {
     user: User;
   };
+  workspaces: Workspace[];
+  invitedWorkspaces: Workspace[];
   ziggy: Config & { location: string };
 };

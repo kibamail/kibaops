@@ -51,4 +51,21 @@ class User extends Authenticatable
     {
         return $this->hasMany(Workspace::class);
     }
+
+    public function workspaceMemberships(): HasMany
+    {
+        return $this->hasMany(WorkspaceMembership::class);
+    }
+
+    public function invitedWorkspaces()
+    {
+        return $this->hasManyThrough(
+            Workspace::class,
+            WorkspaceMembership::class,
+            'user_id',
+            'id',
+            'id',
+            'workspace_id'
+        )->whereColumn('workspaces.user_id', '!=', 'workspace_memberships.user_id');
+    }
 }

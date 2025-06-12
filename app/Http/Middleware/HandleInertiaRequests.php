@@ -35,6 +35,12 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'workspaces' => $request->user()
+                ? $request->user()->workspaces()->with('projects')->latest()->get()
+                : [],
+            'invitedWorkspaces' => $request->user()
+                ? $request->user()->invitedWorkspaces()->with('projects')->latest()->get()
+                : [],
             'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
