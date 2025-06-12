@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Projects\ProjectController;
 use App\Http\Controllers\Workspaces\WorkspaceController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('workspaces', WorkspaceController::class);
+    Route::resource('workspaces.projects', ProjectController::class);
 });
 
 require __DIR__.'/auth.php';
