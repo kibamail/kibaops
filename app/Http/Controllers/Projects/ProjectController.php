@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Projects;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Http\Requests\Projects\CreateProjectRequest;
 use App\Http\Requests\Projects\UpdateProjectRequest;
 use App\Models\Project;
 use App\Models\Workspace;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -23,7 +22,7 @@ class ProjectController extends Controller
     public function index(Workspace $workspace): Response
     {
         $this->authorize('view', $workspace);
-        
+
         $projects = $workspace->projects()->latest()->get();
 
         return Inertia::render('Projects/Index', [
@@ -38,7 +37,7 @@ class ProjectController extends Controller
     public function create(Workspace $workspace): Response
     {
         $this->authorize('update', $workspace);
-        
+
         return Inertia::render('Projects/Create', [
             'workspace' => $workspace,
         ]);
@@ -63,7 +62,7 @@ class ProjectController extends Controller
     public function show(Workspace $workspace, Project $project): Response
     {
         $this->authorize('view', $project);
-        
+
         return Inertia::render('Projects/Show', [
             'workspace' => $workspace,
             'project' => $project,
@@ -76,7 +75,7 @@ class ProjectController extends Controller
     public function edit(Workspace $workspace, Project $project): Response
     {
         $this->authorize('update', $project);
-        
+
         return Inertia::render('Projects/Edit', [
             'workspace' => $workspace,
             'project' => $project,
@@ -89,7 +88,7 @@ class ProjectController extends Controller
     public function update(UpdateProjectRequest $request, Workspace $workspace, Project $project): RedirectResponse
     {
         $this->authorize('update', $project);
-        
+
         $project->update($request->validated());
 
         return redirect()->route('workspaces.projects.show', [
@@ -104,7 +103,7 @@ class ProjectController extends Controller
     public function destroy(Workspace $workspace, Project $project): RedirectResponse
     {
         $this->authorize('delete', $project);
-        
+
         $project->delete();
 
         return redirect()->route('workspaces.projects.index', $workspace)

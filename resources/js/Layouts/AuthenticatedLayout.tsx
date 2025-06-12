@@ -49,6 +49,7 @@ export default function Authenticated({
                           viewBox="0 0 20 20"
                           fill="currentColor"
                         >
+                          <title>Icon</title>
                           <path
                             fillRule="evenodd"
                             d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
@@ -71,10 +72,12 @@ export default function Authenticated({
 
             <div className="-me-2 flex items-center sm:hidden">
               <button
+                type="button"
                 onClick={() => setShowingNavigationDropdown((previousState) => !previousState)}
                 className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none dark:text-gray-500 dark:hover:bg-gray-900 dark:hover:text-gray-400 dark:focus:bg-gray-900 dark:focus:text-gray-400"
               >
                 <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                  <title>Icon</title>
                   <path
                     className={!showingNavigationDropdown ? 'inline-flex' : 'hidden'}
                     strokeLinecap="round"

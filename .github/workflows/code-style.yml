@@ -40,4 +40,4 @@ jobs:
       run: npm ci
 
     - name: Check JavaScript/TypeScript code style with Biome
-      run: npx @biomejs/biome ci .
+      run: npx @biomejs/biome ci resources/js

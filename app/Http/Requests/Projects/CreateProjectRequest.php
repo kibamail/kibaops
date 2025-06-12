@@ -15,6 +15,7 @@ class CreateProjectRequest extends FormRequest
     public function authorize(): bool
     {
         $workspace = Workspace::findOrFail($this->workspace_id);
+
         return Gate::allows('update', $workspace);
     }
 

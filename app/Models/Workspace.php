@@ -25,9 +25,9 @@ class Workspace extends Model
         static::creating(function ($workspace) {
             $slug = Str::slug($workspace->name);
             $count = static::where('slug', 'like', "{$slug}%")->count();
-            
+
             if ($count > 0) {
-                $workspace->slug = $slug . '-' . Str::random(6);
+                $workspace->slug = $slug.'-'.Str::random(6);
             } else {
                 $workspace->slug = $slug;
             }
@@ -38,7 +38,7 @@ class Workspace extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
+
     public function projects(): HasMany
     {
         return $this->hasMany(Project::class);

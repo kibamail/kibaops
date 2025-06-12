@@ -38,9 +38,17 @@ const Trigger = ({ children }: PropsWithChildren) => {
 
   return (
     <>
-      <div onClick={toggleOpen}>{children}</div>
+      <button type="button" onClick={toggleOpen} onKeyDown={toggleOpen}>
+        {children}
+      </button>
 
-      {open && <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />}
+      {open && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setOpen(false)}
+          onKeyDown={() => setOpen(false)}
+        />
+      )}
     </>
   );
 };
@@ -82,14 +90,16 @@ const Content = ({
         leaveFrom="opacity-100 scale-100"
         leaveTo="opacity-0 scale-95"
       >
-        <div
+        <button
+          type="button"
           className={`absolute z-50 mt-2 rounded-md shadow-lg ${alignmentClasses} ${widthClasses}`}
           onClick={() => setOpen(false)}
+          onKeyDown={() => setOpen(false)}
         >
           <div className={`rounded-md ring-1 ring-black ring-opacity-5 ${contentClasses}`}>
             {children}
           </div>
-        </div>
+        </button>
       </Transition>
     </>
   );

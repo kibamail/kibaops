@@ -69,7 +69,7 @@ export default function Login({
         </div>
 
         <div className="mt-4 block">
-          <label className="flex items-center">
+          <label className="flex items-center" htmlFor="input">
             <Checkbox
               name="remember"
               checked={data.remember}

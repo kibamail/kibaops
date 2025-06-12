@@ -2,7 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import type { PageProps } from '@/types';
 import { Head } from '@inertiajs/react';
 
-export default function Create({}: PageProps) {
+export default function Create(_props: PageProps) {
   return (
     <AuthenticatedLayout
       header={

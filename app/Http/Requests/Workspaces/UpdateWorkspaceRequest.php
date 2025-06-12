@@ -23,7 +23,7 @@ class UpdateWorkspaceRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:32', 'regex:/^[a-zA-Z0-9\s]+$/'],
-            'slug' => ['required', 'string', 'unique:workspaces,slug,' . $this->route('workspace')->id],
+            'slug' => ['required', 'string', 'unique:workspaces,slug,'.$this->route('workspace')->id],
         ];
     }
 }

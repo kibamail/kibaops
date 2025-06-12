@@ -49,7 +49,7 @@ test('project can be created', function () {
         ]);
 
     $project = Project::where('name', 'Test Project')->first();
-    
+
     $this->assertModelExists($project);
     $response->assertRedirect(route('workspaces.projects.show', [
         'workspace' => $workspace->id,
@@ -112,7 +112,7 @@ test('project can be updated', function () {
         ]);
 
     $project->refresh();
-    
+
     expect($project->name)->toBe('Updated Project');
     $response->assertRedirect(route('workspaces.projects.show', [
         'workspace' => $workspace,
