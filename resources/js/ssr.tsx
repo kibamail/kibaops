@@ -3,7 +3,7 @@ import createServer from '@inertiajs/react/server';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import ReactDOMServer from 'react-dom/server';
 import type { RouteName } from 'ziggy-js';
-import { route } from '../../vendor/tightenco/ziggy';
+import { route } from '../../vendor/tightenco/ziggy/dist/index.js';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 

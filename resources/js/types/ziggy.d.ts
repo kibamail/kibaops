@@ -27,7 +27,7 @@ declare module 'ziggy-js' {
     | RouteParam[];
 }
 
-declare module '../../vendor/tightenco/ziggy' {
+declare module '../../vendor/tightenco/ziggy/dist/index.js' {
   import { RouteName, RouteParams, Config } from 'ziggy-js';
   
   export function route(
