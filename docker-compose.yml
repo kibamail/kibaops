@@ -1,0 +1,49 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: kibaops_postgres
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: kibaops
+      POSTGRES_USER: kibaops_user
+      POSTGRES_PASSWORD: kibaops_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
+    networks:
+      - kibaops_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kibaops_user -d kibaops"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: kibaops_redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    command: redis-server --appendonly yes --requirepass kibaops_redis_password
+    volumes:
+      - redis_data:/data
+    networks:
+      - kibaops_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  kibaops_network:
+    driver: bridge
