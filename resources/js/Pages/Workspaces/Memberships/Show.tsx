@@ -19,6 +19,7 @@ export default function Show({ workspace, membership }: Props) {
               </h1>
               <p>Email: {membership.email}</p>
               <p>User ID: {membership.user_id || 'Pending'}</p>
+              <p>Role: {membership.role}</p>
             </div>
           </div>
         </div>

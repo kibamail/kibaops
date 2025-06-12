@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\WorkspaceMembershipRole;
 use App\Models\User;
 use App\Models\Workspace;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -19,12 +20,13 @@ class WorkspaceMembershipFactory extends Factory
             'workspace_id' => Workspace::factory(),
             'user_id' => null,
             'email' => $email,
+            'role' => $this->faker->randomElement(WorkspaceMembershipRole::cases()),
         ];
     }
 
     public function withUser(): static
     {
-        return $this->state(function (array $attributes) {
+        return $this->state(function () {
             $user = User::factory()->create();
 
             return [
@@ -36,8 +38,22 @@ class WorkspaceMembershipFactory extends Factory
 
     public function forWorkspace(Workspace $workspace): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn () => [
             'workspace_id' => $workspace->id,
+        ]);
+    }
+
+    public function developer(): static
+    {
+        return $this->state(fn () => [
+            'role' => WorkspaceMembershipRole::DEVELOPER,
+        ]);
+    }
+
+    public function admin(): static
+    {
+        return $this->state(fn () => [
+            'role' => WorkspaceMembershipRole::ADMIN,
         ]);
     }
 }

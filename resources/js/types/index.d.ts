@@ -31,6 +31,7 @@ export interface WorkspaceMembership {
   workspace_id: number;
   user_id: number | null;
   email: string;
+  role: 'developer' | 'admin';
   created_at: string;
   updated_at: string;
   user?: User;

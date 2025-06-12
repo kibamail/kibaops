@@ -55,6 +55,7 @@ test('workspace memberships can be created with bulk emails', function () {
         ->postJson(route('workspaces.memberships.store', $workspace), [
             'emails' => $emails,
             'project_ids' => $projectIds,
+            'role' => 'developer',
         ]);
 
     $response->assertStatus(200);
@@ -64,6 +65,7 @@ test('workspace memberships can be created with bulk emails', function () {
         expect($membership)->not->toBeNull()
             ->and($membership->workspace_id)->toBe($workspace->id)
             ->and($membership->user_id)->toBeNull()
+            ->and($membership->role->value)->toBe('developer')
             ->and($membership->projects->count())->toBe(2);
     }
 });
@@ -82,15 +84,18 @@ test('workspace memberships automatically link existing users', function () {
         ->postJson(route('workspaces.memberships.store', $workspace), [
             'emails' => $emails,
             'project_ids' => $projectIds,
+            'role' => 'admin',
         ]);
 
     $response->assertStatus(200);
 
     $existingUserMembership = WorkspaceMembership::where('email', $existingUser->email)->first();
-    expect($existingUserMembership->user_id)->toBe($existingUser->id);
+    expect($existingUserMembership->user_id)->toBe($existingUser->id)
+        ->and($existingUserMembership->role->value)->toBe('admin');
 
     $newUserMembership = WorkspaceMembership::where('email', 'newuser@example.com')->first();
-    expect($newUserMembership->user_id)->toBeNull();
+    expect($newUserMembership->user_id)->toBeNull()
+        ->and($newUserMembership->role->value)->toBe('admin');
 });
 
 test('workspace membership creation validates project ownership', function () {
@@ -104,6 +109,7 @@ test('workspace membership creation validates project ownership', function () {
         ->postJson(route('workspaces.memberships.store', $workspace), [
             'emails' => ['test@example.com'],
             'project_ids' => [$otherProject->id],
+            'role' => 'developer',
         ]);
 
     $response->assertStatus(422);
@@ -147,7 +153,7 @@ test('workspace membership edit page is displayed', function () {
 test('workspace membership can be updated', function () {
     $user = User::factory()->create();
     $workspace = Workspace::factory()->create(['user_id' => $user->id]);
-    $membership = WorkspaceMembership::factory()->forWorkspace($workspace)->create();
+    $membership = WorkspaceMembership::factory()->forWorkspace($workspace)->developer()->create();
     $projects = Project::factory()->count(3)->create(['workspace_id' => $workspace->id]);
 
     $membership->projects()->attach($projects->take(2)->pluck('id'));
@@ -158,13 +164,15 @@ test('workspace membership can be updated', function () {
         ->actingAs($user)
         ->putJson(route('workspaces.memberships.update', [$workspace, $membership]), [
             'project_ids' => $newProjectIds,
+            'role' => 'admin',
         ]);
 
     $response->assertStatus(200);
 
     $membership->refresh();
     expect($membership->projects->count())->toBe(1)
-        ->and($membership->projects->first()->id)->toBe($projects->last()->id);
+        ->and($membership->projects->first()->id)->toBe($projects->last()->id)
+        ->and($membership->role->value)->toBe('admin');
 });
 
 test('workspace membership can be deleted', function () {
@@ -203,6 +211,7 @@ test('user cannot create memberships for other users workspaces', function () {
         ->postJson(route('workspaces.memberships.store', $workspace), [
             'emails' => ['test@example.com'],
             'project_ids' => [$project->id],
+            'role' => 'developer',
         ]);
 
     $response->assertForbidden();
@@ -219,6 +228,7 @@ test('user cannot update memberships for other users workspaces', function () {
         ->actingAs($user2)
         ->putJson(route('workspaces.memberships.update', [$workspace, $membership]), [
             'project_ids' => [$project->id],
+            'role' => 'admin',
         ]);
 
     $response->assertForbidden();
@@ -248,6 +258,7 @@ test('membership creation requires valid email format', function () {
         ->postJson(route('workspaces.memberships.store', $workspace), [
             'emails' => ['invalid-email'],
             'project_ids' => [$project->id],
+            'role' => 'developer',
         ]);
 
     $response->assertStatus(422);
@@ -264,6 +275,7 @@ test('membership creation requires at least one email', function () {
         ->postJson(route('workspaces.memberships.store', $workspace), [
             'emails' => [],
             'project_ids' => [$project->id],
+            'role' => 'developer',
         ]);
 
     $response->assertStatus(422);
@@ -279,6 +291,7 @@ test('membership creation requires at least one project', function () {
         ->postJson(route('workspaces.memberships.store', $workspace), [
             'emails' => ['test@example.com'],
             'project_ids' => [],
+            'role' => 'developer',
         ]);
 
     $response->assertStatus(422);
@@ -303,4 +316,97 @@ test('user can access their invited workspaces', function () {
     expect($invitedWorkspaces->count())->toBe(1)
         ->and($invitedWorkspaces->first()->workspace->id)->toBe($workspace->id)
         ->and($invitedWorkspaces->first()->workspace->user_id)->toBe($owner->id);
+});
+
+test('membership creation requires a valid role', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
+    $project = Project::factory()->create(['workspace_id' => $workspace->id]);
+
+    $response = $this
+        ->actingAs($user)
+        ->postJson(route('workspaces.memberships.store', $workspace), [
+            'emails' => ['test@example.com'],
+            'project_ids' => [$project->id],
+            'role' => 'invalid_role',
+        ]);
+
+    $response->assertStatus(422);
+    $response->assertJsonValidationErrors(['role']);
+});
+
+test('membership creation requires role field', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
+    $project = Project::factory()->create(['workspace_id' => $workspace->id]);
+
+    $response = $this
+        ->actingAs($user)
+        ->postJson(route('workspaces.memberships.store', $workspace), [
+            'emails' => ['test@example.com'],
+            'project_ids' => [$project->id],
+        ]);
+
+    $response->assertStatus(422);
+    $response->assertJsonValidationErrors(['role']);
+});
+
+test('membership can be created with admin role', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
+    $project = Project::factory()->create(['workspace_id' => $workspace->id]);
+
+    $response = $this
+        ->actingAs($user)
+        ->postJson(route('workspaces.memberships.store', $workspace), [
+            'emails' => ['test@example.com'],
+            'project_ids' => [$project->id],
+            'role' => 'admin',
+        ]);
+
+    $response->assertStatus(200);
+
+    $membership = WorkspaceMembership::where('email', 'test@example.com')->first();
+    expect($membership->role->value)->toBe('admin');
+});
+
+test('membership role can be updated', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
+    $membership = WorkspaceMembership::factory()->forWorkspace($workspace)->developer()->create();
+    $project = Project::factory()->create(['workspace_id' => $workspace->id]);
+
+    $membership->projects()->attach($project->id);
+
+    $response = $this
+        ->actingAs($user)
+        ->putJson(route('workspaces.memberships.update', [$workspace, $membership]), [
+            'project_ids' => [$project->id],
+            'role' => 'admin',
+        ]);
+
+    $response->assertStatus(200);
+
+    $membership->refresh();
+    expect($membership->role->value)->toBe('admin');
+});
+
+test('membership role update is optional', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
+    $membership = WorkspaceMembership::factory()->forWorkspace($workspace)->admin()->create();
+    $project = Project::factory()->create(['workspace_id' => $workspace->id]);
+
+    $membership->projects()->attach($project->id);
+
+    $response = $this
+        ->actingAs($user)
+        ->putJson(route('workspaces.memberships.update', [$workspace, $membership]), [
+            'project_ids' => [$project->id],
+        ]);
+
+    $response->assertStatus(200);
+
+    $membership->refresh();
+    expect($membership->role->value)->toBe('admin');
 });

@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Workspaces;
 
+use App\Enums\WorkspaceMembershipRole;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateWorkspaceMembershipRequest extends FormRequest
 {
@@ -18,6 +20,7 @@ class CreateWorkspaceMembershipRequest extends FormRequest
             'emails.*' => ['required', 'email', 'max:255'],
             'project_ids' => ['required', 'array', 'min:1'],
             'project_ids.*' => ['required', 'integer', 'exists:projects,id'],
+            'role' => ['required', Rule::enum(WorkspaceMembershipRole::class)],
         ];
     }
 
@@ -28,6 +31,8 @@ class CreateWorkspaceMembershipRequest extends FormRequest
             'emails.*.email' => 'Each email must be a valid email address.',
             'project_ids.required' => 'At least one project must be selected.',
             'project_ids.*.exists' => 'One or more selected projects do not exist.',
+            'role.required' => 'A role must be selected.',
+            'role.enum' => 'The selected role is invalid.',
         ];
     }
 }

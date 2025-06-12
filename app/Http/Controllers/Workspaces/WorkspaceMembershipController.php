@@ -52,6 +52,7 @@ class WorkspaceMembershipController extends Controller
         $validated = $request->validated();
         $emails = $validated['emails'];
         $projectIds = $validated['project_ids'];
+        $role = $validated['role'];
 
         $projects = $workspace->projects()->whereIn('id', $projectIds)->get();
 
@@ -61,7 +62,7 @@ class WorkspaceMembershipController extends Controller
 
         $createdMemberships = [];
 
-        DB::transaction(function () use ($workspace, $emails, $projectIds, &$createdMemberships) {
+        DB::transaction(function () use ($workspace, $emails, $projectIds, $role, &$createdMemberships) {
             foreach ($emails as $email) {
                 $user = User::where('email', $email)->first();
 
@@ -72,6 +73,7 @@ class WorkspaceMembershipController extends Controller
                     ],
                     [
                         'user_id' => $user?->id,
+                        'role' => $role,
                     ]
                 );
 
@@ -135,6 +137,10 @@ class WorkspaceMembershipController extends Controller
 
         if ($projects->count() !== count($projectIds)) {
             return response()->json(['error' => 'Some projects do not belong to this workspace'], 422);
+        }
+
+        if (isset($validated['role'])) {
+            $membership->update(['role' => $validated['role']]);
         }
 
         $membership->projects()->sync($projectIds);

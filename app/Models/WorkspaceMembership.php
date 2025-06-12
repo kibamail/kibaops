@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\WorkspaceMembershipRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,6 +16,11 @@ class WorkspaceMembership extends Model
         'workspace_id',
         'user_id',
         'email',
+        'role',
+    ];
+
+    protected $casts = [
+        'role' => WorkspaceMembershipRole::class,
     ];
 
     public function workspace(): BelongsTo
