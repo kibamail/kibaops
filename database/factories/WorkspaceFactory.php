@@ -16,8 +16,14 @@ class WorkspaceFactory extends Factory
      */
     public function definition(): array
     {
+        // Generate a shorter company name to fit within the 32-character limit
+        $name = fake()->company();
+        if (strlen($name) > 30) {
+            $name = substr($name, 0, 30);
+        }
+        
         return [
-            'name' => fake()->company(),
+            'name' => $name,
             'user_id' => \App\Models\User::factory(),
         ];
     }
