@@ -20,12 +20,12 @@ class WorkspaceFactory extends Factory
         // Using words instead of company() to get shorter names
         $name = fake()->words(2, true);
         $name = ucfirst($name);
-        
+
         // Ensure name is within the 32-character limit
         if (strlen($name) > 30) {
             $name = substr($name, 0, 30);
         }
-        
+
         return [
             'name' => $name,
             'user_id' => \App\Models\User::factory(),
