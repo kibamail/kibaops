@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('workspaces', WorkspaceController::class)->only(['store', 'update', 'destroy']);
     Route::resource('projects', ProjectController::class)->only(['store', 'show', 'update', 'destroy']);
+    Route::resource('projects.environments', \App\Http\Controllers\Projects\EnvironmentController::class)->only(['store', 'update', 'destroy']);
     Route::resource('workspaces.memberships', \App\Http\Controllers\Workspaces\WorkspaceMembershipController::class)->except(['create', 'show', 'edit']);
 });
 

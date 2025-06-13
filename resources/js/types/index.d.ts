@@ -24,6 +24,15 @@ export interface Project {
   workspace_id: number;
   created_at: string;
   updated_at: string;
+  environments?: Environment[];
+}
+
+export interface Environment {
+  id: number;
+  slug: string;
+  project_id: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface WorkspaceMembership {
