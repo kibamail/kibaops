@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class Workspace extends Model
@@ -47,5 +48,32 @@ class Workspace extends Model
     public function memberships(): HasMany
     {
         return $this->hasMany(WorkspaceMembership::class);
+    }
+
+    public function createMemberships(array $emails, array $projectIds, string $role): array
+    {
+        $createdMemberships = [];
+
+        DB::transaction(function () use ($emails, $projectIds, $role, &$createdMemberships) {
+            foreach ($emails as $email) {
+                $user = User::where('email', $email)->first();
+
+                $membership = WorkspaceMembership::updateOrCreate(
+                    [
+                        'workspace_id' => $this->id,
+                        'email' => $email,
+                    ],
+                    [
+                        'user_id' => $user?->id,
+                        'role' => $role,
+                    ]
+                );
+
+                $membership->projects()->sync($projectIds);
+                $createdMemberships[] = $membership->load(['user', 'projects']);
+            }
+        });
+
+        return $createdMemberships;
     }
 }

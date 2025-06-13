@@ -1,12 +1,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import type { PageProps, Project, Workspace } from '@/types';
+import type { PageProps, Project } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 
-export default function Show({
-  auth,
-  workspace,
-  project,
-}: PageProps<{ workspace: Workspace; project: Project }>) {
+export default function Show({ project }: PageProps<{ project: Project }>) {
   return (
     <AuthenticatedLayout
       header={
@@ -21,37 +17,15 @@ export default function Show({
             <div className="p-6 text-gray-900">
               <div className="mb-6">
                 <Link
-                  href={route('workspaces.projects.index', workspace.id)}
+                  href={route('dashboard')}
                   className="text-blue-500 hover:underline"
                 >
-                  ← Back to Projects
+                  ← Back to Dashboard
                 </Link>
               </div>
 
-              <div className="flex justify-between items-center mb-6">
+              <div className="mb-6">
                 <h1 className="text-2xl font-semibold">{project.name}</h1>
-                <div className="flex space-x-2">
-                  <Link
-                    href={route('workspaces.projects.edit', {
-                      workspace: workspace.id,
-                      project: project.id,
-                    })}
-                    className="px-4 py-2 bg-yellow-500 text-white rounded-md"
-                  >
-                    Edit
-                  </Link>
-                  <Link
-                    href={route('workspaces.projects.destroy', {
-                      workspace: workspace.id,
-                      project: project.id,
-                    })}
-                    method="delete"
-                    as="button"
-                    className="px-4 py-2 bg-red-500 text-white rounded-md"
-                  >
-                    Delete
-                  </Link>
-                </div>
               </div>
 
               <div className="mt-4">

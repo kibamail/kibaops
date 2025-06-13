@@ -205,3 +205,37 @@ test('shared data is available across different inertia routes', function () {
         ->has('invitedWorkspaces', 0)
     );
 });
+
+test('active workspace id is shared when cookie is present', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
+
+    $response = $this
+        ->actingAs($user)
+        ->withCookie('active_workspace_id', $workspace->id)
+        ->get(route('dashboard'));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->where('activeWorkspaceId', (string) $workspace->id)
+    );
+});
+
+test('active workspace id is null when no cookie is present', function () {
+    $user = User::factory()->create();
+
+    $response = $this
+        ->actingAs($user)
+        ->get(route('dashboard'));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->where('activeWorkspaceId', null)
+    );
+});
+
+test('active workspace id is null for unauthenticated users', function () {
+    $response = $this->get(route('login'));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->where('activeWorkspaceId', null)
+    );
+});

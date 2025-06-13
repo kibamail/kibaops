@@ -25,9 +25,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::resource('workspaces', WorkspaceController::class);
-    Route::resource('workspaces.projects', ProjectController::class);
-    Route::resource('workspaces.memberships', \App\Http\Controllers\Workspaces\WorkspaceMembershipController::class);
+    Route::resource('workspaces', WorkspaceController::class)->only(['store', 'update', 'destroy']);
+    Route::resource('projects', ProjectController::class)->only(['store', 'show', 'update', 'destroy']);
+    Route::resource('workspaces.memberships', \App\Http\Controllers\Workspaces\WorkspaceMembershipController::class)->except(['create', 'show', 'edit']);
 });
 
 require __DIR__.'/auth.php';

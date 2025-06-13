@@ -53,5 +53,6 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
   };
   workspaces: Workspace[];
   invitedWorkspaces: Workspace[];
+  activeWorkspaceId: string | null;
   ziggy: Config & { location: string };
 };

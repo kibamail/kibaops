@@ -7,38 +7,12 @@ use App\Http\Requests\Workspaces\CreateWorkspaceRequest;
 use App\Http\Requests\Workspaces\UpdateWorkspaceRequest;
 use App\Models\Workspace;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class WorkspaceController extends Controller
 {
     use AuthorizesRequests;
-
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request): Response
-    {
-        $this->authorize('viewAny', Workspace::class);
-
-        $workspaces = $request->user()->workspaces()->latest()->get();
-
-        return Inertia::render('Workspaces/Index', [
-            'workspaces' => $workspaces,
-        ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(): Response
-    {
-        $this->authorize('create', Workspace::class);
-
-        return Inertia::render('Workspaces/Create');
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -49,45 +23,24 @@ class WorkspaceController extends Controller
 
         $workspace = $request->user()->workspaces()->create($request->validated());
 
-        return redirect()->route('workspaces.show', $workspace)
+        return redirect()->route('dashboard')
+            ->withCookie($this->setActiveWorkspaceCookie($workspace->id))
             ->with('success', 'Workspace created successfully.');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Workspace $workspace): Response
-    {
-        $this->authorize('view', $workspace);
-
-        return Inertia::render('Workspaces/Show', [
-            'workspace' => $workspace,
-        ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Workspace $workspace): Response
-    {
-        $this->authorize('update', $workspace);
-
-        return Inertia::render('Workspaces/Edit', [
-            'workspace' => $workspace,
-        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateWorkspaceRequest $request, Workspace $workspace): RedirectResponse
+    public function update(UpdateWorkspaceRequest $request, Workspace $workspace): JsonResponse
     {
         $this->authorize('update', $workspace);
 
         $workspace->update($request->validated());
 
-        return redirect()->route('workspaces.show', $workspace)
-            ->with('success', 'Workspace updated successfully.');
+        return response()->json([
+            'message' => 'Workspace updated successfully.',
+            'workspace' => $workspace,
+        ]);
     }
 
     /**
@@ -99,7 +52,15 @@ class WorkspaceController extends Controller
 
         $workspace->delete();
 
-        return redirect()->route('workspaces.index')
+        return redirect()->route('dashboard')
             ->with('success', 'Workspace deleted successfully.');
+    }
+
+    /**
+     * Set the active workspace cookie.
+     */
+    private function setActiveWorkspaceCookie(int $workspaceId): \Symfony\Component\HttpFoundation\Cookie
+    {
+        return cookie('active_workspace_id', $workspaceId, 0, null, null, false, false);
     }
 }

@@ -26,22 +26,6 @@ test('workspace membership index page is displayed', function () {
     );
 });
 
-test('workspace membership create page is displayed', function () {
-    $user = User::factory()->create();
-    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
-    $projects = Project::factory()->count(2)->create(['workspace_id' => $workspace->id]);
-
-    $response = $this
-        ->actingAs($user)
-        ->get(route('workspaces.memberships.create', $workspace));
-
-    $response->assertInertia(fn (Assert $page) => $page
-        ->component('Workspaces/Memberships/Create')
-        ->has('workspace')
-        ->has('projects', 2)
-    );
-});
-
 test('workspace memberships can be created with bulk emails', function () {
     $user = User::factory()->create();
     $workspace = Workspace::factory()->create(['user_id' => $user->id]);
@@ -113,41 +97,7 @@ test('workspace membership creation validates project ownership', function () {
         ]);
 
     $response->assertStatus(422);
-    $response->assertJson(['error' => 'Some projects do not belong to this workspace']);
-});
-
-test('workspace membership show page is displayed', function () {
-    $user = User::factory()->create();
-    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
-    $membership = WorkspaceMembership::factory()->forWorkspace($workspace)->create();
-
-    $response = $this
-        ->actingAs($user)
-        ->get(route('workspaces.memberships.show', [$workspace, $membership]));
-
-    $response->assertInertia(fn (Assert $page) => $page
-        ->component('Workspaces/Memberships/Show')
-        ->has('workspace')
-        ->has('membership')
-    );
-});
-
-test('workspace membership edit page is displayed', function () {
-    $user = User::factory()->create();
-    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
-    $membership = WorkspaceMembership::factory()->forWorkspace($workspace)->create();
-    $projects = Project::factory()->count(2)->create(['workspace_id' => $workspace->id]);
-
-    $response = $this
-        ->actingAs($user)
-        ->get(route('workspaces.memberships.edit', [$workspace, $membership]));
-
-    $response->assertInertia(fn (Assert $page) => $page
-        ->component('Workspaces/Memberships/Edit')
-        ->has('workspace')
-        ->has('membership')
-        ->has('projects', 2)
-    );
+    $response->assertJsonValidationErrors(['project_ids.0']);
 });
 
 test('workspace membership can be updated', function () {

@@ -41,6 +41,7 @@ class HandleInertiaRequests extends Middleware
             'invitedWorkspaces' => $request->user()
                 ? $request->user()->invitedWorkspaces()->with('projects')->latest()->get()
                 : [],
+            'activeWorkspaceId' => $request->cookie('active_workspace_id'),
             'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
@@ -48,3 +49,4 @@ class HandleInertiaRequests extends Middleware
         ];
     }
 }
+    

@@ -3,34 +3,8 @@
 use App\Models\User;
 use App\Models\Workspace;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Inertia\Testing\AssertableInertia as Assert;
 
 uses(RefreshDatabase::class);
-
-test('workspace index page is displayed', function () {
-    $user = User::factory()->create();
-
-    $response = $this
-        ->actingAs($user)
-        ->get(route('workspaces.index'));
-
-    $response->assertInertia(fn (Assert $page) => $page
-        ->component('Workspaces/Index')
-        ->has('workspaces')
-    );
-});
-
-test('workspace create page is displayed', function () {
-    $user = User::factory()->create();
-
-    $response = $this
-        ->actingAs($user)
-        ->get(route('workspaces.create'));
-
-    $response->assertInertia(fn (Assert $page) => $page
-        ->component('Workspaces/Create')
-    );
-});
 
 test('workspace can be created', function () {
     $user = User::factory()->create();
@@ -47,35 +21,8 @@ test('workspace can be created', function () {
         ->and($workspace->name)->toBe('Test Workspace')
         ->and($workspace->user_id)->toBe($user->id);
 
-    $response->assertRedirect(route('workspaces.show', $workspace));
-});
-
-test('workspace show page is displayed', function () {
-    $user = User::factory()->create();
-    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
-
-    $response = $this
-        ->actingAs($user)
-        ->get(route('workspaces.show', $workspace));
-
-    $response->assertInertia(fn (Assert $page) => $page
-        ->component('Workspaces/Show')
-        ->has('workspace')
-    );
-});
-
-test('workspace edit page is displayed', function () {
-    $user = User::factory()->create();
-    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
-
-    $response = $this
-        ->actingAs($user)
-        ->get(route('workspaces.edit', $workspace));
-
-    $response->assertInertia(fn (Assert $page) => $page
-        ->component('Workspaces/Edit')
-        ->has('workspace')
-    );
+    $response->assertRedirect(route('dashboard'));
+    $response->assertCookie('active_workspace_id', $workspace->id);
 });
 
 test('workspace can be updated', function () {
@@ -92,7 +39,14 @@ test('workspace can be updated', function () {
     $workspace->refresh();
 
     expect($workspace->name)->toBe('Updated Workspace');
-    $response->assertRedirect(route('workspaces.show', $workspace));
+    $response->assertJson([
+        'message' => 'Workspace updated successfully.',
+        'workspace' => [
+            'id' => $workspace->id,
+            'name' => 'Updated Workspace',
+            'slug' => $workspace->slug,
+        ],
+    ]);
 });
 
 test('workspace can be deleted', function () {
@@ -104,19 +58,7 @@ test('workspace can be deleted', function () {
         ->delete(route('workspaces.destroy', $workspace));
 
     $this->assertModelMissing($workspace);
-    $response->assertRedirect(route('workspaces.index'));
-});
-
-test('user cannot access workspaces of other users', function () {
-    $user1 = User::factory()->create();
-    $user2 = User::factory()->create();
-    $workspace = Workspace::factory()->create(['user_id' => $user1->id]);
-
-    $response = $this
-        ->actingAs($user2)
-        ->get(route('workspaces.show', $workspace));
-
-    $response->assertForbidden();
+    $response->assertRedirect(route('dashboard'));
 });
 
 test('user cannot update workspaces of other users', function () {
@@ -145,4 +87,19 @@ test('user cannot delete workspaces of other users', function () {
 
     $response->assertForbidden();
     $this->assertModelExists($workspace);
+});
+
+test('creating workspace sets active workspace cookie', function () {
+    $user = User::factory()->create();
+
+    $response = $this
+        ->actingAs($user)
+        ->post(route('workspaces.store'), [
+            'name' => 'Active Workspace Test',
+        ]);
+
+    $workspace = Workspace::where('name', 'Active Workspace Test')->first();
+
+    $response->assertCookie('active_workspace_id', $workspace->id);
+    $response->assertRedirect(route('dashboard'));
 });
