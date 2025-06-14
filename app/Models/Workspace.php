@@ -53,6 +53,14 @@ class Workspace extends Model
         return $this->hasMany(WorkspaceMembership::class);
     }
 
+    /**
+     * Get the cloud providers for the workspace.
+     */
+    public function cloudProviders(): HasMany
+    {
+        return $this->hasMany(CloudProvider::class);
+    }
+
     public function createMemberships(array $emails, array $projectIds, string $role): array
     {
         $createdMemberships = [];
@@ -78,6 +86,54 @@ class Workspace extends Model
         });
 
         return $createdMemberships;
+    }
+
+    /**
+     * Create a new cloud provider for this workspace with secure credential storage.
+     * The provider data is stored in the database while credentials are securely
+     * stored in Vault using the provider's unique key path.
+     */
+    public function createCloudProvider(array $data, string $credentials): CloudProvider
+    {
+        $cloudProvider = $this->cloudProviders()->create($data);
+
+        $this->vault()->writes()->store($cloudProvider->vault_key, $credentials);
+
+        return $cloudProvider;
+    }
+
+    /**
+     * Update an existing cloud provider with new data and/or credentials.
+     * If credentials are provided, they overwrite the existing ones in Vault.
+     * Database fields are only updated if data is provided.
+     */
+    public function updateCloudProvider(CloudProvider $cloudProvider, array $data, ?string $credentials = null): CloudProvider
+    {
+        if (!empty($data)) {
+            $cloudProvider->update($data);
+        }
+
+        if ($credentials !== null) {
+            $this->vault()->writes()->store($cloudProvider->vault_key, $credentials);
+        }
+
+        return $cloudProvider->fresh();
+    }
+
+    /**
+     * Delete a cloud provider and clean up its credentials from Vault.
+     * This performs a soft delete on the database record and attempts to
+     * remove the credentials from Vault for complete cleanup.
+     */
+    public function deleteCloudProvider(CloudProvider $cloudProvider): bool
+    {
+        try {
+            $this->vault()->reads()->secret($cloudProvider->vault_key);
+            $this->vault()->writes()->remove($cloudProvider->vault_key);
+        } catch (\Exception) {
+        }
+
+        return $cloudProvider->delete();
     }
 
     public function vault(): VaultService {

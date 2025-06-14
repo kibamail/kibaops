@@ -45,4 +45,15 @@ class VaultWritesClient extends Client
 
         return $path;
     }
+
+    /**
+     * Remove a secret from Vault at the specified path.
+     * This method deletes the secret permanently from the Vault
+     * storage and is used for cleanup operations.
+     */
+    public function remove(string $path): void
+    {
+        $path = $this->basePath . '/' . $path;
+        parent::delete($path);
+    }
 }
