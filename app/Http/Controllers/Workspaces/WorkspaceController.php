@@ -57,6 +57,18 @@ class WorkspaceController extends Controller
     }
 
     /**
+     * Switch to a different workspace.
+     */
+    public function switch(Workspace $workspace): RedirectResponse
+    {
+        $this->authorize('view', $workspace);
+
+        return redirect()->route('dashboard')
+            ->withCookie($this->setActiveWorkspaceCookie($workspace->id))
+            ->with('success', "Switched to {$workspace->name} workspace.");
+    }
+
+    /**
      * Set the active workspace cookie.
      */
     private function setActiveWorkspaceCookie(int $workspaceId): \Symfony\Component\HttpFoundation\Cookie

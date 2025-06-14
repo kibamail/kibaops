@@ -8,6 +8,8 @@ import { UserIcon } from "@/Components/Icons/user.svg";
 import { Text } from "@kibamail/owly/text";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import cn from "classnames";
+import { usePage } from "@inertiajs/react";
+import type { PageProps } from "@/types";
 
 interface WorkspacesDropdownMenuProps {
     rootId: string;
@@ -18,8 +20,15 @@ export function WorkspacesDropdownMenu({
     rootId,
     onCreateWorkspaceClick,
 }: WorkspacesDropdownMenuProps) {
-    const team = { name: "Ziba", id: "ziba" };
-    const allUserTeams: { id: string; name: string }[] = [];
+    const { workspaces, invitedWorkspaces, activeWorkspaceId } = usePage<PageProps>().props;
+
+    // Combine user's own workspaces and invited workspaces
+    const allWorkspaces = [...workspaces, ...invitedWorkspaces];
+
+    // Find the currently active workspace
+    const activeWorkspace = allWorkspaces.find(
+        workspace => workspace.id.toString() === activeWorkspaceId
+    ) || allWorkspaces[0]; // Fallback to first workspace if no active one is set
 
     return (
         <DropdownMenu.Root>
@@ -31,10 +40,10 @@ export function WorkspacesDropdownMenu({
                     className="grow flex items-center border transition ease-in-out border-(--border-tertiary) hover:bg-(--background-hover) focus:outline-none focus-within:border-(--border-focus) p-1 rounded-lg"
                 >
                     <span className="grow flex items-center">
-                        <TeamAvatar name={team?.name} size="md" />
+                        <TeamAvatar name={activeWorkspace?.name} size="md" />
 
                         <Text className="kb-content-primary truncate capitalize">
-                            {team?.name}
+                            {activeWorkspace?.name || 'Select Workspace'}
                         </Text>
                     </span>
 
@@ -51,23 +60,23 @@ export function WorkspacesDropdownMenu({
                 id={`${rootId}-dropdown-menu-content`}
                 className="border workspaces-dropdown-menu kb-border-tertiary absolute rounded-xl p-1 shadow-[0px_16px_24px_-8px_var(--black-10)] kb-background-primary w-70 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 z-50"
             >
-                <DropdownMenu.RadioGroup value={team?.id}>
-                    {allUserTeams?.map((team) => (
+                <DropdownMenu.RadioGroup value={activeWorkspace?.id.toString()}>
+                    {allWorkspaces.map((workspace) => (
                         <DropdownMenu.RadioItem
-                            key={team?.id}
-                            value={team?.id}
+                            key={workspace.id}
+                            value={workspace.id.toString()}
                             asChild
                         >
                             <a
-                                data-testid={`${rootId}-switch-team-id-${team?.id}`}
-                                href={route("teams_switch", {
-                                    teamId: team?.id,
+                                data-testid={`${rootId}-switch-workspace-id-${workspace.id}`}
+                                href={route("workspaces.switch", {
+                                    workspace: workspace.id,
                                 })}
                                 className="p-2 flex items-center hover:bg-(--background-secondary) rounded-lg cursor-pointer"
                             >
-                                <TeamAvatar name={team?.name} size="sm" />
+                                <TeamAvatar name={workspace.name} size="sm" />
                                 <Text className="kb-content-secondary capitalize">
-                                    {team?.name}
+                                    {workspace.name}
                                 </Text>
 
                                 <DropdownMenu.ItemIndicator className="ml-auto">

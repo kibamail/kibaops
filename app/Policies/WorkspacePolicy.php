@@ -20,7 +20,15 @@ class WorkspacePolicy
      */
     public function view(User $user, Workspace $workspace): bool
     {
-        return $user->id === $workspace->user_id;
+        // Workspace owner can always view
+        if ($user->id === $workspace->user_id) {
+            return true;
+        }
+
+        // Check if user has membership in this workspace
+        return $workspace->memberships()
+            ->where('user_id', $user->id)
+            ->exists();
     }
 
     /**

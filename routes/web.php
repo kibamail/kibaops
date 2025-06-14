@@ -26,6 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('workspaces', WorkspaceController::class)->only(['store', 'update', 'destroy']);
+    Route::get('/workspaces/{workspace}/switch', [WorkspaceController::class, 'switch'])->name('workspaces.switch');
     Route::resource('projects', ProjectController::class)->only(['store', 'show', 'update', 'destroy']);
     Route::resource('projects.environments', \App\Http\Controllers\Projects\EnvironmentController::class)->only(['store', 'update', 'destroy']);
     Route::resource('workspaces.memberships', \App\Http\Controllers\Workspaces\WorkspaceMembershipController::class)->except(['create', 'show', 'edit']);

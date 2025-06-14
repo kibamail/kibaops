@@ -103,3 +103,20 @@ test('creating workspace sets active workspace cookie', function () {
     $response->assertCookie('active_workspace_id', $workspace->id);
     $response->assertRedirect(route('dashboard'));
 });
+
+test('user can switch between workspaces', function () {
+    $user = User::factory()->create();
+
+    // Create two workspaces for the user
+    $workspace1 = $user->workspaces()->create(['name' => 'First Workspace']);
+    $workspace2 = $user->workspaces()->create(['name' => 'Second Workspace']);
+
+    // Switch to the second workspace
+    $response = $this
+        ->actingAs($user)
+        ->get(route('workspaces.switch', $workspace2));
+
+    $response->assertRedirect(route('dashboard'));
+    $response->assertCookie('active_workspace_id', $workspace2->id);
+    $response->assertSessionHas('success', "Switched to {$workspace2->name} workspace.");
+});
