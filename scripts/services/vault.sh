@@ -110,4 +110,3 @@ vault write auth/approle/role/$READ_APPROLE_NAME/custom-secret-id secret_id="$VA
 vault write auth/approle/role/$WRITE_APPROLE_NAME/custom-secret-id secret_id="$VAULT_WRITE_SECRET_ID" > /dev/null
 
 echo "✅ Vault configuration complete!"
-p
