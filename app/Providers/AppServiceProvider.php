@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Listeners\CreateDefaultWorkspace;
 use App\Listeners\UpdatePendingMemberships;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Event;
@@ -25,9 +26,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
 
-        Event::listen(
-            Registered::class,
-            UpdatePendingMemberships::class,
-        );
+        Event::listen(Registered::class, CreateDefaultWorkspace::class);
+        Event::listen(Registered::class, UpdatePendingMemberships::class);
     }
 }
