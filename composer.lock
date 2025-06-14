@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "83038c4e1b08bca0edfb24fe6b31b1ad",
+    "content-hash": "b8034d8d35398385c9f43f7e629ab377",
     "packages": [
         {
             "name": "alextartan/guzzle-psr18-adapter",
@@ -2500,58 +2500,6 @@
                 }
             ],
             "time": "2024-12-08T08:18:47+00:00"
-        },
-        {
-            "name": "mittwald/vault-php",
-            "version": "3.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mittwald/vaultPHP.git",
-                "reference": "33d43288be0bc72be64a694096bb94baa7d28675"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mittwald/vaultPHP/zipball/33d43288be0bc72be64a694096bb94baa7d28675",
-                "reference": "33d43288be0bc72be64a694096bb94baa7d28675",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "guzzlehttp/psr7": "^2.7.1",
-                "php": ">=8.3"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^v3.75.0",
-                "php-http/mock-client": "^1.6.1",
-                "phpunit/phpunit": "^12.1.5",
-                "vimeo/psalm": "^6.10.3"
-            },
-            "suggest": {
-                "guzzlehttp/guzzle": "HTTP Client Adapter"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "VaultPHP\\": "src\\VaultPHP\\"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Marco Rieger",
-                    "email": "m.rieger@mittwald.de"
-                }
-            ],
-            "description": "A PHP client library for 'Vault by HashiCorp'",
-            "homepage": "https://www.mittwald.de/",
-            "support": {
-                "issues": "https://github.com/mittwald/vaultPHP/issues",
-                "source": "https://github.com/mittwald/vaultPHP/tree/3.0.1"
-            },
-            "time": "2025-05-21T13:49:49+00:00"
         },
         {
             "name": "monolog/monolog",
