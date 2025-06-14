@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\WorkspaceMembershipRole;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class WorkspaceMembership extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuid;
 
     protected $fillable = [
         'workspace_id',
@@ -35,6 +36,8 @@ class WorkspaceMembership extends Model
 
     public function projects(): BelongsToMany
     {
-        return $this->belongsToMany(Project::class, 'workspace_membership_projects');
+        return $this->belongsToMany(Project::class, 'workspace_membership_projects')
+            ->using(WorkspaceMembershipProjectPivot::class)
+            ->withTimestamps();
     }
 }

@@ -21,7 +21,7 @@ class UpdateWorkspaceMembershipRequest extends FormRequest
             'project_ids' => ['required', 'array', 'min:1'],
             'project_ids.*' => [
                 'required',
-                'integer',
+                'string',
                 'exists:projects,id',
                 function (string $attribute, mixed $value, \Closure $fail) use ($workspace) {
                     if (! $workspace->projects()->where('id', $value)->exists()) {

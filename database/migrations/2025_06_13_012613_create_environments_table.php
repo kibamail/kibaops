@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('environments', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('slug');
-            $table->foreignId('project_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('project_id')->constrained()->onDelete('cascade');
             $table->timestamps();
 
             $table->unique(['project_id', 'slug']);

@@ -99,7 +99,7 @@ export function WorkspacesDropdownMenu({
 
                 <DropdownMenu.Item className="p-2 flex items-center hover:bg-(--background-secondary) rounded-lg cursor-pointer">
                     <UserPlusIcon className="mr-1.5 w-5 h-5 kb-content-tertiary" />
-                    <Text>Invite member</Text>
+                    <Text>Workspace members</Text>
                 </DropdownMenu.Item>
 
                 <DropdownMenu.Separator className="my-1 h-px bg-(--black-5)" />

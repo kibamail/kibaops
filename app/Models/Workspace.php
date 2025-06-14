@@ -3,16 +3,18 @@
 namespace App\Models;
 
 use App\Services\Vault\VaultService;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Ramsey\Uuid\Uuid;
 
 class Workspace extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuid;
 
     protected VaultService $vault;
 
@@ -72,10 +74,13 @@ class Workspace extends Model
 
         $membershipsData = collect($emails)->map(function ($email) use ($usersByEmail, $role) {
             return [
+                'id' => Uuid::uuid4()->toString(),
                 'workspace_id' => $this->id,
                 'email' => $email,
                 'user_id' => $usersByEmail->get($email)?->id,
                 'role' => $role,
+                'created_at' => now(),
+                'updated_at' => now(),
             ];
         });
 
@@ -83,7 +88,7 @@ class Workspace extends Model
             WorkspaceMembership::upsert(
                 $membershipsData->all(),
                 uniqueBy: ['workspace_id', 'email'],
-                update: ['user_id', 'role']
+                update: ['user_id', 'role', 'updated_at']
             );
 
             $memberships = $this->memberships()->whereIn('email', $membershipsData->pluck('email'))->get();

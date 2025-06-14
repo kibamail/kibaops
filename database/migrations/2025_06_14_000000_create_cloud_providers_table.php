@@ -9,10 +9,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('cloud_providers', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('name', 32);
             $table->enum('type', ['aws', 'hetzner', 'leaseweb', 'google_cloud', 'digital_ocean', 'linode', 'vultr']);
-            $table->foreignId('workspace_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('workspace_id')->constrained()->onDelete('cascade');
             $table->timestamps();
 
             $table->index(['workspace_id', 'type']);

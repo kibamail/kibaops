@@ -1,44 +1,44 @@
 import type { Config } from 'ziggy-js';
 
 export interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
   email_verified_at?: string;
 }
 
 export interface Workspace {
-  id: number;
+  id: string;
   name: string;
   slug: string;
-  user_id: number;
+  user_id: string;
   created_at: string;
   updated_at: string;
   projects?: Project[];
 }
 
 export interface Project {
-  id: number;
+  id: string;
   name: string;
   slug: string;
-  workspace_id: number;
+  workspace_id: string;
   created_at: string;
   updated_at: string;
   environments?: Environment[];
 }
 
 export interface Environment {
-  id: number;
+  id: string;
   slug: string;
-  project_id: number;
+  project_id: string;
   created_at: string;
   updated_at: string;
 }
 
 export interface WorkspaceMembership {
-  id: number;
-  workspace_id: number;
-  user_id: number | null;
+  id: string;
+  workspace_id: string;
+  user_id: string | null;
   email: string;
   role: 'developer' | 'admin';
   created_at: string;
@@ -49,9 +49,9 @@ export interface WorkspaceMembership {
 }
 
 export interface WorkspaceMembershipProject {
-  id: number;
-  workspace_membership_id: number;
-  project_id: number;
+  id: string;
+  workspace_membership_id: string;
+  project_id: string;
   created_at: string;
   updated_at: string;
 }

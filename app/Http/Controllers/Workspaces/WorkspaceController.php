@@ -71,7 +71,7 @@ class WorkspaceController extends Controller
     /**
      * Set the active workspace cookie.
      */
-    private function setActiveWorkspaceCookie(int $workspaceId): \Symfony\Component\HttpFoundation\Cookie
+    private function setActiveWorkspaceCookie(string $workspaceId): \Symfony\Component\HttpFoundation\Cookie
     {
         return cookie('active_workspace_id', $workspaceId, 0, null, null, false, false);
     }
