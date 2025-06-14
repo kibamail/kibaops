@@ -2,12 +2,12 @@
 
 namespace App\Services\Vault;
 
-use Vault\Client;
-use Laminas\Diactoros\Uri;
+use AlexTartan\GuzzlePsr18Adapter\Client as GuzzleClient;
 use Laminas\Diactoros\RequestFactory;
 use Laminas\Diactoros\StreamFactory;
-use AlexTartan\GuzzlePsr18Adapter\Client as GuzzleClient;
+use Laminas\Diactoros\Uri;
 use Vault\AuthenticationStrategies\AppRoleAuthenticationStrategy;
+use Vault\Client;
 
 class VaultWritesClient extends Client
 {
@@ -17,9 +17,9 @@ class VaultWritesClient extends Client
     {
         parent::__construct(
             new Uri($config['address']),
-            new GuzzleClient(),
-            new RequestFactory(),
-            new StreamFactory()
+            new GuzzleClient,
+            new RequestFactory,
+            new StreamFactory
         );
 
         $this->setAuthenticationStrategy(
@@ -29,18 +29,17 @@ class VaultWritesClient extends Client
             )
         )->authenticate();
 
-        
         $this->basePath = $basePath;
     }
 
     public function store(string $path, string|array $data)
     {
-        $path = $this->basePath . '/' . $path;
+        $path = $this->basePath.'/'.$path;
 
-        parent::write($path,[
-            'data' =>  [
-                'value' => $data
-            ]
+        parent::write($path, [
+            'data' => [
+                'value' => $data,
+            ],
         ]);
 
         return $path;
@@ -53,7 +52,7 @@ class VaultWritesClient extends Client
      */
     public function remove(string $path): void
     {
-        $path = $this->basePath . '/' . $path;
+        $path = $this->basePath.'/'.$path;
         parent::delete($path);
     }
 }

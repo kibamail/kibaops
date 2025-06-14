@@ -12,6 +12,7 @@ class UpdateEnvironmentRequest extends FormRequest
     public function authorize(): bool
     {
         $environment = $this->route('environment');
+
         return $this->user()->can('update', $environment);
     }
 
@@ -33,7 +34,7 @@ class UpdateEnvironmentRequest extends FormRequest
                     if ($project->environments()->where('slug', $value)->where('id', '!=', $environment->id)->exists()) {
                         $fail('The slug has already been taken for this project.');
                     }
-                }
+                },
             ],
         ];
     }

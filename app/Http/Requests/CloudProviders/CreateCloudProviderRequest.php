@@ -17,6 +17,7 @@ class CreateCloudProviderRequest extends FormRequest
     public function authorize(): bool
     {
         $workspace = $this->route('workspace');
+
         return $this->user()->can('update', $workspace);
     }
 
@@ -34,7 +35,7 @@ class CreateCloudProviderRequest extends FormRequest
             'type' => [
                 'required',
                 Rule::enum(CloudProviderType::class),
-                new ImplementedCloudProviderType(),
+                new ImplementedCloudProviderType,
             ],
             'credentials' => [
                 'required',

@@ -36,6 +36,7 @@ abstract class AbstractCloudProvider implements CloudProviderInterface
             } else {
                 $response = $this->http->{$method}($url, $options);
             }
+
             return $response->successful();
         } catch (\Exception) {
             return false;

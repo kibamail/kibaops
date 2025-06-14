@@ -6,7 +6,6 @@ use App\Models\Workspace;
 use App\Models\WorkspaceMembership;
 use App\Notifications\WorkspaceInvitation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-
 use Illuminate\Support\Facades\Notification;
 
 uses(RefreshDatabase::class);
@@ -17,7 +16,7 @@ test('existing users receive email and database notifications when added to work
     $workspaceOwner = User::factory()->create();
     $workspace = Workspace::factory()->create(['user_id' => $workspaceOwner->id]);
     $project = Project::factory()->create(['workspace_id' => $workspace->id]);
-    
+
     $existingUser = User::factory()->create(['email' => 'existing@example.com']);
 
     $response = $this
@@ -108,7 +107,7 @@ test('workspace invitation email contains correct content', function () {
     $workspaceOwner = User::factory()->create();
     $workspace = Workspace::factory()->create(['user_id' => $workspaceOwner->id]);
     $user = User::factory()->create();
-    
+
     $membership = WorkspaceMembership::create([
         'workspace_id' => $workspace->id,
         'user_id' => $user->id,
@@ -131,7 +130,7 @@ test('workspace invitation database notification contains correct data', functio
     $workspaceOwner = User::factory()->create();
     $workspace = Workspace::factory()->create(['user_id' => $workspaceOwner->id]);
     $user = User::factory()->create();
-    
+
     $membership = WorkspaceMembership::create([
         'workspace_id' => $workspace->id,
         'user_id' => $user->id,
@@ -148,7 +147,7 @@ test('workspace invitation database notification contains correct data', functio
         'membership_id',
         'role',
         'added_by',
-        'message'
+        'message',
     ])
         ->and($data['workspace_id'])->toBe($workspace->id)
         ->and($data['workspace_name'])->toBe($workspace->name)
@@ -206,7 +205,7 @@ test('notification is queued for background processing', function () {
     $workspaceOwner = User::factory()->create();
     $workspace = Workspace::factory()->create(['user_id' => $workspaceOwner->id]);
     $user = User::factory()->create();
-    
+
     $membership = WorkspaceMembership::create([
         'workspace_id' => $workspace->id,
         'user_id' => $user->id,
@@ -215,6 +214,6 @@ test('notification is queued for background processing', function () {
     ]);
 
     $notification = new WorkspaceInvitation($membership, $workspace);
-    
+
     expect($notification)->toBeInstanceOf(\Illuminate\Contracts\Queue\ShouldQueue::class);
 });

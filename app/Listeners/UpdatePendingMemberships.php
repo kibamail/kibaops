@@ -32,7 +32,7 @@ class UpdatePendingMemberships implements ShouldQueue
 
         foreach ($pendingMemberships as $membership) {
             $membership->update(['user_id' => $user->id]);
-            
+
             $user->notify(new WorkspaceInvitation($membership, $membership->workspace));
         }
     }

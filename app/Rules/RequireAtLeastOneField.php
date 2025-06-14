@@ -31,7 +31,7 @@ class RequireAtLeastOneField implements ValidationRule
             }
         }
 
-        if (!$hasAtLeastOne) {
+        if (! $hasAtLeastOne) {
             $fieldList = implode(' or ', $this->fields);
             $fail("At least one of the following fields is required: {$fieldList}.");
         }

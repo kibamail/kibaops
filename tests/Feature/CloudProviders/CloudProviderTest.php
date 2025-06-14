@@ -9,7 +9,6 @@ use App\Services\CloudProviders\DigitalOceanCloudProvider;
 use App\Services\CloudProviders\HetznerCloudProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Factory as HttpClient;
-
 use Illuminate\Support\Facades\Http;
 
 uses(RefreshDatabase::class);
@@ -261,7 +260,7 @@ test('cloud provider factory creates correct provider instances', function () {
     $doProvider = $factory->create(CloudProviderType::DIGITAL_OCEAN);
     expect($doProvider)->toBeInstanceOf(DigitalOceanCloudProvider::class);
 
-    expect(fn() => $factory->create(CloudProviderType::AWS))
+    expect(fn () => $factory->create(CloudProviderType::AWS))
         ->toThrow(InvalidArgumentException::class, "Cloud provider type 'aws' is not implemented yet.");
 });
 

@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\CloudProviders;
 
-
 use App\Rules\ValidCloudProviderCredentials;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -16,6 +15,7 @@ class UpdateCloudProviderRequest extends FormRequest
     public function authorize(): bool
     {
         $workspace = $this->route('workspace');
+
         return $this->user()->can('update', $workspace);
     }
 
@@ -50,7 +50,7 @@ class UpdateCloudProviderRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            if (!$this->has('name') && !$this->has('credentials')) {
+            if (! $this->has('name') && ! $this->has('credentials')) {
                 $validator->errors()->add('name', 'At least one of the following fields is required: name or credentials.');
             }
         });

@@ -42,9 +42,9 @@ class WorkspaceInvitation extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->subject("You've been added to {$this->workspace->name}")
-            ->greeting("Hello!")
+            ->greeting('Hello!')
             ->line("You have been added to the workspace '{$this->workspace->name}' as a {$this->membership->role->value}.")
-            ->line("You can now access this workspace and collaborate with your team.")
+            ->line('You can now access this workspace and collaborate with your team.')
             ->action('Go to Dashboard', $dashboardUrl)
             ->line('Welcome to the team!');
     }

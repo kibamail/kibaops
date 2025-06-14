@@ -13,6 +13,7 @@ class CreateEnvironmentRequest extends FormRequest
     public function authorize(): bool
     {
         $project = $this->route('project');
+
         return $this->user()->can('create', [Environment::class, $project]);
     }
 
@@ -33,7 +34,7 @@ class CreateEnvironmentRequest extends FormRequest
                     if ($project->environments()->where('slug', $value)->exists()) {
                         $fail('The slug has already been taken for this project.');
                     }
-                }
+                },
             ],
         ];
     }

@@ -2,12 +2,12 @@
 
 namespace App\Services\Vault;
 
-use Vault\Client;
-use Laminas\Diactoros\Uri;
+use AlexTartan\GuzzlePsr18Adapter\Client as GuzzleClient;
 use Laminas\Diactoros\RequestFactory;
 use Laminas\Diactoros\StreamFactory;
-use AlexTartan\GuzzlePsr18Adapter\Client as GuzzleClient;
+use Laminas\Diactoros\Uri;
 use Vault\AuthenticationStrategies\AppRoleAuthenticationStrategy;
+use Vault\Client;
 
 class VaultReadsClient extends Client
 {
@@ -17,9 +17,9 @@ class VaultReadsClient extends Client
     {
         parent::__construct(
             new Uri($config['address']),
-            new GuzzleClient(),
-            new RequestFactory(),
-            new StreamFactory()
+            new GuzzleClient,
+            new RequestFactory,
+            new StreamFactory
         );
 
         $this->setAuthenticationStrategy(
@@ -32,8 +32,9 @@ class VaultReadsClient extends Client
         $this->basePath = $basePath;
     }
 
-    public function secret(string $path) {
-        $path = $this->basePath . '/' . $path;
+    public function secret(string $path)
+    {
+        $path = $this->basePath.'/'.$path;
 
         return parent::read($path)->getData()['data']['value'];
     }

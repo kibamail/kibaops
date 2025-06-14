@@ -17,7 +17,7 @@ class ImplementedCloudProviderType implements ValidationRule
     {
         $type = CloudProviderType::tryFrom($value);
 
-        if ($type && !in_array($type, CloudProviderType::implemented())) {
+        if ($type && ! in_array($type, CloudProviderType::implemented())) {
             $fail("Cloud provider type '{$type->label()}' is not implemented yet.");
         }
     }

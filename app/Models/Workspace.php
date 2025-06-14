@@ -122,7 +122,7 @@ class Workspace extends Model
      */
     public function updateCloudProvider(CloudProvider $cloudProvider, array $data, ?string $credentials = null): CloudProvider
     {
-        if (!empty($data)) {
+        if (! empty($data)) {
             $cloudProvider->update($data);
         }
 
@@ -162,7 +162,8 @@ class Workspace extends Model
             });
     }
 
-    public function vault(): VaultService {
+    public function vault(): VaultService
+    {
         if (isset($this->vault)) {
             return $this->vault;
         }

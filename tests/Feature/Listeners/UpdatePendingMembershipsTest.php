@@ -29,7 +29,7 @@ test('listener updates pending memberships when user registers', function () {
     $newUser = User::factory()->create(['email' => 'pending@example.com']);
     $event = new Registered($newUser);
 
-    $listener = new UpdatePendingMemberships();
+    $listener = new UpdatePendingMemberships;
     $listener->handle($event);
 
     $membership = WorkspaceMembership::where('email', 'pending@example.com')->first();
@@ -70,7 +70,7 @@ test('listener handles multiple pending memberships for same email', function ()
     $newUser = User::factory()->create(['email' => 'multi@example.com']);
     $event = new Registered($newUser);
 
-    $listener = new UpdatePendingMemberships();
+    $listener = new UpdatePendingMemberships;
     $listener->handle($event);
 
     $memberships = WorkspaceMembership::where('email', 'multi@example.com')->get();
@@ -86,7 +86,7 @@ test('listener does nothing when no pending memberships exist', function () {
     $newUser = User::factory()->create(['email' => 'nopending@example.com']);
     $event = new Registered($newUser);
 
-    $listener = new UpdatePendingMemberships();
+    $listener = new UpdatePendingMemberships;
     $listener->handle($event);
 
     Notification::assertNothingSent();
@@ -115,7 +115,7 @@ test('listener only updates memberships with matching email', function () {
     $newUser = User::factory()->create(['email' => 'match@example.com']);
     $event = new Registered($newUser);
 
-    $listener = new UpdatePendingMemberships();
+    $listener = new UpdatePendingMemberships;
     $listener->handle($event);
 
     $membership1->refresh();
@@ -128,7 +128,7 @@ test('listener only updates memberships with matching email', function () {
 });
 
 test('listener is queued for background processing', function () {
-    $listener = new UpdatePendingMemberships();
-    
+    $listener = new UpdatePendingMemberships;
+
     expect($listener)->toBeInstanceOf(\Illuminate\Contracts\Queue\ShouldQueue::class);
 });

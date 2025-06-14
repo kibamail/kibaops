@@ -26,10 +26,10 @@ class CreateWorkspaceMembershipRequest extends FormRequest
                 'integer',
                 'exists:projects,id',
                 function (string $attribute, mixed $value, \Closure $fail) use ($workspace) {
-                    if (!$workspace->projects()->where('id', $value)->exists()) {
+                    if (! $workspace->projects()->where('id', $value)->exists()) {
                         $fail('The selected project does not belong to this workspace.');
                     }
-                }
+                },
             ],
             'role' => ['required', Rule::enum(WorkspaceMembershipRole::class)],
         ];

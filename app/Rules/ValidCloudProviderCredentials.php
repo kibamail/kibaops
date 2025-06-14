@@ -23,14 +23,14 @@ class ValidCloudProviderCredentials implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!in_array($this->type, CloudProviderType::implemented())) {
+        if (! in_array($this->type, CloudProviderType::implemented())) {
             return;
         }
 
         $factory = app(CloudProviderFactory::class);
         $provider = $factory->create($this->type);
 
-        if (!$provider->verify($value)) {
+        if (! $provider->verify($value)) {
             $fail('The provided credentials could not be verified. Please check your credentials and try again.');
         }
     }

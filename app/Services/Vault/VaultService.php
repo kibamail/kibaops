@@ -2,19 +2,14 @@
 
 namespace App\Services\Vault;
 
-use Vault\Client;
-use Laminas\Diactoros\Uri;
-use Laminas\Diactoros\RequestFactory;
-use Laminas\Diactoros\StreamFactory;
-use AlexTartan\GuzzlePsr18Adapter\Client as GuzzleClient;
-use Vault\AuthenticationStrategies\AppRoleAuthenticationStrategy;
-
 class VaultService
 {
     private array $config;
+
     private string $basePath = 'secrets/data';
 
     private VaultReadsClient $reads;
+
     private VaultWritesClient $writes;
 
     public function base(string $base)
@@ -29,7 +24,8 @@ class VaultService
         $this->config = $config;
     }
 
-    public function reads() {
+    public function reads()
+    {
 
         if (isset($this->reads)) {
             return $this->reads;
@@ -42,7 +38,8 @@ class VaultService
         return $client;
     }
 
-    public function writes() {
+    public function writes()
+    {
         if (isset($this->writes)) {
             return $this->writes;
         }
