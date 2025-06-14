@@ -9,7 +9,7 @@ export default function Authenticated({ children }: PropsWithChildren) {
             <main className="w-full kb-background-secondary flex flex-col h-[calc(100vh-5rem)] overflow-y-hidden">
                 <div className="w-full pr-2 flex pl-2 h-full">
                     <div className="w-full rounded-lg border border-b kb-border-tertiary overflow-y-auto h-full flex-grow">
-                        <div className="flex flex-grow w-full">{children}</div>
+                        <div className="flex flex-grow w-full h-full">{children}</div>
                     </div>
                 </div>
             </main>

@@ -1,6 +1,7 @@
 import { FooterMenuItems } from "@/Components/Dashboard/FooterMenuItems";
 import { SearchBoxTrigger } from "./SearchBoxTrigger";
 import { WorkspacesDropdownMenu } from "./WorkspaceDropdownMenu";
+import { ProjectsDropdownMenu } from "./ProjectsDropdownMenu";
 import { CreateWorkspaceFlow } from "./CreateWorkspaceFlow";
 import { KibaIcon } from "@/Components/Icons/kiba.svg";
 import { SlashesIcon } from "../Icons/slashes.svg";
@@ -32,9 +33,11 @@ export function Topbar() {
                         onCreateWorkspaceClick={handleCreateWorkspaceClick}
                     />
 
-                    {/* <SlashesIcon width={24} height={24} viewBox="0 0 24 24" /> */}
+                    <SlashesIcon width={24} height={24} viewBox="0 0 24 24" />
 
-                    {/* <WorkspacesDropdownMenu rootId="topbar-workspaces" /> */}
+                    <ProjectsDropdownMenu
+                        rootId="topbar-projects"
+                    />
                 </div>
 
                 <div className="max-w-md hidden lg:flex w-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 justify-center items-center">

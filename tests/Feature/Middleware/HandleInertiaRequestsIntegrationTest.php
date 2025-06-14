@@ -46,6 +46,9 @@ test('authenticated user receives workspaces and invited workspaces in shared da
         ->where('invitedWorkspaces.0.projects.0.id', $invitedProjects->get(0)->id)
         ->where('invitedWorkspaces.0.projects.1.id', $invitedProjects->get(1)->id)
         ->where('invitedWorkspaces.0.projects.2.id', $invitedProjects->get(2)->id)
+        ->has('projects', 0)
+        ->where('activeProject', null)
+        ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -64,6 +67,9 @@ test('authenticated user with only owned workspaces receives empty invited works
         ->has('invitedWorkspaces', 0)
         ->where('workspaces.0.id', $ownedWorkspace->id)
         ->has('workspaces.0.projects', 2)
+        ->has('projects', 0)
+        ->where('activeProject', null)
+        ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -90,6 +96,9 @@ test('authenticated user with only invited workspaces receives empty owned works
         ->has('invitedWorkspaces', 1)
         ->where('invitedWorkspaces.0.id', $invitedWorkspace->id)
         ->has('invitedWorkspaces.0.projects', 2)
+        ->has('projects', 0)
+        ->where('activeProject', null)
+        ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -103,6 +112,9 @@ test('authenticated user with no workspaces receives empty arrays', function () 
     $response->assertInertia(fn (Assert $page) => $page
         ->has('workspaces', 0)
         ->has('invitedWorkspaces', 0)
+        ->has('projects', 0)
+        ->where('activeProject', null)
+        ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -112,6 +124,9 @@ test('unauthenticated user receives empty arrays for workspaces', function () {
     $response->assertInertia(fn (Assert $page) => $page
         ->has('workspaces', 0)
         ->has('invitedWorkspaces', 0)
+        ->has('projects', 0)
+        ->where('activeProject', null)
+        ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -140,6 +155,9 @@ test('workspaces are ordered by latest first', function () {
         ->where('workspaces.0.id', $thirdWorkspace->id)
         ->where('workspaces.1.id', $secondWorkspace->id)
         ->where('workspaces.2.id', $firstWorkspace->id)
+        ->has('projects', 0)
+        ->where('activeProject', null)
+        ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -179,6 +197,9 @@ test('invited workspaces are ordered by latest first', function () {
         ->where('invitedWorkspaces.0.id', $thirdWorkspace->id)
         ->where('invitedWorkspaces.1.id', $secondWorkspace->id)
         ->where('invitedWorkspaces.2.id', $firstWorkspace->id)
+        ->has('projects', 0)
+        ->where('activeProject', null)
+        ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -194,6 +215,9 @@ test('shared data is available across different inertia routes', function () {
     $dashboardResponse->assertInertia(fn (Assert $page) => $page
         ->has('workspaces', 1)
         ->has('invitedWorkspaces', 0)
+        ->has('projects', 0)
+        ->where('activeProject', null)
+        ->where('cloudProvidersCount', 0)
     );
 
     $profileResponse = $this
@@ -203,6 +227,9 @@ test('shared data is available across different inertia routes', function () {
     $profileResponse->assertInertia(fn (Assert $page) => $page
         ->has('workspaces', 1)
         ->has('invitedWorkspaces', 0)
+        ->has('projects', 0)
+        ->where('activeProject', null)
+        ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -237,5 +264,114 @@ test('active workspace id is null for unauthenticated users', function () {
 
     $response->assertInertia(fn (Assert $page) => $page
         ->where('activeWorkspaceId', null)
+    );
+});
+
+test('projects are loaded for active workspace', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
+    $projects = Project::factory()->count(3)->create(['workspace_id' => $workspace->id]);
+
+    $response = $this
+        ->actingAs($user)
+        ->withCookie('active_workspace_id', $workspace->id)
+        ->get(route('dashboard'));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->has('projects', 3)
+        ->where('projects.0.id', $projects->get(0)->id)
+        ->where('projects.1.id', $projects->get(1)->id)
+        ->where('projects.2.id', $projects->get(2)->id)
+        ->where('activeProject', null)
+        ->where('cloudProvidersCount', 0)
+    );
+});
+
+test('active project is extracted from project show route', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
+    $project = Project::factory()->create(['workspace_id' => $workspace->id]);
+
+    $response = $this
+        ->actingAs($user)
+        ->withCookie('active_workspace_id', $workspace->id)
+        ->get(route('projects.show', $project));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->has('projects', 1)
+        ->where('projects.0.id', $project->id)
+        ->where('activeProject.id', $project->id)
+        ->where('activeProject.name', $project->name)
+        ->where('cloudProvidersCount', 0)
+    );
+});
+
+test('active project is null when no project id in url', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
+    Project::factory()->count(2)->create(['workspace_id' => $workspace->id]);
+
+    $response = $this
+        ->actingAs($user)
+        ->withCookie('active_workspace_id', $workspace->id)
+        ->get(route('dashboard'));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->has('projects', 2)
+        ->where('activeProject', null)
+        ->where('cloudProvidersCount', 0)
+    );
+});
+
+test('projects are empty when no active workspace', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
+    Project::factory()->count(2)->create(['workspace_id' => $workspace->id]);
+
+    $response = $this
+        ->actingAs($user)
+        ->get(route('dashboard'));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->has('projects', 0)
+        ->where('activeProject', null)
+        ->where('cloudProvidersCount', 0)
+    );
+});
+
+test('cloud providers count is returned for active workspace', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
+
+    // Create some cloud providers for the workspace
+    \App\Models\CloudProvider::factory()->count(3)->create([
+        'workspace_id' => $workspace->id,
+    ]);
+
+    $response = $this
+        ->actingAs($user)
+        ->withCookie('active_workspace_id', $workspace->id)
+        ->get(route('dashboard'));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->where('cloudProvidersCount', 3)
+    );
+});
+
+test('cloud providers count is zero when no active workspace', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
+
+    // Create cloud providers but don't set active workspace
+    \App\Models\CloudProvider::factory()->count(2)->create([
+        'workspace_id' => $workspace->id,
+    ]);
+
+    $response = $this
+        ->actingAs($user)
+        ->get(route('dashboard'));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->where('cloudProvidersCount', 0)
     );
 });

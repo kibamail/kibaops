@@ -56,6 +56,25 @@ export interface WorkspaceMembershipProject {
   updated_at: string;
 }
 
+export type CloudProviderType =
+  | 'aws'
+  | 'hetzner'
+  | 'leaseweb'
+  | 'google_cloud'
+  | 'digital_ocean'
+  | 'linode'
+  | 'vultr'
+  | 'ovh';
+
+export interface CloudProvider {
+  id: string;
+  name: string;
+  type: CloudProviderType;
+  workspace_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
   auth: {
     user: User;
@@ -63,5 +82,8 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
   workspaces: Workspace[];
   invitedWorkspaces: Workspace[];
   activeWorkspaceId: string | null;
+  projects: Project[];
+  activeProject: Project | null;
+  cloudProvidersCount: number;
   ziggy: Config & { location: string };
 };
