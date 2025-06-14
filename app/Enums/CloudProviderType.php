@@ -11,6 +11,7 @@ enum CloudProviderType: string
     case DIGITAL_OCEAN = 'digital_ocean';
     case LINODE = 'linode';
     case VULTR = 'vultr';
+    case OVH = 'ovh';
 
     /**
      * Get the human-readable label for the cloud provider type.
@@ -25,6 +26,7 @@ enum CloudProviderType: string
             self::DIGITAL_OCEAN => 'DigitalOcean',
             self::LINODE => 'Linode',
             self::VULTR => 'Vultr',
+            self::OVH => 'OVH',
         };
     }
 
@@ -278,6 +280,24 @@ enum CloudProviderType: string
                     ['name' => 'Tokyo, Japan', 'slug' => 'tyo-10'],
                 ],
             ],
+            self::OVH => [
+                'North America' => [
+                    ['name' => 'Beauharnois, Canada', 'slug' => 'bhs'],
+                    ['name' => 'Hillsboro, USA', 'slug' => 'us-west-or-1'],
+                    ['name' => 'Vint Hill, USA', 'slug' => 'us-east-va-1'],
+                ],
+                'Europe' => [
+                    ['name' => 'Gravelines, France', 'slug' => 'gra'],
+                    ['name' => 'Strasbourg, France', 'slug' => 'sbg'],
+                    ['name' => 'Frankfurt, Germany', 'slug' => 'de'],
+                    ['name' => 'London, United Kingdom', 'slug' => 'uk'],
+                    ['name' => 'Warsaw, Poland', 'slug' => 'waw'],
+                ],
+                'Asia Pacific' => [
+                    ['name' => 'Singapore', 'slug' => 'sgp'],
+                    ['name' => 'Sydney, Australia', 'slug' => 'syd'],
+                ],
+            ],
         };
     }
 
@@ -316,6 +336,21 @@ enum CloudProviderType: string
             $flatRegions = array_merge($flatRegions, $regions);
         }
         return $flatRegions;
+    }
+
+    /**
+     * Get all cloud provider data for frontend consumption.
+     * Returns an array with provider information including type, name, and implementation status.
+     */
+    public static function allProviders(): array
+    {
+        $implementedTypes = collect(self::implemented())->pluck('value')->toArray();
+
+        return collect(self::cases())->map(fn ($case) => [
+            'type' => $case->value,
+            'name' => $case->label(),
+            'implemented' => in_array($case->value, $implementedTypes),
+        ])->toArray();
     }
 
     /**

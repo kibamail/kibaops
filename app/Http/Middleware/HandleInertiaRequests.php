@@ -64,6 +64,7 @@ class HandleInertiaRequests extends Middleware
             'projects' => $projects,
             'activeProject' => $activeProject,
             'cloudProvidersCount' => $cloudProvidersCount,
+            'cloudProviders' => CloudProviderType::allProviders(),
             'cloudProviderRegions' => CloudProviderType::allRegions(),
             'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),

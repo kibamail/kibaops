@@ -10,74 +10,46 @@ import { PlusIcon } from "@/Components/Icons/plus.svg";
 import { Button } from "@kibamail/owly";
 import { Heading } from "@kibamail/owly/heading";
 import { Text } from "@kibamail/owly/text";
-import type { CloudProviderType } from "@/types";
+import type { CloudProviderType, CloudProviderInfo } from "@/types";
 import { CloudWaterdropIcon } from "@/Components/Icons/cloud-waterdrop.svg";
+import { usePage } from "@inertiajs/react";
 
-interface CloudProviderInfo {
-    type: CloudProviderType;
-    name: string;
+interface CloudProviderWithIcon extends CloudProviderInfo {
     icon: React.ComponentType<{ className?: string }>;
-    implemented: boolean;
 }
 
-const cloudProviders: CloudProviderInfo[] = [
-    // Available providers first
-    {
-        type: 'hetzner',
-        name: 'Hetzner Cloud',
-        icon: HetznerIcon,
-        implemented: true,
-    },
-    {
-        type: 'digital_ocean',
-        name: 'DigitalOcean',
-        icon: DigitalOceanIcon,
-        implemented: true,
-    },
-    // Coming soon providers
-    {
-        type: 'aws',
-        name: 'Amazon Web Services',
-        icon: AWSIcon,
-        implemented: false,
-    },
-    {
-        type: 'google_cloud',
-        name: 'Google Cloud Platform',
-        icon: GoogleCloudIcon,
-        implemented: false,
-    },
-    {
-        type: 'leaseweb',
-        name: 'LeaseWeb',
-        icon: LeaseWebIcon,
-        implemented: false,
-    },
-    {
-        type: 'linode',
-        name: 'Linode',
-        icon: LinodeIcon,
-        implemented: false,
-    },
-    {
-        type: 'ovh',
-        name: 'OVH',
-        icon: OVHIcon,
-        implemented: false,
-    },
-    {
-        type: 'vultr',
-        name: 'Vultr',
-        icon: VultrIcon,
-        implemented: false,
-    },
-];
+// Icon mapping for cloud providers
+const providerIcons: Record<CloudProviderType, React.ComponentType<{ className?: string }>> = {
+    aws: AWSIcon,
+    hetzner: HetznerIcon,
+    leaseweb: LeaseWebIcon,
+    google_cloud: GoogleCloudIcon,
+    digital_ocean: DigitalOceanIcon,
+    linode: LinodeIcon,
+    vultr: VultrIcon,
+    ovh: OVHIcon,
+};
 
 export function NoCloudProviders() {
+    const { cloudProviders } = usePage().props;
+
     const handleConnectProvider = (providerType: CloudProviderType) => {
         // TODO: Implement cloud provider connection flow
         console.log(`Connect ${providerType} provider`);
     };
+
+    // Combine backend data with frontend icons, sort by implementation status
+    const cloudProvidersWithIcons: CloudProviderWithIcon[] = cloudProviders
+        .map((provider) => ({
+            ...provider,
+            icon: providerIcons[provider.type],
+        }))
+        .sort((a, b) => {
+            // Available providers first
+            if (a.implemented && !b.implemented) return -1;
+            if (!a.implemented && b.implemented) return 1;
+            return 0;
+        });
 
     return (
         <div className="w-full h-full kb-background-hover flex flex-col items-center pt-24">
@@ -100,7 +72,7 @@ export function NoCloudProviders() {
                 </div>
 
                 <div className="w-full mt-6 flex flex-col gap-4 max-w-lg mx-auto">
-                    {cloudProviders.map((provider) => {
+                    {cloudProvidersWithIcons.map((provider) => {
                         const IconComponent = provider.icon;
                         return (
                             <div

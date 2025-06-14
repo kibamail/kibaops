@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('cloud_providers', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name', 32);
-            $table->enum('type', ['aws', 'hetzner', 'leaseweb', 'google_cloud', 'digital_ocean', 'linode', 'vultr']);
+            $table->enum('type', ['aws', 'hetzner', 'leaseweb', 'google_cloud', 'digital_ocean', 'linode', 'vultr', 'ovh']);
             $table->foreignUuid('workspace_id')->constrained()->onDelete('cascade');
             $table->timestamps();
 

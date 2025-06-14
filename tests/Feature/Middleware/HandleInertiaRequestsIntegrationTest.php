@@ -392,6 +392,7 @@ test('cloud provider regions are shared with frontend grouped by continent', fun
         ->has('cloudProviderRegions.vultr')
         ->has('cloudProviderRegions.linode')
         ->has('cloudProviderRegions.leaseweb')
+        ->has('cloudProviderRegions.ovh')
         // Check continent grouping for Hetzner
         ->has('cloudProviderRegions.hetzner.Europe')
         ->has('cloudProviderRegions.hetzner.North America')
@@ -422,7 +423,8 @@ test('cloud provider regions contain correct continent-grouped structure for all
             ->has('cloudProviderRegions.google_cloud')
             ->has('cloudProviderRegions.vultr')
             ->has('cloudProviderRegions.linode')
-            ->has('cloudProviderRegions.leaseweb');
+            ->has('cloudProviderRegions.leaseweb')
+            ->has('cloudProviderRegions.ovh');
 
         // Check continent-grouped structure for Hetzner
         $page->has('cloudProviderRegions.hetzner.Europe')
@@ -446,4 +448,34 @@ test('cloud provider regions contain correct continent-grouped structure for all
             ->has('cloudProviderRegions.aws.Africa')
             ->has('cloudProviderRegions.aws.South America');
     });
+});
+
+test('cloud providers data is shared with frontend with correct structure', function () {
+    $user = User::factory()->create();
+
+    $response = $this
+        ->actingAs($user)
+        ->get(route('dashboard'));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->has('cloudProviders')
+        ->has('cloudProviders.0.type')
+        ->has('cloudProviders.0.name')
+        ->has('cloudProviders.0.implemented')
+        // Check that all expected providers are present
+        ->where('cloudProviders.0.type', 'aws')
+        ->where('cloudProviders.0.name', 'Amazon Web Services')
+        ->where('cloudProviders.0.implemented', false)
+        // Check that implemented providers are marked correctly
+        ->whereContains('cloudProviders', fn ($provider) =>
+            $provider['type'] === 'hetzner' && $provider['implemented'] === true
+        )
+        ->whereContains('cloudProviders', fn ($provider) =>
+            $provider['type'] === 'digital_ocean' && $provider['implemented'] === true
+        )
+        // Check that OVH is included
+        ->whereContains('cloudProviders', fn ($provider) =>
+            $provider['type'] === 'ovh' && $provider['name'] === 'OVH' && $provider['implemented'] === false
+        )
+    );
 });
