@@ -16,10 +16,7 @@ export default function Show({ project }: PageProps<{ project: Project }>) {
           <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div className="p-6 text-gray-900">
               <div className="mb-6">
-                <Link
-                  href={route('dashboard')}
-                  className="text-blue-500 hover:underline"
-                >
+                <Link href={route('dashboard')} className="text-blue-500 hover:underline">
                   ← Back to Dashboard
                 </Link>
               </div>

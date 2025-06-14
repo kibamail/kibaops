@@ -1,5 +1,5 @@
+import type { PageProps, Workspace, WorkspaceMembership } from '@/types';
 import { Head } from '@inertiajs/react';
-import { PageProps, Workspace, WorkspaceMembership } from '@/types';
 
 interface Props extends PageProps {
   workspace: Workspace;
@@ -14,9 +14,7 @@ export default function Index({ workspace, memberships }: Props) {
         <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
           <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div className="p-6 text-gray-900">
-              <h1 className="text-2xl font-bold mb-4">
-                Workspace Memberships: {workspace.name}
-              </h1>
+              <h1 className="text-2xl font-bold mb-4">Workspace Memberships: {workspace.name}</h1>
               <p>Memberships count: {memberships.length}</p>
             </div>
           </div>

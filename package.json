@@ -6,8 +6,6 @@
         "build": "tsc && vite build && vite build --ssr",
         "dev": "vite",
         "typecheck": "tsc --noEmit",
-        "lint": "eslint resources/js --ext .js,.jsx,.ts,.tsx",
-        "lint:fix": "eslint resources/js --ext .js,.jsx,.ts,.tsx --fix",
         "biome:check": "biome check .",
         "biome:fix": "biome check --write --unsafe ."
     },
