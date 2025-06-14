@@ -47,7 +47,7 @@ class VaultService
             return $this->writes;
         }
 
-        $wirtes = new VaultWritesClient($this->config);
+        $wirtes = new VaultWritesClient($this->config, $this->basePath);
 
         $this->writes = $wirtes;
 

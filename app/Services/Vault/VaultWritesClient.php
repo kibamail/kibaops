@@ -11,7 +11,9 @@ use Vault\AuthenticationStrategies\AppRoleAuthenticationStrategy;
 
 class VaultWritesClient extends Client
 {
-    public function __construct(array $config)
+    private string $basePath;
+
+    public function __construct(array $config, string $basePath)
     {
         parent::__construct(
             new Uri($config['address']),
@@ -26,5 +28,21 @@ class VaultWritesClient extends Client
                 $config['write']['secret']
             )
         )->authenticate();
+
+        
+        $this->basePath = $basePath;
+    }
+
+    public function store(string $path, string|array $data)
+    {
+        $path = $this->basePath . '/' . $path;
+
+        parent::write($path,[
+            'data' =>  [
+                'value' => $data
+            ]
+        ]);
+
+        return $path;
     }
 }

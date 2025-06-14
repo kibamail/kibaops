@@ -31,4 +31,10 @@ class VaultReadsClient extends Client
 
         $this->basePath = $basePath;
     }
+
+    public function secret(string $path) {
+        $path = $this->basePath . '/' . $path;
+
+        return parent::read($path)->getData()['data']['value'];
+    }
 }

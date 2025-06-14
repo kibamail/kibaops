@@ -85,7 +85,7 @@ class Workspace extends Model
             return $this->vault;
         }
 
-        $this->vault = app(VaultService::class)->base("secrets/data/workspaces/{$this->id}");
+        $this->vault = app(VaultService::class)->base("/secrets/data/workspaces/{$this->id}");
 
         return $this->vault;
     }
