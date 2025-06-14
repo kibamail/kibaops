@@ -91,10 +91,14 @@ class Workspace extends Model
             $memberships->each(fn (WorkspaceMembership $membership) => $membership->projects()->sync($projectIds));
         });
 
-        return $this->memberships()
+        $createdMemberships = $this->memberships()
             ->whereIn('email', $emails)
             ->with(['user', 'projects'])
             ->get();
+
+        $this->sendInvitationNotifications($createdMemberships);
+
+        return $createdMemberships;
     }
 
     /**
@@ -143,6 +147,19 @@ class Workspace extends Model
         }
 
         return $cloudProvider->delete();
+    }
+
+    /**
+     * Send invitation notifications to users who have been added to the workspace.
+     * Only sends notifications to users who already exist in the system and
+     * have a user_id associated with their membership.
+     */
+    private function sendInvitationNotifications(\Illuminate\Database\Eloquent\Collection $memberships): void
+    {
+        $memberships->filter(fn ($membership) => $membership->user_id !== null)
+            ->each(function ($membership) {
+                $membership->user->notify(new \App\Notifications\WorkspaceInvitation($membership, $this));
+            });
     }
 
     public function vault(): VaultService {
