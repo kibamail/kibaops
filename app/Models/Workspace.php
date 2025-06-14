@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\Vault\VaultService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,6 +13,8 @@ use Illuminate\Support\Str;
 class Workspace extends Model
 {
     use HasFactory;
+
+    protected VaultService $vault;
 
     protected $fillable = [
         'name',
@@ -75,5 +78,15 @@ class Workspace extends Model
         });
 
         return $createdMemberships;
+    }
+
+    public function vault(): VaultService {
+        if (isset($this->vault)) {
+            return $this->vault;
+        }
+
+        $this->vault = app(VaultService::class)->base("secrets/data/workspaces/{$this->id}");
+
+        return $this->vault;
     }
 }
