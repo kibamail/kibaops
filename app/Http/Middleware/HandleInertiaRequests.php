@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\CloudProviderType;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
@@ -63,6 +64,7 @@ class HandleInertiaRequests extends Middleware
             'projects' => $projects,
             'activeProject' => $activeProject,
             'cloudProvidersCount' => $cloudProvidersCount,
+            'cloudProviderRegions' => CloudProviderType::allRegions(),
             'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),

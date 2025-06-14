@@ -75,6 +75,13 @@ export interface CloudProvider {
   updated_at: string;
 }
 
+export interface CloudProviderRegion {
+  name: string;
+  slug: string;
+}
+
+export type CloudProviderRegionsByContinent = Record<string, CloudProviderRegion[]>;
+
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
   auth: {
     user: User;
@@ -85,5 +92,6 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
   projects: Project[];
   activeProject: Project | null;
   cloudProvidersCount: number;
+  cloudProviderRegions: Record<CloudProviderType, CloudProviderRegionsByContinent>;
   ziggy: Config & { location: string };
 };

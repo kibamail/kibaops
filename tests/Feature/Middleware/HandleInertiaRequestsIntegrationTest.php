@@ -375,3 +375,75 @@ test('cloud providers count is zero when no active workspace', function () {
         ->where('cloudProvidersCount', 0)
     );
 });
+
+test('cloud provider regions are shared with frontend grouped by continent', function () {
+    $user = User::factory()->create();
+
+    $response = $this
+        ->actingAs($user)
+        ->get(route('dashboard'));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->has('cloudProviderRegions')
+        ->has('cloudProviderRegions.aws')
+        ->has('cloudProviderRegions.hetzner')
+        ->has('cloudProviderRegions.digital_ocean')
+        ->has('cloudProviderRegions.google_cloud')
+        ->has('cloudProviderRegions.vultr')
+        ->has('cloudProviderRegions.linode')
+        ->has('cloudProviderRegions.leaseweb')
+        // Check continent grouping for Hetzner
+        ->has('cloudProviderRegions.hetzner.Europe')
+        ->has('cloudProviderRegions.hetzner.North America')
+        ->has('cloudProviderRegions.hetzner.Asia Pacific')
+        ->where('cloudProviderRegions.hetzner.Europe.0.name', 'Falkenstein, Germany')
+        ->where('cloudProviderRegions.hetzner.Europe.0.slug', 'fsn1')
+        // Check continent grouping for DigitalOcean
+        ->has('cloudProviderRegions.digital_ocean.North America')
+        ->has('cloudProviderRegions.digital_ocean.Europe')
+        ->has('cloudProviderRegions.digital_ocean.Asia Pacific')
+        ->where('cloudProviderRegions.digital_ocean.North America.0.name', 'New York 1')
+        ->where('cloudProviderRegions.digital_ocean.North America.0.slug', 'nyc1')
+    );
+});
+
+test('cloud provider regions contain correct continent-grouped structure for all providers', function () {
+    $user = User::factory()->create();
+
+    $response = $this
+        ->actingAs($user)
+        ->get(route('dashboard'));
+
+    $response->assertInertia(function (Assert $page) {
+        $page->has('cloudProviderRegions')
+            ->has('cloudProviderRegions.aws')
+            ->has('cloudProviderRegions.hetzner')
+            ->has('cloudProviderRegions.digital_ocean')
+            ->has('cloudProviderRegions.google_cloud')
+            ->has('cloudProviderRegions.vultr')
+            ->has('cloudProviderRegions.linode')
+            ->has('cloudProviderRegions.leaseweb');
+
+        // Check continent-grouped structure for Hetzner
+        $page->has('cloudProviderRegions.hetzner.Europe')
+            ->has('cloudProviderRegions.hetzner.Europe.0.name')
+            ->has('cloudProviderRegions.hetzner.Europe.0.slug')
+            ->where('cloudProviderRegions.hetzner.Europe.0.name', 'Falkenstein, Germany')
+            ->where('cloudProviderRegions.hetzner.Europe.0.slug', 'fsn1');
+
+        // Check continent-grouped structure for DigitalOcean
+        $page->has('cloudProviderRegions.digital_ocean.North America')
+            ->has('cloudProviderRegions.digital_ocean.North America.0.name')
+            ->has('cloudProviderRegions.digital_ocean.North America.0.slug')
+            ->where('cloudProviderRegions.digital_ocean.North America.0.name', 'New York 1')
+            ->where('cloudProviderRegions.digital_ocean.North America.0.slug', 'nyc1');
+
+        // Check that AWS has multiple continents
+        $page->has('cloudProviderRegions.aws.North America')
+            ->has('cloudProviderRegions.aws.Europe')
+            ->has('cloudProviderRegions.aws.Asia Pacific')
+            ->has('cloudProviderRegions.aws.Middle East')
+            ->has('cloudProviderRegions.aws.Africa')
+            ->has('cloudProviderRegions.aws.South America');
+    });
+});
