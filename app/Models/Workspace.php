@@ -61,31 +61,40 @@ class Workspace extends Model
         return $this->hasMany(CloudProvider::class);
     }
 
-    public function createMemberships(array $emails, array $projectIds, string $role): array
+    /**
+     * Create or update memberships for a set of emails and associate them with projects.
+     * This method efficiently handles bulk operations using upsert and eager loading
+     * to minimize database queries while maintaining data consistency.
+     */
+    public function createMemberships(array $emails, array $projectIds, string $role): \Illuminate\Database\Eloquent\Collection
     {
-        $createdMemberships = [];
+        $usersByEmail = User::whereIn('email', $emails)->get()->keyBy('email');
 
-        DB::transaction(function () use ($emails, $projectIds, $role, &$createdMemberships) {
-            foreach ($emails as $email) {
-                $user = User::where('email', $email)->first();
-
-                $membership = WorkspaceMembership::updateOrCreate(
-                    [
-                        'workspace_id' => $this->id,
-                        'email' => $email,
-                    ],
-                    [
-                        'user_id' => $user?->id,
-                        'role' => $role,
-                    ]
-                );
-
-                $membership->projects()->sync($projectIds);
-                $createdMemberships[] = $membership->load(['user', 'projects']);
-            }
+        $membershipsData = collect($emails)->map(function ($email) use ($usersByEmail, $role) {
+            return [
+                'workspace_id' => $this->id,
+                'email' => $email,
+                'user_id' => $usersByEmail->get($email)?->id,
+                'role' => $role,
+            ];
         });
 
-        return $createdMemberships;
+        DB::transaction(function () use ($membershipsData, $projectIds) {
+            WorkspaceMembership::upsert(
+                $membershipsData->all(),
+                uniqueBy: ['workspace_id', 'email'],
+                update: ['user_id', 'role']
+            );
+
+            $memberships = $this->memberships()->whereIn('email', $membershipsData->pluck('email'))->get();
+
+            $memberships->each(fn (WorkspaceMembership $membership) => $membership->projects()->sync($projectIds));
+        });
+
+        return $this->memberships()
+            ->whereIn('email', $emails)
+            ->with(['user', 'projects'])
+            ->get();
     }
 
     /**
