@@ -11,10 +11,12 @@ import cn from "classnames";
 
 interface WorkspacesDropdownMenuProps {
     rootId: string;
+    onCreateWorkspaceClick: () => void;
 }
 
 export function WorkspacesDropdownMenu({
     rootId,
+    onCreateWorkspaceClick,
 }: WorkspacesDropdownMenuProps) {
     const team = { name: "Ziba", id: "ziba" };
     const allUserTeams: { id: string; name: string }[] = [];
@@ -76,7 +78,10 @@ export function WorkspacesDropdownMenu({
                     ))}
                 </DropdownMenu.RadioGroup>
 
-                <DropdownMenu.Item className="p-2 flex items-center hover:bg-(--background-secondary) rounded-lg cursor-pointer">
+                <DropdownMenu.Item
+                    className="p-2 flex items-center hover:bg-(--background-secondary) rounded-lg cursor-pointer"
+                    onSelect={onCreateWorkspaceClick}
+                >
                     <PlusIcon className="mr-1.5 w-5 h-5 kb-content-tertiary" />
                     <Text>New workspace</Text>
                 </DropdownMenu.Item>
@@ -99,7 +104,7 @@ export function WorkspacesDropdownMenu({
                     asChild
                     className="p-2 flex items-center hover:bg-(--background-secondary) rounded-lg cursor-pointer"
                 >
-                    <a href={'/'}>
+                    <a href={"/"}>
                         <UserIcon className="mr-1.5 w-5 h-5 kb-content-tertiary" />
                         <Text>Account settings</Text>
                     </a>

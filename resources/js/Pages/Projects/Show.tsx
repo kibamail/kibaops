@@ -5,9 +5,7 @@ import { Head, Link } from '@inertiajs/react';
 export default function Show({ project }: PageProps<{ project: Project }>) {
   return (
     <AuthenticatedLayout
-      header={
-        <h2 className="font-semibold text-xl text-gray-800 leading-tight">Project Details</h2>
-      }
+
     >
       <Head title={`Project: ${project.name}`} />
 

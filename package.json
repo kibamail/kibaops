@@ -36,6 +36,6 @@
     },
     "dependencies": {
         "@kibamail/owly": "^1.0.37",
-        "@radix-ui/react-dropdown-menu": "^2.1.15"
+        "@radix-ui/react-dropdown-menu": "^2.1.4"
     }
 }
