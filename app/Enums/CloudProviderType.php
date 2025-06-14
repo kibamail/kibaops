@@ -39,6 +39,109 @@ enum CloudProviderType: string
     }
 
     /**
+     * Get the credential fields required for this cloud provider type.
+     * Returns an array of field definitions with name, label, type, and validation rules.
+     */
+    public function credentialFields(): array
+    {
+        return match ($this) {
+            self::AWS => [
+                [
+                    'name' => 'access_key',
+                    'label' => 'Access Key ID',
+                    'type' => 'text',
+                    'placeholder' => 'AKIAIOSFODNN7EXAMPLE',
+                    'required' => true,
+                ],
+                [
+                    'name' => 'secret_key',
+                    'label' => 'Secret Access Key',
+                    'type' => 'password',
+                    'placeholder' => 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+                    'required' => true,
+                ],
+            ],
+            self::HETZNER => [
+                [
+                    'name' => 'token',
+                    'label' => 'API Token',
+                    'type' => 'password',
+                    'placeholder' => 'Enter your Hetzner Cloud API token',
+                    'required' => true,
+                ],
+            ],
+            self::DIGITAL_OCEAN => [
+                [
+                    'name' => 'token',
+                    'label' => 'Personal Access Token',
+                    'type' => 'password',
+                    'placeholder' => 'Enter your DigitalOcean personal access token',
+                    'required' => true,
+                ],
+            ],
+            self::GOOGLE_CLOUD => [
+                [
+                    'name' => 'service_account_key',
+                    'label' => 'Service Account Key (JSON)',
+                    'type' => 'textarea',
+                    'placeholder' => 'Paste your service account JSON key here',
+                    'required' => true,
+                ],
+            ],
+            self::LEASEWEB => [
+                [
+                    'name' => 'api_key',
+                    'label' => 'API Key',
+                    'type' => 'password',
+                    'placeholder' => 'Enter your LeaseWeb API key',
+                    'required' => true,
+                ],
+            ],
+            self::LINODE => [
+                [
+                    'name' => 'token',
+                    'label' => 'Personal Access Token',
+                    'type' => 'password',
+                    'placeholder' => 'Enter your Linode personal access token',
+                    'required' => true,
+                ],
+            ],
+            self::VULTR => [
+                [
+                    'name' => 'api_key',
+                    'label' => 'API Key',
+                    'type' => 'password',
+                    'placeholder' => 'Enter your Vultr API key',
+                    'required' => true,
+                ],
+            ],
+            self::OVH => [
+                [
+                    'name' => 'application_key',
+                    'label' => 'Application Key',
+                    'type' => 'text',
+                    'placeholder' => 'Enter your OVH application key',
+                    'required' => true,
+                ],
+                [
+                    'name' => 'application_secret',
+                    'label' => 'Application Secret',
+                    'type' => 'password',
+                    'placeholder' => 'Enter your OVH application secret',
+                    'required' => true,
+                ],
+                [
+                    'name' => 'consumer_key',
+                    'label' => 'Consumer Key',
+                    'type' => 'password',
+                    'placeholder' => 'Enter your OVH consumer key',
+                    'required' => true,
+                ],
+            ],
+        };
+    }
+
+    /**
      * Get supported regions for the cloud provider type grouped by continent.
      * Returns an array with continent keys and regions with 'name' and 'slug' keys.
      */
@@ -340,7 +443,7 @@ enum CloudProviderType: string
 
     /**
      * Get all cloud provider data for frontend consumption.
-     * Returns an array with provider information including type, name, and implementation status.
+     * Returns an array with provider information including type, name, implementation status, and credential fields.
      */
     public static function allProviders(): array
     {
@@ -350,6 +453,7 @@ enum CloudProviderType: string
             'type' => $case->value,
             'name' => $case->label(),
             'implemented' => in_array($case->value, $implementedTypes),
+            'credentialFields' => $case->credentialFields(),
         ])->toArray();
     }
 

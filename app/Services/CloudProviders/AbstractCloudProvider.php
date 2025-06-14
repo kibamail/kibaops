@@ -20,8 +20,10 @@ abstract class AbstractCloudProvider implements CloudProviderInterface
     /**
      * Verify that the provided credentials are valid for this cloud provider.
      * This method must be implemented by each specific provider class.
+     *
+     * @param array $credentials Array of credential values in the order defined by credentialFields()
      */
-    abstract public function verify(string $credentials): bool;
+    abstract public function verify(array $credentials): bool;
 
     /**
      * Make an HTTP request to the cloud provider's API and return success status.

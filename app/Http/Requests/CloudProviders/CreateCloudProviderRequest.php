@@ -39,8 +39,12 @@ class CreateCloudProviderRequest extends FormRequest
             ],
             'credentials' => [
                 'required',
-                'string',
+                'array',
                 $type ? new ValidCloudProviderCredentials($type) : null,
+            ],
+            'credentials.*' => [
+                'required',
+                'string',
             ],
         ];
     }

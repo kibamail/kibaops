@@ -462,6 +462,7 @@ test('cloud providers data is shared with frontend with correct structure', func
         ->has('cloudProviders.0.type')
         ->has('cloudProviders.0.name')
         ->has('cloudProviders.0.implemented')
+        ->has('cloudProviders.0.credentialFields')
         // Check that all expected providers are present
         ->where('cloudProviders.0.type', 'aws')
         ->where('cloudProviders.0.name', 'Amazon Web Services')
@@ -476,6 +477,19 @@ test('cloud providers data is shared with frontend with correct structure', func
         // Check that OVH is included
         ->whereContains('cloudProviders', fn ($provider) =>
             $provider['type'] === 'ovh' && $provider['name'] === 'OVH' && $provider['implemented'] === false
+        )
+        // Check credential fields structure for AWS (multiple fields)
+        ->whereContains('cloudProviders', fn ($provider) =>
+            $provider['type'] === 'aws' &&
+            count($provider['credentialFields']) === 2 &&
+            $provider['credentialFields'][0]['name'] === 'access_key' &&
+            $provider['credentialFields'][1]['name'] === 'secret_key'
+        )
+        // Check credential fields structure for Hetzner (single field)
+        ->whereContains('cloudProviders', fn ($provider) =>
+            $provider['type'] === 'hetzner' &&
+            count($provider['credentialFields']) === 1 &&
+            $provider['credentialFields'][0]['name'] === 'token'
         )
     );
 });

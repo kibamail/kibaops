@@ -27,7 +27,7 @@ test('cloud provider can be created with valid hetzner credentials', function ()
         ->postJson(route('workspaces.cloud-providers.store', $workspace), [
             'name' => 'My Hetzner Provider',
             'type' => CloudProviderType::HETZNER->value,
-            'credentials' => 'valid-hetzner-token',
+            'credentials' => ['valid-hetzner-token'],
         ]);
 
     $response->assertStatus(201);
@@ -47,7 +47,7 @@ test('cloud provider can be created with valid hetzner credentials', function ()
         ->and($cloudProvider->workspace_id)->toBe($workspace->id);
 
     $storedCredentials = $workspace->vault()->reads()->secret($cloudProvider->vault_key);
-    expect($storedCredentials)->toBe('valid-hetzner-token');
+    expect($storedCredentials)->toBe(['valid-hetzner-token']);
 });
 
 test('cloud provider can be created with valid digital ocean credentials', function () {
@@ -64,7 +64,7 @@ test('cloud provider can be created with valid digital ocean credentials', funct
         ->postJson(route('workspaces.cloud-providers.store', $workspace), [
             'name' => 'My DigitalOcean Provider',
             'type' => CloudProviderType::DIGITAL_OCEAN->value,
-            'credentials' => 'valid-do-token',
+            'credentials' => ['valid-do-token'],
         ]);
 
     $response->assertStatus(201);
@@ -84,7 +84,7 @@ test('cloud provider can be created with valid digital ocean credentials', funct
         ->and($cloudProvider->workspace_id)->toBe($workspace->id);
 
     $storedCredentials = $workspace->vault()->reads()->secret($cloudProvider->vault_key);
-    expect($storedCredentials)->toBe('valid-do-token');
+    expect($storedCredentials)->toBe(['valid-do-token']);
 });
 
 test('cloud provider creation fails with invalid hetzner credentials', function () {
@@ -101,7 +101,7 @@ test('cloud provider creation fails with invalid hetzner credentials', function 
         ->postJson(route('workspaces.cloud-providers.store', $workspace), [
             'name' => 'Invalid Hetzner Provider',
             'type' => CloudProviderType::HETZNER->value,
-            'credentials' => 'invalid-hetzner-token',
+            'credentials' => ['invalid-hetzner-token'],
         ]);
 
     $response->assertStatus(422);
@@ -126,7 +126,7 @@ test('cloud provider creation fails with invalid digital ocean credentials', fun
         ->postJson(route('workspaces.cloud-providers.store', $workspace), [
             'name' => 'Invalid DO Provider',
             'type' => CloudProviderType::DIGITAL_OCEAN->value,
-            'credentials' => 'invalid-do-token',
+            'credentials' => ['invalid-do-token'],
         ]);
 
     $response->assertStatus(422);
@@ -146,7 +146,7 @@ test('cloud provider creation fails for unimplemented provider types', function 
         ->postJson(route('workspaces.cloud-providers.store', $workspace), [
             'name' => 'AWS Provider',
             'type' => CloudProviderType::AWS->value,
-            'credentials' => 'some-aws-token',
+            'credentials' => ['access-key', 'secret-key'],
         ]);
 
     $response->assertStatus(422);
@@ -166,7 +166,7 @@ test('cloud provider creation requires valid input', function () {
         ->postJson(route('workspaces.cloud-providers.store', $workspace), [
             'name' => '',
             'type' => 'invalid-type',
-            'credentials' => '',
+            'credentials' => [],
         ]);
 
     $response->assertStatus(422);
@@ -182,7 +182,7 @@ test('cloud provider name cannot exceed 32 characters', function () {
         ->postJson(route('workspaces.cloud-providers.store', $workspace), [
             'name' => str_repeat('a', 33),
             'type' => CloudProviderType::HETZNER->value,
-            'credentials' => 'some-token',
+            'credentials' => ['some-token'],
         ]);
 
     $response->assertStatus(422);
@@ -199,7 +199,7 @@ test('user cannot create cloud provider for workspace they do not own', function
         ->postJson(route('workspaces.cloud-providers.store', $workspace), [
             'name' => 'Unauthorized Provider',
             'type' => CloudProviderType::HETZNER->value,
-            'credentials' => 'some-token',
+            'credentials' => ['some-token'],
         ]);
 
     $response->assertForbidden();
@@ -214,7 +214,7 @@ test('hetzner cloud provider verifies both read and write access', function () {
         'api.hetzner-cloud.com/v1/ssh_keys' => Http::response(['ssh_keys' => []], 200),
     ]);
 
-    $result = $provider->verify('valid-token');
+    $result = $provider->verify(['valid-token']);
     expect($result)->toBeTrue();
 
     Http::assertSent(function ($request) {
@@ -237,7 +237,7 @@ test('digital ocean cloud provider verifies both read and write access', functio
         'api.digitalocean.com/v2/account/keys' => Http::response(['ssh_keys' => []], 200),
     ]);
 
-    $result = $provider->verify('valid-token');
+    $result = $provider->verify(['valid-token']);
     expect($result)->toBeTrue();
 
     Http::assertSent(function ($request) {
@@ -333,7 +333,7 @@ test('cloud provider can be updated with new credentials', function () {
     $response = $this
         ->actingAs($user)
         ->putJson(route('workspaces.cloud-providers.update', [$workspace, $cloudProvider]), [
-            'credentials' => 'new-valid-token',
+            'credentials' => ['new-valid-token'],
         ]);
 
     $response->assertStatus(200);
@@ -342,7 +342,7 @@ test('cloud provider can be updated with new credentials', function () {
     ]);
 
     $storedCredentials = $workspace->vault()->reads()->secret($cloudProvider->vault_key);
-    expect($storedCredentials)->toBe('new-valid-token');
+    expect($storedCredentials)->toBe(['new-valid-token']);
 });
 
 test('cloud provider can be updated with both name and credentials', function () {
@@ -362,7 +362,7 @@ test('cloud provider can be updated with both name and credentials', function ()
         ->actingAs($user)
         ->putJson(route('workspaces.cloud-providers.update', [$workspace, $cloudProvider]), [
             'name' => 'Updated DO Provider',
-            'credentials' => 'new-do-token',
+            'credentials' => ['new-do-token'],
         ]);
 
     $response->assertStatus(200);
@@ -378,7 +378,7 @@ test('cloud provider can be updated with both name and credentials', function ()
     expect($cloudProvider->name)->toBe('Updated DO Provider');
 
     $storedCredentials = $workspace->vault()->reads()->secret($cloudProvider->vault_key);
-    expect($storedCredentials)->toBe('new-do-token');
+    expect($storedCredentials)->toBe(['new-do-token']);
 });
 
 test('cloud provider update fails with invalid credentials', function () {
@@ -397,7 +397,7 @@ test('cloud provider update fails with invalid credentials', function () {
     $response = $this
         ->actingAs($user)
         ->putJson(route('workspaces.cloud-providers.update', [$workspace, $cloudProvider]), [
-            'credentials' => 'invalid-token',
+            'credentials' => ['invalid-token'],
         ]);
 
     $response->assertStatus(422);
@@ -446,7 +446,7 @@ test('cloud provider can be deleted', function () {
         'type' => CloudProviderType::HETZNER,
     ]);
 
-    $workspace->vault()->writes()->store($cloudProvider->vault_key, 'test-credentials');
+    $workspace->vault()->writes()->store($cloudProvider->vault_key, ['test-credentials']);
 
     $response = $this
         ->actingAs($user)

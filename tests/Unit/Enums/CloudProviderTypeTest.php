@@ -29,7 +29,7 @@ test('allRegions method returns all provider regions grouped by continent', func
     $allRegions = CloudProviderType::allRegions();
 
     expect($allRegions)->toBeArray();
-    expect($allRegions)->toHaveKeys(['aws', 'hetzner', 'leaseweb', 'google_cloud', 'digital_ocean', 'linode', 'vultr']);
+    expect($allRegions)->toHaveKeys(['aws', 'hetzner', 'leaseweb', 'google_cloud', 'digital_ocean', 'linode', 'vultr', 'ovh']);
 
     foreach ($allRegions as $regionsByContinent) {
         expect($regionsByContinent)->toBeArray();
@@ -139,6 +139,96 @@ test('continent grouping is consistent across providers', function () {
         foreach ($continents as $continent) {
             expect($continent)->toBeString();
             expect($continent)->not->toBeEmpty();
+        }
+    }
+});
+
+test('credentialFields method returns correct field definitions for each provider', function () {
+    foreach (CloudProviderType::cases() as $provider) {
+        $fields = $provider->credentialFields();
+
+        expect($fields)->toBeArray();
+        expect($fields)->not->toBeEmpty();
+
+        foreach ($fields as $field) {
+            expect($field)->toHaveKeys(['name', 'label', 'type', 'placeholder', 'required']);
+            expect($field['name'])->toBeString();
+            expect($field['label'])->toBeString();
+            expect($field['type'])->toBeIn(['text', 'password', 'textarea']);
+            expect($field['placeholder'])->toBeString();
+            expect($field['required'])->toBeBool();
+        }
+    }
+});
+
+test('aws credential fields include access key and secret key', function () {
+    $fields = CloudProviderType::AWS->credentialFields();
+
+    expect($fields)->toHaveCount(2);
+    expect($fields[0]['name'])->toBe('access_key');
+    expect($fields[0]['label'])->toBe('Access Key ID');
+    expect($fields[0]['type'])->toBe('text');
+    expect($fields[0]['required'])->toBeTrue();
+
+    expect($fields[1]['name'])->toBe('secret_key');
+    expect($fields[1]['label'])->toBe('Secret Access Key');
+    expect($fields[1]['type'])->toBe('password');
+    expect($fields[1]['required'])->toBeTrue();
+});
+
+test('hetzner credential fields include single token', function () {
+    $fields = CloudProviderType::HETZNER->credentialFields();
+
+    expect($fields)->toHaveCount(1);
+    expect($fields[0]['name'])->toBe('token');
+    expect($fields[0]['label'])->toBe('API Token');
+    expect($fields[0]['type'])->toBe('password');
+    expect($fields[0]['required'])->toBeTrue();
+});
+
+test('digital ocean credential fields include single token', function () {
+    $fields = CloudProviderType::DIGITAL_OCEAN->credentialFields();
+
+    expect($fields)->toHaveCount(1);
+    expect($fields[0]['name'])->toBe('token');
+    expect($fields[0]['label'])->toBe('Personal Access Token');
+    expect($fields[0]['type'])->toBe('password');
+    expect($fields[0]['required'])->toBeTrue();
+});
+
+test('ovh credential fields include application key, secret, and consumer key', function () {
+    $fields = CloudProviderType::OVH->credentialFields();
+
+    expect($fields)->toHaveCount(3);
+    expect($fields[0]['name'])->toBe('application_key');
+    expect($fields[0]['label'])->toBe('Application Key');
+    expect($fields[0]['type'])->toBe('text');
+    expect($fields[0]['required'])->toBeTrue();
+
+    expect($fields[1]['name'])->toBe('application_secret');
+    expect($fields[1]['label'])->toBe('Application Secret');
+    expect($fields[1]['type'])->toBe('password');
+    expect($fields[1]['required'])->toBeTrue();
+
+    expect($fields[2]['name'])->toBe('consumer_key');
+    expect($fields[2]['label'])->toBe('Consumer Key');
+    expect($fields[2]['type'])->toBe('password');
+    expect($fields[2]['required'])->toBeTrue();
+});
+
+test('allProviders method includes credential fields', function () {
+    $providers = CloudProviderType::allProviders();
+
+    expect($providers)->toBeArray();
+    expect($providers)->not->toBeEmpty();
+
+    foreach ($providers as $provider) {
+        expect($provider)->toHaveKeys(['type', 'name', 'implemented', 'credentialFields']);
+        expect($provider['credentialFields'])->toBeArray();
+        expect($provider['credentialFields'])->not->toBeEmpty();
+
+        foreach ($provider['credentialFields'] as $field) {
+            expect($field)->toHaveKeys(['name', 'label', 'type', 'placeholder', 'required']);
         }
     }
 });

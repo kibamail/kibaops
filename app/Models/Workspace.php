@@ -111,7 +111,7 @@ class Workspace extends Model
      * The provider data is stored in the database while credentials are securely
      * stored in Vault using the provider's unique key path.
      */
-    public function createCloudProvider(array $data, string $credentials): CloudProvider
+    public function createCloudProvider(array $data, array $credentials): CloudProvider
     {
         $cloudProvider = $this->cloudProviders()->create($data);
 
@@ -125,7 +125,7 @@ class Workspace extends Model
      * If credentials are provided, they overwrite the existing ones in Vault.
      * Database fields are only updated if data is provided.
      */
-    public function updateCloudProvider(CloudProvider $cloudProvider, array $data, ?string $credentials = null): CloudProvider
+    public function updateCloudProvider(CloudProvider $cloudProvider, array $data, ?array $credentials = null): CloudProvider
     {
         if (! empty($data)) {
             $cloudProvider->update($data);

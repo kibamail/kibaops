@@ -11,7 +11,7 @@ test('workspaces can store and retrieve vault secrets', function () {
     expect($workspace->vault()->reads())->toBe($workspace->vault()->reads());
     expect($workspace->vault()->writes())->toBe($workspace->vault()->writes());
 
-    $apiKey = str()->random(64);
+    $apiKey = [str()->random(64)];
     $key = 'providers/hetzner';
 
     $workspace->vault()->writes()->store($key, $apiKey);

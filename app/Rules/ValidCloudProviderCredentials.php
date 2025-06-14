@@ -27,6 +27,29 @@ class ValidCloudProviderCredentials implements ValidationRule
             return;
         }
 
+        // Ensure value is an array
+        if (!is_array($value)) {
+            $fail('The credentials must be provided as an array.');
+            return;
+        }
+
+        // Validate that all required credential fields are provided
+        $credentialFields = $this->type->credentialFields();
+        $requiredFields = collect($credentialFields)->where('required', true);
+
+        if (count($value) !== count($credentialFields)) {
+            $fail('The number of credential values must match the required fields.');
+            return;
+        }
+
+        // Validate each credential field is not empty if required
+        foreach ($requiredFields as $index => $field) {
+            if (empty($value[$index])) {
+                $fail("The {$field['label']} field is required.");
+                return;
+            }
+        }
+
         $factory = app(CloudProviderFactory::class);
         $provider = $factory->create($this->type);
 

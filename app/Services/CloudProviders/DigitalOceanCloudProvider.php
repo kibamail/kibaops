@@ -8,11 +8,18 @@ class DigitalOceanCloudProvider extends AbstractCloudProvider
      * Verify DigitalOcean credentials by testing both read and write access.
      * We check the droplets endpoint for read access and account keys for
      * write access to ensure the token has sufficient permissions.
+     *
+     * @param array $credentials Array containing [token]
      */
-    public function verify(string $credentials): bool
+    public function verify(array $credentials): bool
     {
-        $readVerified = $this->verifyReadAccess($credentials);
-        $writeVerified = $this->verifyWriteAccess($credentials);
+        if (empty($credentials) || !isset($credentials[0])) {
+            return false;
+        }
+
+        $token = $credentials[0];
+        $readVerified = $this->verifyReadAccess($token);
+        $writeVerified = $this->verifyWriteAccess($token);
 
         return $readVerified && $writeVerified;
     }

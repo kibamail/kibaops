@@ -82,10 +82,19 @@ export interface CloudProviderRegion {
 
 export type CloudProviderRegionsByContinent = Record<string, CloudProviderRegion[]>;
 
+export interface CloudProviderCredentialField {
+  name: string;
+  label: string;
+  type: 'text' | 'password' | 'textarea';
+  placeholder: string;
+  required: boolean;
+}
+
 export interface CloudProviderInfo {
   type: CloudProviderType;
   name: string;
   implemented: boolean;
+  credentialFields: CloudProviderCredentialField[];
 }
 
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {

@@ -36,8 +36,12 @@ class UpdateCloudProviderRequest extends FormRequest
             ],
             'credentials' => [
                 'sometimes',
-                'string',
+                'array',
                 $this->filled('credentials') ? new ValidCloudProviderCredentials($cloudProvider->type) : null,
+            ],
+            'credentials.*' => [
+                'required_with:credentials',
+                'string',
             ],
         ];
     }
