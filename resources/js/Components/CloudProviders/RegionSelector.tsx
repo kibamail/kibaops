@@ -1,6 +1,11 @@
-import * as SelectField from "@kibamail/owly/select-field";
-import { usePage } from "@inertiajs/react";
-import type { CloudProviderType, CloudProviderRegion, CloudProviderRegionsByContinent, PageProps } from "@/types";
+import type {
+  CloudProviderRegion,
+  CloudProviderRegionsByContinent,
+  CloudProviderType,
+  PageProps,
+} from '@/types';
+import { usePage } from '@inertiajs/react';
+import * as SelectField from '@kibamail/owly/select-field';
 
 interface RegionSelectorProps {
   providerType: CloudProviderType;
@@ -20,7 +25,7 @@ export function RegionSelector({
   providerType,
   selectedRegion,
   onRegionChange,
-  placeholder = "Select a region",
+  placeholder = 'Select a region',
   disabled = false,
   groupByContinent = true,
 }: RegionSelectorProps) {
@@ -38,34 +43,30 @@ export function RegionSelector({
   }
 
   return (
-    <SelectField.Root
-      value={selectedRegion}
-      onValueChange={onRegionChange}
-      disabled={disabled}
-    >
+    <SelectField.Root value={selectedRegion} onValueChange={onRegionChange} disabled={disabled}>
       <SelectField.Trigger placeholder={placeholder} />
       <SelectField.Content>
-        {groupByContinent ? (
-          Object.entries(regionsByContinent).map(([continent, regions]) => (
-            <div key={continent}>
-              <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                {continent}
+        {groupByContinent
+          ? Object.entries(regionsByContinent).map(([continent, regions]) => (
+              <div key={continent}>
+                <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  {continent}
+                </div>
+                {regions.map((region: CloudProviderRegion) => (
+                  <SelectField.Item key={region.slug} value={region.slug}>
+                    {region.name}
+                  </SelectField.Item>
+                ))}
               </div>
-              {regions.map((region: CloudProviderRegion) => (
+            ))
+          : // Flat list without continent grouping
+            Object.values(regionsByContinent)
+              .flat()
+              .map((region: CloudProviderRegion) => (
                 <SelectField.Item key={region.slug} value={region.slug}>
                   {region.name}
                 </SelectField.Item>
               ))}
-            </div>
-          ))
-        ) : (
-          // Flat list without continent grouping
-          Object.values(regionsByContinent).flat().map((region: CloudProviderRegion) => (
-            <SelectField.Item key={region.slug} value={region.slug}>
-              {region.name}
-            </SelectField.Item>
-          ))
-        )}
       </SelectField.Content>
     </SelectField.Root>
   );
@@ -75,7 +76,9 @@ export function RegionSelector({
  * Hook to get regions for a specific cloud provider grouped by continent.
  * Returns the regions object grouped by continent for the specified provider type.
  */
-export function useCloudProviderRegions(providerType: CloudProviderType): CloudProviderRegionsByContinent {
+export function useCloudProviderRegions(
+  providerType: CloudProviderType
+): CloudProviderRegionsByContinent {
   const { cloudProviderRegions } = usePage<PageProps>().props;
   return cloudProviderRegions[providerType] || {};
 }
@@ -84,7 +87,9 @@ export function useCloudProviderRegions(providerType: CloudProviderType): CloudP
  * Hook to get regions for a specific cloud provider as a flat array.
  * Returns a flat array of all regions for the specified provider type.
  */
-export function useCloudProviderRegionsFlat(providerType: CloudProviderType): CloudProviderRegion[] {
+export function useCloudProviderRegionsFlat(
+  providerType: CloudProviderType
+): CloudProviderRegion[] {
   const { cloudProviderRegions } = usePage<PageProps>().props;
   const regionsByContinent = cloudProviderRegions[providerType] || {};
   return Object.values(regionsByContinent).flat();
@@ -94,7 +99,10 @@ export function useCloudProviderRegionsFlat(providerType: CloudProviderType): Cl
  * Hook to get all cloud provider regions.
  * Returns the complete regions object with all providers grouped by continent.
  */
-export function useAllCloudProviderRegions(): Record<CloudProviderType, CloudProviderRegionsByContinent> {
+export function useAllCloudProviderRegions(): Record<
+  CloudProviderType,
+  CloudProviderRegionsByContinent
+> {
   const { cloudProviderRegions } = usePage<PageProps>().props;
   return cloudProviderRegions;
 }

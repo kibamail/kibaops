@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 export const UserPlusIcon = React.forwardRef<
   React.ElementRef<'svg'>,
@@ -41,5 +41,5 @@ export const UserPlusIcon = React.forwardRef<
         />
       </svg>
     </>
-  )
-})
+  );
+});

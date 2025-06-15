@@ -16,7 +16,7 @@ test('listener creates default workspace when user registers', function () {
     $listener->handle($event);
 
     $workspace = Workspace::where('user_id', $user->id)->first();
-    
+
     expect($workspace)->not->toBeNull()
         ->and($workspace->name)->toBe("John Doe's workspace")
         ->and($workspace->user_id)->toBe($user->id)
@@ -31,7 +31,7 @@ test('listener creates workspace with proper slug for names with special charact
     $listener->handle($event);
 
     $workspace = Workspace::where('user_id', $user->id)->first();
-    
+
     expect($workspace)->not->toBeNull()
         ->and($workspace->name)->toBe("Mary O'Connor's workspace")
         ->and($workspace->slug)->toBe('mary-oconnors-workspace');
@@ -49,7 +49,7 @@ test('listener creates workspace with unique slug when duplicate names exist', f
 
     $newWorkspace = Workspace::where('user_id', $newUser->id)->first();
     $existingWorkspace = Workspace::where('user_id', $existingUser->id)->first();
-    
+
     expect($newWorkspace)->not->toBeNull()
         ->and($newWorkspace->name)->toBe("Jane Smith's workspace")
         ->and($newWorkspace->slug)->not->toBe($existingWorkspace->slug)

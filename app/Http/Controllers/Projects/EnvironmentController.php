@@ -8,7 +8,6 @@ use App\Http\Requests\Projects\UpdateEnvironmentRequest;
 use App\Models\Environment;
 use App\Models\Project;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-
 use Illuminate\Http\RedirectResponse;
 
 class EnvironmentController extends Controller

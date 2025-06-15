@@ -4,9 +4,7 @@ import { Head, Link } from '@inertiajs/react';
 
 export default function Show({ project }: PageProps<{ project: Project }>) {
   return (
-    <AuthenticatedLayout
-
-    >
+    <AuthenticatedLayout>
       <Head title={`Project: ${project.name}`} />
 
       <div className="py-12">

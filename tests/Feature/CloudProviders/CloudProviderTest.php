@@ -548,8 +548,8 @@ test('cloud provider returns detailed error information', function () {
         'https://api.hetzner.cloud/v1/servers' => Http::response([
             'error' => [
                 'message' => 'Invalid API token provided',
-                'code' => 'unauthorized'
-            ]
+                'code' => 'unauthorized',
+            ],
         ], 401),
     ]);
 
@@ -581,10 +581,6 @@ test('cloud provider handles empty token', function () {
     expect($result->message)->toBe('Invalid credentials provided');
     expect($result->errors)->toBe(['credentials' => 'Token cannot be empty']);
 });
-
-
-
-
 
 test('cloud provider can be deleted', function () {
     $user = User::factory()->create();

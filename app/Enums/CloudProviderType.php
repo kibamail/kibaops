@@ -474,6 +474,7 @@ enum CloudProviderType: string
         foreach ($this->regions() as $regions) {
             $flatRegions = array_merge($flatRegions, $regions);
         }
+
         return $flatRegions;
     }
 
@@ -505,6 +506,7 @@ enum CloudProviderType: string
         foreach (self::cases() as $case) {
             $regions[$case->value] = $case->regions();
         }
+
         return $regions;
     }
 }

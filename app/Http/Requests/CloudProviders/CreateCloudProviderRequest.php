@@ -6,7 +6,6 @@ use App\Enums\CloudProviderType;
 use App\Rules\ImplementedCloudProviderType;
 use App\Rules\ValidCloudProviderCredentials;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class CreateCloudProviderRequest extends FormRequest

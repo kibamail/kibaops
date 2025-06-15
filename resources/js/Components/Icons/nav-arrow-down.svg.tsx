@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 export const NavArrowDownIcon = React.forwardRef<
   React.ElementRef<'svg'>,
@@ -25,5 +25,5 @@ export const NavArrowDownIcon = React.forwardRef<
         strokeLinejoin="round"
       />
     </svg>
-  )
-})
+  );
+});

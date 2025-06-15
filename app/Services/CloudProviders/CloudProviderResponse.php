@@ -57,7 +57,7 @@ class CloudProviderResponse
      */
     public function isRetryable(): bool
     {
-        if ($this->success || !$this->httpStatusCode) {
+        if ($this->success || ! $this->httpStatusCode) {
             return false;
         }
 
@@ -80,7 +80,7 @@ class CloudProviderResponse
         }
 
         $message = $this->message;
-        
+
         if ($this->providerMessage) {
             $message .= " Provider error: {$this->providerMessage}";
         }

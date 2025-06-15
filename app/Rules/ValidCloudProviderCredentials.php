@@ -32,14 +32,16 @@ class ValidCloudProviderCredentials implements ValidationRule
 
         if (! in_array($this->type, CloudProviderType::implemented())) {
             Log::info('ValidCloudProviderCredentials: Provider type not implemented, skipping validation');
+
             return;
         }
 
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             Log::warning('ValidCloudProviderCredentials: Credentials not provided as array', [
                 'value_type' => gettype($value),
             ]);
             $fail('The credentials must be provided as an array.');
+
             return;
         }
 
@@ -58,6 +60,7 @@ class ValidCloudProviderCredentials implements ValidationRule
                 'expected' => count($credentialFields),
             ]);
             $fail('The number of credential values must match the required fields.');
+
             return;
         }
 
@@ -68,6 +71,7 @@ class ValidCloudProviderCredentials implements ValidationRule
                     'field_label' => $field['label'],
                 ]);
                 $fail("The {$field['label']} field is required.");
+
                 return;
             }
         }
@@ -86,7 +90,7 @@ class ValidCloudProviderCredentials implements ValidationRule
             'verification_response' => $verificationResponse->toArray(),
         ]);
 
-        if (!$verificationResponse->success) {
+        if (! $verificationResponse->success) {
             Log::warning('ValidCloudProviderCredentials: Credential verification failed', [
                 'error_message' => $verificationResponse->message,
                 'provider_message' => $verificationResponse->providerMessage,

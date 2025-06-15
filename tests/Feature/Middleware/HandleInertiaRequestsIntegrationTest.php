@@ -470,37 +470,29 @@ test('cloud providers data is shared with frontend with correct structure', func
         ->where('cloudProviders.0.name', 'Amazon web services')
         ->where('cloudProviders.0.implemented', false)
         // Check that implemented providers are marked correctly
-        ->whereContains('cloudProviders', fn ($provider) =>
-            $provider['type'] === 'hetzner' && $provider['implemented'] === true
+        ->whereContains('cloudProviders', fn ($provider) => $provider['type'] === 'hetzner' && $provider['implemented'] === true
         )
-        ->whereContains('cloudProviders', fn ($provider) =>
-            $provider['type'] === 'digital_ocean' && $provider['implemented'] === true
+        ->whereContains('cloudProviders', fn ($provider) => $provider['type'] === 'digital_ocean' && $provider['implemented'] === true
         )
         // Check that OVH is included
-        ->whereContains('cloudProviders', fn ($provider) =>
-            $provider['type'] === 'ovh' && $provider['name'] === 'OVH' && $provider['implemented'] === false
+        ->whereContains('cloudProviders', fn ($provider) => $provider['type'] === 'ovh' && $provider['name'] === 'OVH' && $provider['implemented'] === false
         )
         // Check that documentation links are properly structured
-        ->whereContains('cloudProviders', fn ($provider) =>
-            $provider['type'] === 'aws' && $provider['documentationLink'] === 'https://kibaops.com/docs/providers/aws'
+        ->whereContains('cloudProviders', fn ($provider) => $provider['type'] === 'aws' && $provider['documentationLink'] === 'https://kibaops.com/docs/providers/aws'
         )
-        ->whereContains('cloudProviders', fn ($provider) =>
-            $provider['type'] === 'hetzner' && $provider['documentationLink'] === 'https://kibaops.com/docs/providers/hetzner'
+        ->whereContains('cloudProviders', fn ($provider) => $provider['type'] === 'hetzner' && $provider['documentationLink'] === 'https://kibaops.com/docs/providers/hetzner'
         )
         // Check that descriptions are clean without links
-        ->whereContains('cloudProviders', fn ($provider) =>
-            $provider['type'] === 'aws' && !str_contains($provider['description'], 'kibaops.com')
+        ->whereContains('cloudProviders', fn ($provider) => $provider['type'] === 'aws' && ! str_contains($provider['description'], 'kibaops.com')
         )
         // Check credential fields structure for AWS (multiple fields)
-        ->whereContains('cloudProviders', fn ($provider) =>
-            $provider['type'] === 'aws' &&
+        ->whereContains('cloudProviders', fn ($provider) => $provider['type'] === 'aws' &&
             count($provider['credentialFields']) === 2 &&
             $provider['credentialFields'][0]['name'] === 'access_key' &&
             $provider['credentialFields'][1]['name'] === 'secret_key'
         )
         // Check credential fields structure for Hetzner (single field)
-        ->whereContains('cloudProviders', fn ($provider) =>
-            $provider['type'] === 'hetzner' &&
+        ->whereContains('cloudProviders', fn ($provider) => $provider['type'] === 'hetzner' &&
             count($provider['credentialFields']) === 1 &&
             $provider['credentialFields'][0]['name'] === 'token'
         )

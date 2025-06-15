@@ -11,11 +11,11 @@ class DigitalOceanCloudProvider extends AbstractCloudProvider
      * We check the droplets endpoint for read access and account keys for
      * write access to ensure the token has sufficient permissions.
      *
-     * @param array $credentials Array containing [token]
+     * @param  array  $credentials  Array containing [token]
      */
     public function verify(array $credentials): CloudProviderResponse
     {
-        if (empty($credentials) || !isset($credentials[0])) {
+        if (empty($credentials) || ! isset($credentials[0])) {
             return CloudProviderResponse::failure(
                 message: 'No credentials provided',
                 errors: ['credentials' => 'Token is required for DigitalOcean']
@@ -32,18 +32,20 @@ class DigitalOceanCloudProvider extends AbstractCloudProvider
         }
 
         Log::info('Verifying DigitalOcean credentials', [
-            'token_prefix' => substr($token, 0, 8) . '***'
+            'token_prefix' => substr($token, 0, 8).'***',
         ]);
 
         $readResponse = $this->verifyReadAccess($token);
-        if (!$readResponse->success) {
+        if (! $readResponse->success) {
             Log::error('DigitalOcean read access verification failed', $readResponse->toArray());
+
             return $readResponse;
         }
 
         $writeResponse = $this->verifyWriteAccess($token);
-        if (!$writeResponse->success) {
+        if (! $writeResponse->success) {
             Log::error('DigitalOcean write access verification failed', $writeResponse->toArray());
+
             return $writeResponse;
         }
 

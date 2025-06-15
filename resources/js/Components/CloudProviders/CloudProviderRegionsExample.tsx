@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { RegionSelector, useAllCloudProviderRegions } from "./RegionSelector";
-import * as SelectField from "@kibamail/owly/select-field";
-import { Heading } from "@kibamail/owly/heading";
-import { Text } from "@kibamail/owly/text";
-import type { CloudProviderType } from "@/types";
+import type { CloudProviderType } from '@/types';
+import { Heading } from '@kibamail/owly/heading';
+import * as SelectField from '@kibamail/owly/select-field';
+import { Text } from '@kibamail/owly/text';
+import { useState } from 'react';
+import { RegionSelector, useAllCloudProviderRegions } from './RegionSelector';
 
 /**
  * Example component demonstrating how to use cloud provider regions data.
@@ -12,9 +12,9 @@ import type { CloudProviderType } from "@/types";
 export function CloudProviderRegionsExample() {
   const [selectedProvider, setSelectedProvider] = useState<CloudProviderType>('hetzner');
   const [selectedRegion, setSelectedRegion] = useState<string>('');
-  
+
   const allRegions = useAllCloudProviderRegions();
-  
+
   const providerOptions = [
     { value: 'aws', label: 'Amazon Web Services' },
     { value: 'hetzner', label: 'Hetzner Cloud' },
@@ -37,20 +37,17 @@ export function CloudProviderRegionsExample() {
           Cloud Provider Regions Example
         </Heading>
         <Text className="kb-content-tertiary">
-          This example demonstrates how frontend components can access the globally 
-          shared cloud provider regions data through Inertia middleware.
+          This example demonstrates how frontend components can access the globally shared cloud
+          provider regions data through Inertia middleware.
         </Text>
       </div>
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-2">
+          <label htmlFor="provider-select" className="block text-sm font-medium mb-2">
             Select Cloud Provider
           </label>
-          <SelectField.Root
-            value={selectedProvider}
-            onValueChange={handleProviderChange}
-          >
+          <SelectField.Root value={selectedProvider} onValueChange={handleProviderChange}>
             <SelectField.Trigger placeholder="Select a provider" />
             <SelectField.Content>
               {providerOptions.map((option) => (
@@ -63,7 +60,7 @@ export function CloudProviderRegionsExample() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">
+          <label htmlFor="region-select" className="block text-sm font-medium mb-2">
             Select Region
           </label>
           <RegionSelector
@@ -95,9 +92,7 @@ export function CloudProviderRegionsExample() {
             return (
               <div key={provider} className="p-3 bg-gray-50 rounded-lg">
                 <div className="flex justify-between items-center mb-2">
-                  <Text className="font-medium capitalize">
-                    {provider.replace('_', ' ')}
-                  </Text>
+                  <Text className="font-medium capitalize">{provider.replace('_', ' ')}</Text>
                   <Text className="kb-content-tertiary">
                     {totalRegions} regions across {continentCount} continents
                   </Text>

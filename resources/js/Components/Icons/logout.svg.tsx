@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 export const LogoutIcon = React.forwardRef<
   React.ElementRef<'svg'>,
@@ -34,5 +34,5 @@ export const LogoutIcon = React.forwardRef<
         />
       </svg>
     </>
-  )
-})
+  );
+});

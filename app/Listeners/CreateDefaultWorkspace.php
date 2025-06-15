@@ -7,7 +7,6 @@ use Illuminate\Auth\Events\Registered;
 
 class CreateDefaultWorkspace
 {
-
     /**
      * Handle user registration events to create a default workspace.
      * This listener automatically creates a workspace with the format
@@ -18,7 +17,7 @@ class CreateDefaultWorkspace
         /** @var \App\Models\User|null $user */
         $user = $event->user;
 
-        $workspaceName = $user->name . "'s workspace";
+        $workspaceName = $user->name."'s workspace";
 
         $user->workspaces()->create([
             'name' => $workspaceName,

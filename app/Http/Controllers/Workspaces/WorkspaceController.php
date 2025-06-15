@@ -7,7 +7,6 @@ use App\Http\Requests\Workspaces\CreateWorkspaceRequest;
 use App\Http\Requests\Workspaces\UpdateWorkspaceRequest;
 use App\Models\Workspace;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-
 use Illuminate\Http\RedirectResponse;
 
 class WorkspaceController extends Controller

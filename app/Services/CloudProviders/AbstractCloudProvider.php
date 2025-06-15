@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Log;
 abstract class AbstractCloudProvider implements CloudProviderInterface
 {
     protected HttpClient $http;
+
     protected int $maxRetries = 2;
+
     protected int $baseDelayMs = 1000;
 
     public function __construct(HttpClient $http)
@@ -23,6 +25,7 @@ abstract class AbstractCloudProvider implements CloudProviderInterface
     {
         $this->maxRetries = $maxRetries;
         $this->baseDelayMs = $baseDelayMs;
+
         return $this;
     }
 
@@ -42,6 +45,7 @@ abstract class AbstractCloudProvider implements CloudProviderInterface
 
                 if ($response->successful()) {
                     $this->logSuccess($method, $url, $response, $attempt);
+
                     return CloudProviderResponse::success(
                         message: 'API request completed successfully',
                         rawResponse: $response->json(),
@@ -51,8 +55,9 @@ abstract class AbstractCloudProvider implements CloudProviderInterface
 
                 $errorResponse = $this->handleErrorResponse($response, $attempt);
 
-                if (!$errorResponse->isRetryable() || $attempt > $this->maxRetries) {
+                if (! $errorResponse->isRetryable() || $attempt > $this->maxRetries) {
                     $this->logFailure($method, $url, $response, $attempt, $errorResponse);
+
                     return $errorResponse;
                 }
 
@@ -63,6 +68,7 @@ abstract class AbstractCloudProvider implements CloudProviderInterface
             } catch (RequestException $e) {
                 if ($attempt > $this->maxRetries) {
                     $this->logNetworkError($method, $url, $attempt, $e);
+
                     return CloudProviderResponse::failure(
                         message: 'Network error occurred while contacting cloud provider',
                         errors: ['network' => $e->getMessage()],
@@ -73,6 +79,7 @@ abstract class AbstractCloudProvider implements CloudProviderInterface
 
             } catch (\Exception $e) {
                 $this->logUnexpectedError($method, $url, $attempt, $e);
+
                 return CloudProviderResponse::failure(
                     message: 'Unexpected error occurred while contacting cloud provider',
                     errors: ['unexpected' => $e->getMessage()],
@@ -213,7 +220,7 @@ abstract class AbstractCloudProvider implements CloudProviderInterface
             $auth = $sanitized['Authorization'];
             if (str_starts_with($auth, 'Bearer ')) {
                 $token = substr($auth, 7);
-                $sanitized['Authorization'] = 'Bearer ' . substr($token, 0, 8) . '***';
+                $sanitized['Authorization'] = 'Bearer '.substr($token, 0, 8).'***';
             }
         }
 

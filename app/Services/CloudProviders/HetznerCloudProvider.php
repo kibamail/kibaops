@@ -11,11 +11,11 @@ class HetznerCloudProvider extends AbstractCloudProvider
      * We check the servers endpoint for read access and SSH keys for write
      * access to ensure the token has sufficient permissions.
      *
-     * @param array $credentials Array containing [token]
+     * @param  array  $credentials  Array containing [token]
      */
     public function verify(array $credentials): CloudProviderResponse
     {
-        if (empty($credentials) || !isset($credentials[0])) {
+        if (empty($credentials) || ! isset($credentials[0])) {
             return CloudProviderResponse::failure(
                 message: 'No credentials provided',
                 errors: ['credentials' => 'Token is required for Hetzner Cloud']
@@ -32,18 +32,20 @@ class HetznerCloudProvider extends AbstractCloudProvider
         }
 
         Log::info('Verifying Hetzner Cloud credentials', [
-            'token_prefix' => substr($token, 0, 8) . '***'
+            'token_prefix' => substr($token, 0, 8).'***',
         ]);
 
         $readResponse = $this->verifyReadAccess($token);
-        if (!$readResponse->success) {
+        if (! $readResponse->success) {
             Log::error('Hetzner Cloud read access verification failed', $readResponse->toArray());
+
             return $readResponse;
         }
 
         $writeResponse = $this->verifyWriteAccess($token);
-        if (!$writeResponse->success) {
+        if (! $writeResponse->success) {
             Log::error('Hetzner Cloud write access verification failed', $writeResponse->toArray());
+
             return $writeResponse;
         }
 
