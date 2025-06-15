@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { RegionSelector, useAllCloudProviderRegions } from "./RegionSelector";
-import { SelectField } from "@kibamail/owly";
+import * as SelectField from "@kibamail/owly/select-field";
 import { Heading } from "@kibamail/owly/heading";
 import { Text } from "@kibamail/owly/text";
 import type { CloudProviderType } from "@/types";
@@ -51,9 +51,7 @@ export function CloudProviderRegionsExample() {
             value={selectedProvider}
             onValueChange={handleProviderChange}
           >
-            <SelectField.Trigger>
-              <SelectField.Value placeholder="Select a provider" />
-            </SelectField.Trigger>
+            <SelectField.Trigger placeholder="Select a provider" />
             <SelectField.Content>
               {providerOptions.map((option) => (
                 <SelectField.Item key={option.value} value={option.value}>

@@ -52,13 +52,8 @@ test('project can be updated', function () {
     $project->refresh();
 
     expect($project->name)->toBe('Updated Project');
-    $response->assertJson([
-        'message' => 'Project updated successfully.',
-        'project' => [
-            'id' => $project->id,
-            'name' => 'Updated Project',
-        ],
-    ]);
+    $response->assertRedirect();
+    $response->assertSessionHas('success', 'Project updated successfully.');
 });
 
 test('project can be deleted', function () {

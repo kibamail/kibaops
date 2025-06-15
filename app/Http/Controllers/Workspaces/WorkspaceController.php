@@ -7,7 +7,7 @@ use App\Http\Requests\Workspaces\CreateWorkspaceRequest;
 use App\Http\Requests\Workspaces\UpdateWorkspaceRequest;
 use App\Models\Workspace;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\JsonResponse;
+
 use Illuminate\Http\RedirectResponse;
 
 class WorkspaceController extends Controller
@@ -31,16 +31,13 @@ class WorkspaceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateWorkspaceRequest $request, Workspace $workspace): JsonResponse
+    public function update(UpdateWorkspaceRequest $request, Workspace $workspace): RedirectResponse
     {
         $this->authorize('update', $workspace);
 
         $workspace->update($request->validated());
 
-        return response()->json([
-            'message' => 'Workspace updated successfully.',
-            'workspace' => $workspace,
-        ]);
+        return redirect()->back()->with('success', 'Workspace updated successfully.');
     }
 
     /**

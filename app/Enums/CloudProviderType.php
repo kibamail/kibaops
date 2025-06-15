@@ -19,11 +19,11 @@ enum CloudProviderType: string
     public function label(): string
     {
         return match ($this) {
-            self::AWS => 'Amazon Web Services',
-            self::HETZNER => 'Hetzner Cloud',
-            self::LEASEWEB => 'LeaseWeb',
-            self::GOOGLE_CLOUD => 'Google Cloud Platform',
-            self::DIGITAL_OCEAN => 'DigitalOcean',
+            self::AWS => 'Amazon web services',
+            self::HETZNER => 'Hetzner cloud',
+            self::LEASEWEB => 'Lease web',
+            self::GOOGLE_CLOUD => 'Google cloud platform',
+            self::DIGITAL_OCEAN => 'Digital ocean',
             self::LINODE => 'Linode',
             self::VULTR => 'Vultr',
             self::OVH => 'OVH',
@@ -39,6 +39,42 @@ enum CloudProviderType: string
     }
 
     /**
+     * Get a description with instructions on how to obtain credentials for this provider.
+     * Returns a short description without the documentation link.
+     */
+    public function description(): string
+    {
+        return match ($this) {
+            self::AWS => 'Create an IAM user with programmatic access in your AWS console.',
+            self::HETZNER => 'Generate an API token in your Hetzner Cloud console under Security > API Tokens.',
+            self::DIGITAL_OCEAN => 'Create a personal access token in your DigitalOcean control panel under API > Tokens.',
+            self::GOOGLE_CLOUD => 'Create a service account and download the JSON key file from Google Cloud Console.',
+            self::LEASEWEB => 'Generate an API key in your LeaseWeb customer portal under API Management.',
+            self::LINODE => 'Create a personal access token in your Linode Cloud Manager under My Profile > API Tokens.',
+            self::VULTR => 'Generate an API key in your Vultr customer portal under Account > API.',
+            self::OVH => 'Create API credentials in your OVH control panel under Advanced > API Management.',
+        };
+    }
+
+    /**
+     * Get the documentation link for this cloud provider.
+     * Returns the URL to the provider-specific documentation.
+     */
+    public function documentationLink(): string
+    {
+        return match ($this) {
+            self::AWS => 'https://kibaops.com/docs/providers/aws',
+            self::HETZNER => 'https://kibaops.com/docs/providers/hetzner',
+            self::DIGITAL_OCEAN => 'https://kibaops.com/docs/providers/digitalocean',
+            self::GOOGLE_CLOUD => 'https://kibaops.com/docs/providers/gcp',
+            self::LEASEWEB => 'https://kibaops.com/docs/providers/leaseweb',
+            self::LINODE => 'https://kibaops.com/docs/providers/linode',
+            self::VULTR => 'https://kibaops.com/docs/providers/vultr',
+            self::OVH => 'https://kibaops.com/docs/providers/ovh',
+        };
+    }
+
+    /**
      * Get the credential fields required for this cloud provider type.
      * Returns an array of field definitions with name, label, type, and validation rules.
      */
@@ -48,14 +84,14 @@ enum CloudProviderType: string
             self::AWS => [
                 [
                     'name' => 'access_key',
-                    'label' => 'Access Key ID',
+                    'label' => 'Access key ID',
                     'type' => 'text',
                     'placeholder' => 'AKIAIOSFODNN7EXAMPLE',
                     'required' => true,
                 ],
                 [
                     'name' => 'secret_key',
-                    'label' => 'Secret Access Key',
+                    'label' => 'Secret access key',
                     'type' => 'password',
                     'placeholder' => 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
                     'required' => true,
@@ -64,16 +100,16 @@ enum CloudProviderType: string
             self::HETZNER => [
                 [
                     'name' => 'token',
-                    'label' => 'API Token',
+                    'label' => 'API token',
                     'type' => 'password',
-                    'placeholder' => 'Enter your Hetzner Cloud API token',
+                    'placeholder' => 'Enter your hetzner cloud api token',
                     'required' => true,
                 ],
             ],
             self::DIGITAL_OCEAN => [
                 [
                     'name' => 'token',
-                    'label' => 'Personal Access Token',
+                    'label' => 'Personal access token',
                     'type' => 'password',
                     'placeholder' => 'Enter your DigitalOcean personal access token',
                     'required' => true,
@@ -82,7 +118,7 @@ enum CloudProviderType: string
             self::GOOGLE_CLOUD => [
                 [
                     'name' => 'service_account_key',
-                    'label' => 'Service Account Key (JSON)',
+                    'label' => 'Service account key (JSON)',
                     'type' => 'textarea',
                     'placeholder' => 'Paste your service account JSON key here',
                     'required' => true,
@@ -100,18 +136,18 @@ enum CloudProviderType: string
             self::LINODE => [
                 [
                     'name' => 'token',
-                    'label' => 'Personal Access Token',
+                    'label' => 'Personal access token',
                     'type' => 'password',
-                    'placeholder' => 'Enter your Linode personal access token',
+                    'placeholder' => 'Enter your linode personal access token',
                     'required' => true,
                 ],
             ],
             self::VULTR => [
                 [
                     'name' => 'api_key',
-                    'label' => 'API Key',
+                    'label' => 'API key',
                     'type' => 'password',
-                    'placeholder' => 'Enter your Vultr API key',
+                    'placeholder' => 'Enter your vultr api key',
                     'required' => true,
                 ],
             ],
@@ -120,21 +156,21 @@ enum CloudProviderType: string
                     'name' => 'application_key',
                     'label' => 'Application Key',
                     'type' => 'text',
-                    'placeholder' => 'Enter your OVH application key',
+                    'placeholder' => 'Enter your ovh application key',
                     'required' => true,
                 ],
                 [
                     'name' => 'application_secret',
                     'label' => 'Application Secret',
                     'type' => 'password',
-                    'placeholder' => 'Enter your OVH application secret',
+                    'placeholder' => 'Enter your ovh application secret',
                     'required' => true,
                 ],
                 [
                     'name' => 'consumer_key',
                     'label' => 'Consumer Key',
                     'type' => 'password',
-                    'placeholder' => 'Enter your OVH consumer key',
+                    'placeholder' => 'Enter your ovh consumer key',
                     'required' => true,
                 ],
             ],
@@ -443,7 +479,7 @@ enum CloudProviderType: string
 
     /**
      * Get all cloud provider data for frontend consumption.
-     * Returns an array with provider information including type, name, implementation status, and credential fields.
+     * Returns an array with provider information including type, name, implementation status, description, documentation link, and credential fields.
      */
     public static function allProviders(): array
     {
@@ -453,6 +489,8 @@ enum CloudProviderType: string
             'type' => $case->value,
             'name' => $case->label(),
             'implemented' => in_array($case->value, $implementedTypes),
+            'description' => $case->description(),
+            'documentationLink' => $case->documentationLink(),
             'credentialFields' => $case->credentialFields(),
         ])->toArray();
     }

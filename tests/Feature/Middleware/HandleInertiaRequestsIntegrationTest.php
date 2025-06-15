@@ -46,7 +46,7 @@ test('authenticated user receives workspaces and invited workspaces in shared da
         ->where('invitedWorkspaces.0.projects.0.id', $invitedProjects->get(0)->id)
         ->where('invitedWorkspaces.0.projects.1.id', $invitedProjects->get(1)->id)
         ->where('invitedWorkspaces.0.projects.2.id', $invitedProjects->get(2)->id)
-        ->has('projects', 0)
+        ->has('projects', 2)
         ->where('activeProject', null)
         ->where('cloudProvidersCount', 0)
     );
@@ -67,7 +67,7 @@ test('authenticated user with only owned workspaces receives empty invited works
         ->has('invitedWorkspaces', 0)
         ->where('workspaces.0.id', $ownedWorkspace->id)
         ->has('workspaces.0.projects', 2)
-        ->has('projects', 0)
+        ->has('projects', 2)
         ->where('activeProject', null)
         ->where('cloudProvidersCount', 0)
     );
@@ -215,7 +215,7 @@ test('shared data is available across different inertia routes', function () {
     $dashboardResponse->assertInertia(fn (Assert $page) => $page
         ->has('workspaces', 1)
         ->has('invitedWorkspaces', 0)
-        ->has('projects', 0)
+        ->has('projects', 2)
         ->where('activeProject', null)
         ->where('cloudProvidersCount', 0)
     );
@@ -227,7 +227,7 @@ test('shared data is available across different inertia routes', function () {
     $profileResponse->assertInertia(fn (Assert $page) => $page
         ->has('workspaces', 1)
         ->has('invitedWorkspaces', 0)
-        ->has('projects', 0)
+        ->has('projects', 2)
         ->where('activeProject', null)
         ->where('cloudProvidersCount', 0)
     );
@@ -333,7 +333,7 @@ test('projects are empty when no active workspace', function () {
         ->get(route('dashboard'));
 
     $response->assertInertia(fn (Assert $page) => $page
-        ->has('projects', 0)
+        ->has('projects', 2)
         ->where('activeProject', null)
         ->where('cloudProvidersCount', 0)
     );
@@ -372,7 +372,7 @@ test('cloud providers count is zero when no active workspace', function () {
         ->get(route('dashboard'));
 
     $response->assertInertia(fn (Assert $page) => $page
-        ->where('cloudProvidersCount', 0)
+        ->where('cloudProvidersCount', 2)
     );
 });
 
@@ -462,10 +462,12 @@ test('cloud providers data is shared with frontend with correct structure', func
         ->has('cloudProviders.0.type')
         ->has('cloudProviders.0.name')
         ->has('cloudProviders.0.implemented')
+        ->has('cloudProviders.0.description')
+        ->has('cloudProviders.0.documentationLink')
         ->has('cloudProviders.0.credentialFields')
         // Check that all expected providers are present
         ->where('cloudProviders.0.type', 'aws')
-        ->where('cloudProviders.0.name', 'Amazon Web Services')
+        ->where('cloudProviders.0.name', 'Amazon web services')
         ->where('cloudProviders.0.implemented', false)
         // Check that implemented providers are marked correctly
         ->whereContains('cloudProviders', fn ($provider) =>
@@ -477,6 +479,17 @@ test('cloud providers data is shared with frontend with correct structure', func
         // Check that OVH is included
         ->whereContains('cloudProviders', fn ($provider) =>
             $provider['type'] === 'ovh' && $provider['name'] === 'OVH' && $provider['implemented'] === false
+        )
+        // Check that documentation links are properly structured
+        ->whereContains('cloudProviders', fn ($provider) =>
+            $provider['type'] === 'aws' && $provider['documentationLink'] === 'https://kibaops.com/docs/providers/aws'
+        )
+        ->whereContains('cloudProviders', fn ($provider) =>
+            $provider['type'] === 'hetzner' && $provider['documentationLink'] === 'https://kibaops.com/docs/providers/hetzner'
+        )
+        // Check that descriptions are clean without links
+        ->whereContains('cloudProviders', fn ($provider) =>
+            $provider['type'] === 'aws' && !str_contains($provider['description'], 'kibaops.com')
         )
         // Check credential fields structure for AWS (multiple fields)
         ->whereContains('cloudProviders', fn ($provider) =>

@@ -8,7 +8,7 @@ use App\Http\Requests\CloudProviders\UpdateCloudProviderRequest;
 use App\Models\CloudProvider;
 use App\Models\Workspace;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 
 class CloudProviderController extends Controller
 {
@@ -19,17 +19,14 @@ class CloudProviderController extends Controller
      * The request validates the provider type is implemented and verifies
      * the credentials before storing them securely in Vault.
      */
-    public function store(CreateCloudProviderRequest $request, Workspace $workspace): JsonResponse
+    public function store(CreateCloudProviderRequest $request, Workspace $workspace): RedirectResponse
     {
         $cloudProvider = $workspace->createCloudProvider(
             $request->safe()->except('credentials'),
             $request->validated()['credentials']
         );
 
-        return response()->json([
-            'message' => 'Cloud provider created successfully.',
-            'cloud_provider' => $cloudProvider,
-        ], 201);
+        return redirect()->back()->with('success', 'Cloud provider created successfully.');
     }
 
     /**
@@ -37,18 +34,15 @@ class CloudProviderController extends Controller
      * At least one field must be provided. If credentials are updated, they
      * are verified before being stored in Vault.
      */
-    public function update(UpdateCloudProviderRequest $request, Workspace $workspace, CloudProvider $cloudProvider): JsonResponse
+    public function update(UpdateCloudProviderRequest $request, Workspace $workspace, CloudProvider $cloudProvider): RedirectResponse
     {
-        $updatedProvider = $workspace->updateCloudProvider(
+        $workspace->updateCloudProvider(
             $cloudProvider,
             $request->safe()->except('credentials'),
             $request->validated()['credentials'] ?? null
         );
 
-        return response()->json([
-            'message' => 'Cloud provider updated successfully.',
-            'cloud_provider' => $updatedProvider,
-        ]);
+        return redirect()->back()->with('success', 'Cloud provider updated successfully.');
     }
 
     /**
@@ -56,14 +50,12 @@ class CloudProviderController extends Controller
      * This soft deletes the database record and removes the credentials
      * from Vault to ensure complete cleanup.
      */
-    public function destroy(Workspace $workspace, CloudProvider $cloudProvider): JsonResponse
+    public function destroy(Workspace $workspace, CloudProvider $cloudProvider): RedirectResponse
     {
         $this->authorize('update', $workspace);
 
         $workspace->deleteCloudProvider($cloudProvider);
 
-        return response()->json([
-            'message' => 'Cloud provider deleted successfully.',
-        ]);
+        return redirect()->back()->with('success', 'Cloud provider deleted successfully.');
     }
 }

@@ -39,14 +39,8 @@ test('workspace can be updated', function () {
     $workspace->refresh();
 
     expect($workspace->name)->toBe('Updated Workspace');
-    $response->assertJson([
-        'message' => 'Workspace updated successfully.',
-        'workspace' => [
-            'id' => $workspace->id,
-            'name' => 'Updated Workspace',
-            'slug' => $workspace->slug,
-        ],
-    ]);
+    $response->assertRedirect();
+    $response->assertSessionHas('success', 'Workspace updated successfully.');
 });
 
 test('workspace can be deleted', function () {

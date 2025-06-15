@@ -1,4 +1,4 @@
-import { SelectField } from "@kibamail/owly";
+import * as SelectField from "@kibamail/owly/select-field";
 import { usePage } from "@inertiajs/react";
 import type { CloudProviderType, CloudProviderRegion, CloudProviderRegionsByContinent, PageProps } from "@/types";
 
@@ -32,9 +32,7 @@ export function RegionSelector({
   if (!hasRegions) {
     return (
       <SelectField.Root disabled>
-        <SelectField.Trigger>
-          <SelectField.Value placeholder="No regions available" />
-        </SelectField.Trigger>
+        <SelectField.Trigger placeholder="No regions available" />
       </SelectField.Root>
     );
   }
@@ -45,9 +43,7 @@ export function RegionSelector({
       onValueChange={onRegionChange}
       disabled={disabled}
     >
-      <SelectField.Trigger>
-        <SelectField.Value placeholder={placeholder} />
-      </SelectField.Trigger>
+      <SelectField.Trigger placeholder={placeholder} />
       <SelectField.Content>
         {groupByContinent ? (
           Object.entries(regionsByContinent).map(([continent, regions]) => (

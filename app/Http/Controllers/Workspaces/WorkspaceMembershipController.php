@@ -9,7 +9,7 @@ use App\Http\Requests\Workspaces\UpdateWorkspaceMembershipRequest;
 use App\Models\Workspace;
 use App\Models\WorkspaceMembership;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -32,7 +32,7 @@ class WorkspaceMembershipController extends Controller
         ]);
     }
 
-    public function store(CreateWorkspaceMembershipRequest $request, Workspace $workspace): JsonResponse
+    public function store(CreateWorkspaceMembershipRequest $request, Workspace $workspace): RedirectResponse
     {
         $this->authorize('update', $workspace);
 
@@ -41,15 +41,12 @@ class WorkspaceMembershipController extends Controller
         $projectIds = $validated['project_ids'];
         $role = $validated['role'];
 
-        $createdMemberships = $workspace->createMemberships($emails, $projectIds, $role);
+        $workspace->createMemberships($emails, $projectIds, $role);
 
-        return response()->json([
-            'message' => 'Memberships created successfully',
-            'memberships' => $createdMemberships,
-        ]);
+        return redirect()->back()->with('success', 'Memberships created successfully');
     }
 
-    public function update(UpdateWorkspaceMembershipRequest $request, Workspace $workspace, WorkspaceMembership $membership): JsonResponse
+    public function update(UpdateWorkspaceMembershipRequest $request, Workspace $workspace, WorkspaceMembership $membership): RedirectResponse
     {
         $this->authorize('update', $workspace);
 
@@ -61,20 +58,14 @@ class WorkspaceMembershipController extends Controller
         }
 
         $membership->projects()->sync($projectIds);
-        $membership->load(['user', 'projects']);
 
-        return response()->json([
-            'message' => 'Membership updated successfully',
-            'membership' => $membership,
-        ]);
+        return redirect()->back()->with('success', 'Membership updated successfully');
     }
 
-    public function destroy(DeleteWorkspaceMembershipRequest $request, Workspace $workspace, WorkspaceMembership $membership): JsonResponse
+    public function destroy(DeleteWorkspaceMembershipRequest $request, Workspace $workspace, WorkspaceMembership $membership): RedirectResponse
     {
         $membership->delete();
 
-        return response()->json([
-            'message' => 'Membership deleted successfully',
-        ]);
+        return redirect()->back()->with('success', 'Membership deleted successfully');
     }
 }

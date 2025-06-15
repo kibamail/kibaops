@@ -6,6 +6,7 @@ use App\Enums\CloudProviderType;
 use App\Rules\ImplementedCloudProviderType;
 use App\Rules\ValidCloudProviderCredentials;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class CreateCloudProviderRequest extends FormRequest
@@ -16,9 +17,7 @@ class CreateCloudProviderRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $workspace = $this->route('workspace');
-
-        return $this->user()->can('update', $workspace);
+        return $this->user()->can('update', $this->route('workspace'));
     }
 
     /**

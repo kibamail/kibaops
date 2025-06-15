@@ -8,7 +8,7 @@ use App\Http\Requests\Projects\UpdateEnvironmentRequest;
 use App\Models\Environment;
 use App\Models\Project;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\JsonResponse;
+
 use Illuminate\Http\RedirectResponse;
 
 class EnvironmentController extends Controller
@@ -33,16 +33,13 @@ class EnvironmentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateEnvironmentRequest $request, Project $project, Environment $environment): JsonResponse
+    public function update(UpdateEnvironmentRequest $request, Project $project, Environment $environment): RedirectResponse
     {
         $this->authorize('update', $environment);
 
         $environment->update($request->validated());
 
-        return response()->json([
-            'message' => 'Environment updated successfully.',
-            'environment' => $environment,
-        ]);
+        return redirect()->back()->with('success', 'Environment updated successfully.');
     }
 
     /**

@@ -167,13 +167,8 @@ test('workspace admin can update environment', function () {
     $environment->refresh();
 
     expect($environment->slug)->toBe('updated-environment');
-    $response->assertJson([
-        'message' => 'Environment updated successfully.',
-        'environment' => [
-            'id' => $environment->id,
-            'slug' => 'updated-environment',
-        ],
-    ]);
+    $response->assertRedirect();
+    $response->assertSessionHas('success', 'Environment updated successfully.');
 });
 
 test('workspace developer cannot update environment', function () {

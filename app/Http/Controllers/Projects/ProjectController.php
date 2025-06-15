@@ -7,7 +7,6 @@ use App\Http\Requests\Projects\CreateProjectRequest;
 use App\Http\Requests\Projects\UpdateProjectRequest;
 use App\Models\Project;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -42,16 +41,13 @@ class ProjectController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProjectRequest $request, Project $project): JsonResponse
+    public function update(UpdateProjectRequest $request, Project $project): RedirectResponse
     {
         $this->authorize('update', $project);
 
         $project->update($request->validated());
 
-        return response()->json([
-            'message' => 'Project updated successfully.',
-            'project' => $project,
-        ]);
+        return redirect()->back()->with('success', 'Project updated successfully.');
     }
 
     /**

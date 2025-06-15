@@ -2,6 +2,8 @@
 
 namespace App\Contracts;
 
+use App\Services\CloudProviders\CloudProviderResponse;
+
 interface CloudProviderInterface
 {
     /**
@@ -10,6 +12,7 @@ interface CloudProviderInterface
      * credentials have sufficient permissions for our operations.
      *
      * @param array $credentials Array of credential values in the order defined by credentialFields()
+     * @return CloudProviderResponse Detailed response including success status, messages, and error details
      */
-    public function verify(array $credentials): bool;
+    public function verify(array $credentials): CloudProviderResponse;
 }

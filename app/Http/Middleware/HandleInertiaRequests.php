@@ -32,9 +32,14 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $activeWorkspaceId = $request->cookie('active_workspace_id');
+
+        if (! $activeWorkspaceId && $request->user()) {
+            $firstWorkspace = $request->user()->workspaces()->first();
+            $activeWorkspaceId = $firstWorkspace ? $firstWorkspace->id : null;
+        }
+
         $activeProjectId = $this->extractActiveProjectId($request);
 
-        // Get workspaces with projects
         $workspaces = $request->user()
             ? $request->user()->workspaces()->with('projects')->latest()->get()
             : [];
@@ -42,15 +47,12 @@ class HandleInertiaRequests extends Middleware
             ? $request->user()->invitedWorkspaces()->with('projects')->latest()->get()
             : [];
 
-        // Find active workspace and its projects
         $allWorkspaces = collect($workspaces)->concat(collect($invitedWorkspaces));
         $activeWorkspace = $allWorkspaces->firstWhere('id', $activeWorkspaceId);
         $projects = $activeWorkspace ? $activeWorkspace->projects : collect();
 
-        // Find active project
         $activeProject = $activeProjectId ? $projects->firstWhere('id', $activeProjectId) : null;
 
-        // Count cloud providers for the active workspace
         $cloudProvidersCount = $activeWorkspace ? $activeWorkspace->cloudProviders()->count() : 0;
 
         return [

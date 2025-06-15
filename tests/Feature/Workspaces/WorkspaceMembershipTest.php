@@ -36,13 +36,14 @@ test('workspace memberships can be created with bulk emails', function () {
 
     $response = $this
         ->actingAs($user)
-        ->postJson(route('workspaces.memberships.store', $workspace), [
+        ->post(route('workspaces.memberships.store', $workspace), [
             'emails' => $emails,
             'project_ids' => $projectIds,
             'role' => 'developer',
         ]);
 
-    $response->assertStatus(200);
+    $response->assertRedirect();
+    $response->assertSessionHas('success', 'Memberships created successfully');
 
     foreach ($emails as $email) {
         $membership = WorkspaceMembership::where('email', $email)->first();
@@ -65,13 +66,14 @@ test('workspace memberships automatically link existing users', function () {
 
     $response = $this
         ->actingAs($owner)
-        ->postJson(route('workspaces.memberships.store', $workspace), [
+        ->post(route('workspaces.memberships.store', $workspace), [
             'emails' => $emails,
             'project_ids' => $projectIds,
             'role' => 'admin',
         ]);
 
-    $response->assertStatus(200);
+    $response->assertRedirect();
+    $response->assertSessionHas('success', 'Memberships created successfully');
 
     $existingUserMembership = WorkspaceMembership::where('email', $existingUser->email)->first();
     expect($existingUserMembership->user_id)->toBe($existingUser->id)
@@ -90,14 +92,14 @@ test('workspace membership creation validates project ownership', function () {
 
     $response = $this
         ->actingAs($user)
-        ->postJson(route('workspaces.memberships.store', $workspace), [
+        ->post(route('workspaces.memberships.store', $workspace), [
             'emails' => ['test@example.com'],
             'project_ids' => [$otherProject->id],
             'role' => 'developer',
         ]);
 
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors(['project_ids.0']);
+    $response->assertRedirect();
+    $response->assertSessionHasErrors(['project_ids.0']);
 });
 
 test('workspace membership can be updated', function () {
@@ -112,12 +114,13 @@ test('workspace membership can be updated', function () {
 
     $response = $this
         ->actingAs($user)
-        ->putJson(route('workspaces.memberships.update', [$workspace, $membership]), [
+        ->put(route('workspaces.memberships.update', [$workspace, $membership]), [
             'project_ids' => $newProjectIds,
             'role' => 'admin',
         ]);
 
-    $response->assertStatus(200);
+    $response->assertRedirect();
+    $response->assertSessionHas('success', 'Membership updated successfully');
 
     $membership->refresh();
     expect($membership->projects->count())->toBe(1)
@@ -132,9 +135,10 @@ test('workspace membership can be deleted', function () {
 
     $response = $this
         ->actingAs($user)
-        ->deleteJson(route('workspaces.memberships.destroy', [$workspace, $membership]));
+        ->delete(route('workspaces.memberships.destroy', [$workspace, $membership]));
 
-    $response->assertStatus(200);
+    $response->assertRedirect();
+    $response->assertSessionHas('success', 'Membership deleted successfully');
     $this->assertModelMissing($membership);
 });
 
@@ -158,7 +162,7 @@ test('user cannot create memberships for other users workspaces', function () {
 
     $response = $this
         ->actingAs($user2)
-        ->postJson(route('workspaces.memberships.store', $workspace), [
+        ->post(route('workspaces.memberships.store', $workspace), [
             'emails' => ['test@example.com'],
             'project_ids' => [$project->id],
             'role' => 'developer',
@@ -176,7 +180,7 @@ test('user cannot update memberships for other users workspaces', function () {
 
     $response = $this
         ->actingAs($user2)
-        ->putJson(route('workspaces.memberships.update', [$workspace, $membership]), [
+        ->put(route('workspaces.memberships.update', [$workspace, $membership]), [
             'project_ids' => [$project->id],
             'role' => 'admin',
         ]);
@@ -192,7 +196,7 @@ test('user cannot delete memberships for other users workspaces', function () {
 
     $response = $this
         ->actingAs($user2)
-        ->deleteJson(route('workspaces.memberships.destroy', [$workspace, $membership]));
+        ->delete(route('workspaces.memberships.destroy', [$workspace, $membership]));
 
     $response->assertForbidden();
     $this->assertModelExists($membership);
@@ -205,14 +209,14 @@ test('membership creation requires valid email format', function () {
 
     $response = $this
         ->actingAs($user)
-        ->postJson(route('workspaces.memberships.store', $workspace), [
+        ->post(route('workspaces.memberships.store', $workspace), [
             'emails' => ['invalid-email'],
             'project_ids' => [$project->id],
             'role' => 'developer',
         ]);
 
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors(['emails.0']);
+    $response->assertRedirect();
+    $response->assertSessionHasErrors(['emails.0']);
 });
 
 test('membership creation requires at least one email', function () {
@@ -222,14 +226,14 @@ test('membership creation requires at least one email', function () {
 
     $response = $this
         ->actingAs($user)
-        ->postJson(route('workspaces.memberships.store', $workspace), [
+        ->post(route('workspaces.memberships.store', $workspace), [
             'emails' => [],
             'project_ids' => [$project->id],
             'role' => 'developer',
         ]);
 
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors(['emails']);
+    $response->assertRedirect();
+    $response->assertSessionHasErrors(['emails']);
 });
 
 test('membership creation requires at least one project', function () {
@@ -238,14 +242,14 @@ test('membership creation requires at least one project', function () {
 
     $response = $this
         ->actingAs($user)
-        ->postJson(route('workspaces.memberships.store', $workspace), [
+        ->post(route('workspaces.memberships.store', $workspace), [
             'emails' => ['test@example.com'],
             'project_ids' => [],
             'role' => 'developer',
         ]);
 
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors(['project_ids']);
+    $response->assertRedirect();
+    $response->assertSessionHasErrors(['project_ids']);
 });
 
 test('user can access their invited workspaces', function () {
@@ -275,14 +279,14 @@ test('membership creation requires a valid role', function () {
 
     $response = $this
         ->actingAs($user)
-        ->postJson(route('workspaces.memberships.store', $workspace), [
+        ->post(route('workspaces.memberships.store', $workspace), [
             'emails' => ['test@example.com'],
             'project_ids' => [$project->id],
             'role' => 'invalid_role',
         ]);
 
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors(['role']);
+    $response->assertRedirect();
+    $response->assertSessionHasErrors(['role']);
 });
 
 test('membership creation requires role field', function () {
@@ -292,13 +296,13 @@ test('membership creation requires role field', function () {
 
     $response = $this
         ->actingAs($user)
-        ->postJson(route('workspaces.memberships.store', $workspace), [
+        ->post(route('workspaces.memberships.store', $workspace), [
             'emails' => ['test@example.com'],
             'project_ids' => [$project->id],
         ]);
 
-    $response->assertStatus(422);
-    $response->assertJsonValidationErrors(['role']);
+    $response->assertRedirect();
+    $response->assertSessionHasErrors(['role']);
 });
 
 test('membership can be created with admin role', function () {
@@ -308,13 +312,14 @@ test('membership can be created with admin role', function () {
 
     $response = $this
         ->actingAs($user)
-        ->postJson(route('workspaces.memberships.store', $workspace), [
+        ->post(route('workspaces.memberships.store', $workspace), [
             'emails' => ['test@example.com'],
             'project_ids' => [$project->id],
             'role' => 'admin',
         ]);
 
-    $response->assertStatus(200);
+    $response->assertRedirect();
+    $response->assertSessionHas('success', 'Memberships created successfully');
 
     $membership = WorkspaceMembership::where('email', 'test@example.com')->first();
     expect($membership->role->value)->toBe('admin');
@@ -330,12 +335,13 @@ test('membership role can be updated', function () {
 
     $response = $this
         ->actingAs($user)
-        ->putJson(route('workspaces.memberships.update', [$workspace, $membership]), [
+        ->put(route('workspaces.memberships.update', [$workspace, $membership]), [
             'project_ids' => [$project->id],
             'role' => 'admin',
         ]);
 
-    $response->assertStatus(200);
+    $response->assertRedirect();
+    $response->assertSessionHas('success', 'Membership updated successfully');
 
     $membership->refresh();
     expect($membership->role->value)->toBe('admin');
@@ -351,11 +357,12 @@ test('membership role update is optional', function () {
 
     $response = $this
         ->actingAs($user)
-        ->putJson(route('workspaces.memberships.update', [$workspace, $membership]), [
+        ->put(route('workspaces.memberships.update', [$workspace, $membership]), [
             'project_ids' => [$project->id],
         ]);
 
-    $response->assertStatus(200);
+    $response->assertRedirect();
+    $response->assertSessionHas('success', 'Membership updated successfully');
 
     $membership->refresh();
     expect($membership->role->value)->toBe('admin');

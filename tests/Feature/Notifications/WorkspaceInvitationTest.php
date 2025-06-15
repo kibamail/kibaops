@@ -21,13 +21,14 @@ test('existing users receive email and database notifications when added to work
 
     $response = $this
         ->actingAs($workspaceOwner)
-        ->postJson(route('workspaces.memberships.store', $workspace), [
+        ->post(route('workspaces.memberships.store', $workspace), [
             'emails' => ['existing@example.com'],
             'project_ids' => [$project->id],
             'role' => 'developer',
         ]);
 
-    $response->assertStatus(200);
+    $response->assertRedirect();
+    $response->assertSessionHas('success', 'Memberships created successfully');
 
     $membership = WorkspaceMembership::where('email', 'existing@example.com')->first();
     expect($membership->user_id)->toBe($existingUser->id);
@@ -51,13 +52,14 @@ test('new users do not receive notifications immediately when invited', function
 
     $response = $this
         ->actingAs($workspaceOwner)
-        ->postJson(route('workspaces.memberships.store', $workspace), [
+        ->post(route('workspaces.memberships.store', $workspace), [
             'emails' => ['newuser@example.com'],
             'project_ids' => [$project->id],
             'role' => 'developer',
         ]);
 
-    $response->assertStatus(200);
+    $response->assertRedirect();
+    $response->assertSessionHas('success', 'Memberships created successfully');
 
     $membership = WorkspaceMembership::where('email', 'newuser@example.com')->first();
     expect($membership->user_id)->toBeNull();

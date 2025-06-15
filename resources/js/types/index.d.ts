@@ -94,6 +94,8 @@ export interface CloudProviderInfo {
   type: CloudProviderType;
   name: string;
   implemented: boolean;
+  description: string;
+  documentationLink: string;
   credentialFields: CloudProviderCredentialField[];
 }
 
