@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Ramsey\Uuid\Uuid;
 
 class Workspace extends Model
 {
@@ -72,28 +71,15 @@ class Workspace extends Model
     {
         $usersByEmail = User::whereIn('email', $emails)->get()->keyBy('email');
 
-        $membershipsData = collect($emails)->map(function ($email) use ($usersByEmail, $role) {
-            return [
-                'id' => Uuid::uuid4()->toString(),
-                'workspace_id' => $this->id,
-                'email' => $email,
-                'user_id' => $usersByEmail->get($email)?->id,
-                'role' => $role,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-        });
+        DB::transaction(function () use ($emails, $usersByEmail, $projectIds, $role) {
+            foreach ($emails as $email) {
+                $membership = WorkspaceMembership::updateOrCreate(
+                    ['workspace_id' => $this->id, 'email' => $email],
+                    ['user_id' => $usersByEmail->get($email)?->id, 'role' => $role]
+                );
 
-        DB::transaction(function () use ($membershipsData, $projectIds) {
-            WorkspaceMembership::upsert(
-                $membershipsData->all(),
-                uniqueBy: ['workspace_id', 'email'],
-                update: ['user_id', 'role', 'updated_at']
-            );
-
-            $memberships = $this->memberships()->whereIn('email', $membershipsData->pluck('email'))->get();
-
-            $memberships->each(fn (WorkspaceMembership $membership) => $membership->projects()->sync($projectIds));
+                $membership->projects()->sync($projectIds);
+            }
         });
 
         $createdMemberships = $this->memberships()
