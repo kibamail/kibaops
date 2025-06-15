@@ -1,4 +1,5 @@
 import { Topbar } from "@/Components/Dashboard/Topbar";
+import { OnboardingSidebar } from "@/Components/Layout/OnboardingSidebar";
 import { Text } from "@kibamail/owly/text";
 import type { PropsWithChildren } from "react";
 
@@ -9,7 +10,12 @@ export default function Authenticated({ children }: PropsWithChildren) {
             <main className="w-full kb-background-secondary flex flex-col h-[calc(100vh-5rem)] overflow-y-hidden">
                 <div className="w-full pr-2 flex pl-2 h-full">
                     <div className="w-full rounded-lg border border-b kb-border-tertiary overflow-y-auto h-full flex-grow">
-                        <div className="flex flex-grow w-full h-full">{children}</div>
+                        <div className="flex flex-grow w-full h-full">
+                            <div className="w-full flex-grow">{children}</div>
+                            <div className="w-full max-w-md p-6 border-l kb-border-tertiary">
+                                <OnboardingSidebar />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </main>
