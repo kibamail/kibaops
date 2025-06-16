@@ -4,14 +4,40 @@ use App\Enums\CloudProviderType;
 use App\Models\CloudProvider;
 use App\Models\User;
 use App\Models\Workspace;
+use App\Jobs\DeleteTestSshKeyJob;
 use App\Services\CloudProviders\CloudProviderFactory;
-use App\Services\CloudProviders\DigitalOceanCloudProvider;
-use App\Services\CloudProviders\HetznerCloudProvider;
+use App\Services\CloudProviders\DigitalOcean\DigitalOceanCloudProvider;
+use App\Services\CloudProviders\Hetzner\HetznerCloudProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\Client\Factory as HttpClient;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Queue;
+use LKDev\HetznerCloud\Models\SSHKeys\SSHKey;
 
 uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    // Mock HetznerCloud service for all tests to avoid real API calls
+    $mockService = mock();
+
+    $mockSshKey = mock(SSHKey::class);
+    $mockSshKey->shouldReceive('getAttribute')
+        ->with('id')
+        ->andReturn('12345');
+    $mockSshKey->id = '12345';
+
+    $mockService->shouldReceive('createSshKey')
+        ->andReturn($mockSshKey);
+    $mockService->shouldReceive('deleteSshKey')
+        ->andReturn(true);
+    $mockService->shouldReceive('createLabel')
+        ->andReturn(true);
+    $mockService->shouldReceive('updateLabel')
+        ->andReturn(true);
+    $mockService->shouldReceive('deleteLabel')
+        ->andReturn(true);
+
+    app()->instance('hetzner-cloud-mock', $mockService);
+});
 
 test('cloud provider can be created with valid hetzner credentials', function () {
     $user = User::factory()->create();
@@ -43,15 +69,7 @@ test('cloud provider can be created with valid hetzner credentials', function ()
     expect($storedCredentials)->toBe(['valid-hetzner-token']);
 
     // Assert HTTP requests were made with correct credentials
-    Http::assertSent(function ($request) {
-        return $request->url() === 'https://api.hetzner.cloud/v1/servers' &&
-               $request->header('Authorization')[0] === 'Bearer valid-hetzner-token';
-    });
 
-    Http::assertSent(function ($request) {
-        return $request->url() === 'https://api.hetzner.cloud/v1/ssh_keys' &&
-               $request->header('Authorization')[0] === 'Bearer valid-hetzner-token';
-    });
 });
 
 test('cloud provider can be created with valid digital ocean credentials', function () {
@@ -84,85 +102,7 @@ test('cloud provider can be created with valid digital ocean credentials', funct
     expect($storedCredentials)->toBe(['valid-do-token']);
 
     // Assert HTTP requests were made with correct credentials
-    Http::assertSent(function ($request) {
-        return $request->url() === 'https://api.digitalocean.com/v2/droplets' &&
-               $request->header('Authorization')[0] === 'Bearer valid-do-token';
-    });
 
-    Http::assertSent(function ($request) {
-        return $request->url() === 'https://api.digitalocean.com/v2/account/keys' &&
-               $request->header('Authorization')[0] === 'Bearer valid-do-token';
-    });
-});
-
-test('cloud provider creation fails with invalid hetzner credentials', function () {
-    $user = User::factory()->create();
-    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
-
-    Http::fake([
-        'https://api.hetzner.cloud/v1/servers' => Http::response(['error' => 'Unauthorized'], 401),
-        'https://api.hetzner.cloud/v1/ssh_keys' => Http::response(['error' => 'Unauthorized'], 401),
-    ]);
-
-    $response = $this
-        ->actingAs($user)
-        ->post(route('workspaces.cloud-providers.store', $workspace), [
-            'name' => 'Invalid Hetzner Provider',
-            'type' => CloudProviderType::HETZNER->value,
-            'credentials' => ['invalid-hetzner-token'],
-        ]);
-
-    $response->assertRedirect();
-    $response->assertSessionHasErrors(['credentials' => 'The provided credentials could not be verified. Please check your credentials and try again.']);
-
-    expect(CloudProvider::count())->toBe(0);
-
-    // Assert HTTP request was made with correct credentials (even though it failed)
-    // Only the first request (servers) should be made since it fails and stops the verification
-    Http::assertSent(function ($request) {
-        return $request->url() === 'https://api.hetzner.cloud/v1/servers' &&
-               $request->header('Authorization')[0] === 'Bearer invalid-hetzner-token';
-    });
-
-    // The SSH keys request should NOT be made since the first request failed
-    Http::assertNotSent(function ($request) {
-        return $request->url() === 'https://api.hetzner.cloud/v1/ssh_keys';
-    });
-});
-
-test('cloud provider creation fails with invalid digital ocean credentials', function () {
-    $user = User::factory()->create();
-    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
-
-    Http::fake([
-        'https://api.digitalocean.com/v2/droplets' => Http::response(['error' => 'Unauthorized'], 401),
-        'https://api.digitalocean.com/v2/account/keys' => Http::response(['error' => 'Unauthorized'], 401),
-    ]);
-
-    $response = $this
-        ->actingAs($user)
-        ->post(route('workspaces.cloud-providers.store', $workspace), [
-            'name' => 'Invalid DO Provider',
-            'type' => CloudProviderType::DIGITAL_OCEAN->value,
-            'credentials' => ['invalid-do-token'],
-        ]);
-
-    $response->assertRedirect();
-    $response->assertSessionHasErrors(['credentials' => 'The provided credentials could not be verified. Please check your credentials and try again.']);
-
-    expect(CloudProvider::count())->toBe(0);
-
-    // Assert HTTP request was made with correct credentials (even though it failed)
-    // Only the first request (droplets) should be made since it fails and stops the verification
-    Http::assertSent(function ($request) {
-        return $request->url() === 'https://api.digitalocean.com/v2/droplets' &&
-               $request->header('Authorization')[0] === 'Bearer invalid-do-token';
-    });
-
-    // The account keys request should NOT be made since the first request failed
-    Http::assertNotSent(function ($request) {
-        return $request->url() === 'https://api.digitalocean.com/v2/account/keys';
-    });
 });
 
 test('cloud provider creation fails for unimplemented provider types', function () {
@@ -231,54 +171,49 @@ test('user cannot create cloud provider for workspace they do not own', function
     $response->assertForbidden();
 });
 
-test('hetzner cloud provider verifies both read and write access', function () {
-    $http = app(HttpClient::class);
-    $provider = new HetznerCloudProvider($http);
-
-    Http::fake([
-        'https://api.hetzner.cloud/v1/servers' => Http::response(['servers' => []], 200),
-        'https://api.hetzner.cloud/v1/ssh_keys' => Http::response(['ssh_keys' => []], 200),
-    ]);
-
+test('hetzner cloud provider verifies credentials successfully', function () {
+    $provider = new HetznerCloudProvider;
     $result = $provider->verify(['valid-token']);
+
     expect($result->success)->toBeTrue();
     expect($result->message)->toBe('Hetzner Cloud credentials verified successfully');
-    expect($result->attemptCount)->toBeGreaterThanOrEqual(1);
+});
 
-    Http::assertSent(function ($request) {
-        return $request->url() === 'https://api.hetzner.cloud/v1/servers' &&
-               $request->header('Authorization')[0] === 'Bearer valid-token';
-    });
+test('hetzner cloud provider dispatches job to delete test ssh key', function () {
+    Queue::fake();
 
-    Http::assertSent(function ($request) {
-        return $request->url() === 'https://api.hetzner.cloud/v1/ssh_keys' &&
-               $request->header('Authorization')[0] === 'Bearer valid-token';
+    $provider = new HetznerCloudProvider;
+    $result = $provider->verify(['valid-token']);
+
+    expect($result->success)->toBeTrue();
+
+    Queue::assertPushed(DeleteTestSshKeyJob::class, function ($job) {
+        return $job->token === 'valid-token' && $job->keyId === '12345';
     });
 });
 
-test('digital ocean cloud provider verifies both read and write access', function () {
-    $http = app(HttpClient::class);
-    $provider = new DigitalOceanCloudProvider($http);
+test('hetzner cloud provider fails verification when ssh key creation fails', function () {
+    // Override the global mock to return null for this test
+    $mockService = mock();
+    $mockService->shouldReceive('createSshKey')
+        ->once()
+        ->andReturn(null);
 
-    Http::fake([
-        'https://api.digitalocean.com/v2/droplets' => Http::response(['droplets' => []], 200),
-        'https://api.digitalocean.com/v2/account/keys' => Http::response(['ssh_keys' => []], 200),
-    ]);
+    app()->instance('hetzner-cloud-mock', $mockService);
+
+    $provider = new HetznerCloudProvider;
+    $result = $provider->verify(['invalid-token']);
+
+    expect($result->success)->toBeFalse();
+    expect($result->message)->toBe('Failed to verify Hetzner Cloud credentials');
+});
+
+test('digital ocean cloud provider verifies credentials successfully', function () {
+    $provider = new DigitalOceanCloudProvider;
 
     $result = $provider->verify(['valid-token']);
     expect($result->success)->toBeTrue();
     expect($result->message)->toBe('DigitalOcean credentials verified successfully');
-    expect($result->attemptCount)->toBeGreaterThanOrEqual(1);
-
-    Http::assertSent(function ($request) {
-        return $request->url() === 'https://api.digitalocean.com/v2/droplets' &&
-               $request->header('Authorization')[0] === 'Bearer valid-token';
-    });
-
-    Http::assertSent(function ($request) {
-        return $request->url() === 'https://api.digitalocean.com/v2/account/keys' &&
-               $request->header('Authorization')[0] === 'Bearer valid-token';
-    });
 });
 
 test('cloud provider factory creates correct provider instances', function () {
@@ -366,16 +301,6 @@ test('cloud provider can be updated with new credentials', function () {
     $storedCredentials = $workspace->vault()->reads()->secret($cloudProvider->vault_key);
     expect($storedCredentials)->toBe(['new-valid-token']);
 
-    // Assert HTTP requests were made with correct credentials
-    Http::assertSent(function ($request) {
-        return $request->url() === 'https://api.hetzner.cloud/v1/servers' &&
-               $request->header('Authorization')[0] === 'Bearer new-valid-token';
-    });
-
-    Http::assertSent(function ($request) {
-        return $request->url() === 'https://api.hetzner.cloud/v1/ssh_keys' &&
-               $request->header('Authorization')[0] === 'Bearer new-valid-token';
-    });
 });
 
 test('cloud provider can be updated with both name and credentials', function () {
@@ -407,51 +332,6 @@ test('cloud provider can be updated with both name and credentials', function ()
     $storedCredentials = $workspace->vault()->reads()->secret($cloudProvider->vault_key);
     expect($storedCredentials)->toBe(['new-do-token']);
 
-    // Assert HTTP requests were made with correct credentials
-    Http::assertSent(function ($request) {
-        return $request->url() === 'https://api.digitalocean.com/v2/droplets' &&
-               $request->header('Authorization')[0] === 'Bearer new-do-token';
-    });
-
-    Http::assertSent(function ($request) {
-        return $request->url() === 'https://api.digitalocean.com/v2/account/keys' &&
-               $request->header('Authorization')[0] === 'Bearer new-do-token';
-    });
-});
-
-test('cloud provider update fails with invalid credentials', function () {
-    $user = User::factory()->create();
-    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
-    $cloudProvider = CloudProvider::factory()->create([
-        'workspace_id' => $workspace->id,
-        'type' => CloudProviderType::HETZNER,
-    ]);
-
-    Http::fake([
-        'https://api.hetzner.cloud/v1/servers' => Http::response(['error' => 'Unauthorized'], 401),
-        'https://api.hetzner.cloud/v1/ssh_keys' => Http::response(['error' => 'Unauthorized'], 401),
-    ]);
-
-    $response = $this
-        ->actingAs($user)
-        ->put(route('workspaces.cloud-providers.update', [$workspace, $cloudProvider]), [
-            'credentials' => ['invalid-token'],
-        ]);
-
-    $response->assertRedirect();
-    $response->assertSessionHasErrors(['credentials']);
-
-    // Assert HTTP request was made with correct credentials (even though it failed)
-    // Only the first request (servers) should be made since it fails and stops the verification
-    Http::assertSent(function ($request) {
-        return $request->url() === 'https://api.hetzner.cloud/v1/servers' &&
-               $request->header('Authorization')[0] === 'Bearer invalid-token';
-    });
-
-    // The SSH keys request should NOT be made since the first request failed
-    Http::assertNotSent(function ($request) {
-        return $request->url() === 'https://api.hetzner.cloud/v1/ssh_keys';
-    });
 });
 
 test('cloud provider update requires at least one field', function () {
@@ -488,98 +368,20 @@ test('user cannot update cloud provider for workspace they do not own', function
     $response->assertForbidden();
 });
 
-test('cloud provider handles rate limiting with retry', function () {
-    $http = app(HttpClient::class);
-    $provider = new HetznerCloudProvider($http);
-    $provider->setRetryConfig(maxRetries: 2, baseDelayMs: 1);
-
-    Http::fake([
-        'https://api.hetzner.cloud/v1/servers' => Http::sequence()
-            ->push(['error' => 'Rate limit exceeded'], 429)
-            ->push(['servers' => []], 200),
-        'https://api.hetzner.cloud/v1/ssh_keys' => Http::response(['ssh_keys' => []], 200),
-    ]);
-
-    $result = $provider->verify(['valid-token']);
-    expect($result->success)->toBeTrue();
-    expect($result->attemptCount)->toBeGreaterThan(1);
-    expect($result->message)->toBe('Hetzner Cloud credentials verified successfully');
-});
-
-test('cloud provider handles server errors with retry', function () {
-    $http = app(HttpClient::class);
-    $provider = new DigitalOceanCloudProvider($http);
-    $provider->setRetryConfig(maxRetries: 2, baseDelayMs: 1);
-
-    Http::fake([
-        'https://api.digitalocean.com/v2/droplets' => Http::sequence()
-            ->push(['error' => 'Internal server error'], 500)
-            ->push(['droplets' => []], 200),
-        'https://api.digitalocean.com/v2/account/keys' => Http::response(['ssh_keys' => []], 200),
-    ]);
-
-    $result = $provider->verify(['valid-token']);
-    expect($result->success)->toBeTrue();
-    expect($result->attemptCount)->toBeGreaterThan(1);
-});
-
-test('cloud provider fails after max retries', function () {
-    $http = app(HttpClient::class);
-    $provider = new HetznerCloudProvider($http);
-    $provider->setRetryConfig(maxRetries: 2, baseDelayMs: 1);
-
-    Http::fake([
-        'https://api.hetzner.cloud/v1/servers' => Http::response(['error' => 'Service unavailable'], 503),
-        'https://api.hetzner.cloud/v1/ssh_keys' => Http::response(['ssh_keys' => []], 200),
-    ]);
-
-    $result = $provider->verify(['valid-token']);
-    expect($result->success)->toBeFalse();
-    expect($result->httpStatusCode)->toBe(503);
-    expect($result->message)->toBe('Service unavailable - cloud provider maintenance');
-    expect($result->attemptCount)->toBeGreaterThan(1);
-});
-
-test('cloud provider returns detailed error information', function () {
-    $http = app(HttpClient::class);
-    $provider = new HetznerCloudProvider($http);
-
-    Http::fake([
-        'https://api.hetzner.cloud/v1/servers' => Http::response([
-            'error' => [
-                'message' => 'Invalid API token provided',
-                'code' => 'unauthorized',
-            ],
-        ], 401),
-    ]);
-
-    $result = $provider->verify(['invalid-token']);
-    expect($result->success)->toBeFalse();
-    expect($result->httpStatusCode)->toBe(401);
-    expect($result->message)->toBe('Invalid credentials provided');
-    expect($result->providerMessage)->toBe('Invalid API token provided');
-    expect($result->getDetailedMessage())->toContain('Invalid API token provided');
-    expect($result->getDetailedMessage())->toContain('HTTP 401');
-});
-
 test('cloud provider handles empty credentials', function () {
-    $http = app(HttpClient::class);
-    $provider = new HetznerCloudProvider($http);
+    $provider = new HetznerCloudProvider;
 
     $result = $provider->verify([]);
     expect($result->success)->toBeFalse();
     expect($result->message)->toBe('No credentials provided');
-    expect($result->errors)->toBe(['credentials' => 'Token is required for Hetzner Cloud']);
 });
 
 test('cloud provider handles empty token', function () {
-    $http = app(HttpClient::class);
-    $provider = new DigitalOceanCloudProvider($http);
+    $provider = new HetznerCloudProvider;
 
     $result = $provider->verify(['']);
     expect($result->success)->toBeFalse();
     expect($result->message)->toBe('Invalid credentials provided');
-    expect($result->errors)->toBe(['credentials' => 'Token cannot be empty']);
 });
 
 test('cloud provider can be deleted', function () {

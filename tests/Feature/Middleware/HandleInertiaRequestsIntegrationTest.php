@@ -30,25 +30,26 @@ test('authenticated user receives workspaces and invited workspaces in shared da
         ->actingAs($user)
         ->get(route('dashboard'));
 
-    $response->assertInertia(fn (Assert $page) => $page
-        ->has('workspaces', 1)
-        ->has('invitedWorkspaces', 1)
-        ->where('workspaces.0.id', $ownedWorkspace->id)
-        ->where('workspaces.0.name', $ownedWorkspace->name)
-        ->where('workspaces.0.user_id', $user->id)
-        ->has('workspaces.0.projects', 2)
-        ->where('workspaces.0.projects.0.id', $ownedProjects->first()->id)
-        ->where('workspaces.0.projects.1.id', $ownedProjects->last()->id)
-        ->where('invitedWorkspaces.0.id', $invitedWorkspace->id)
-        ->where('invitedWorkspaces.0.name', $invitedWorkspace->name)
-        ->where('invitedWorkspaces.0.user_id', $otherUser->id)
-        ->has('invitedWorkspaces.0.projects', 3)
-        ->where('invitedWorkspaces.0.projects.0.id', $invitedProjects->get(0)->id)
-        ->where('invitedWorkspaces.0.projects.1.id', $invitedProjects->get(1)->id)
-        ->where('invitedWorkspaces.0.projects.2.id', $invitedProjects->get(2)->id)
-        ->has('projects', 2)
-        ->where('activeProject', null)
-        ->where('cloudProvidersCount', 0)
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->has('workspaces', 1)
+            ->has('invitedWorkspaces', 1)
+            ->where('workspaces.0.id', $ownedWorkspace->id)
+            ->where('workspaces.0.name', $ownedWorkspace->name)
+            ->where('workspaces.0.user_id', $user->id)
+            ->has('workspaces.0.projects', 2)
+            ->where('workspaces.0.projects.0.id', $ownedProjects->first()->id)
+            ->where('workspaces.0.projects.1.id', $ownedProjects->last()->id)
+            ->where('invitedWorkspaces.0.id', $invitedWorkspace->id)
+            ->where('invitedWorkspaces.0.name', $invitedWorkspace->name)
+            ->where('invitedWorkspaces.0.user_id', $otherUser->id)
+            ->has('invitedWorkspaces.0.projects', 3)
+            ->where('invitedWorkspaces.0.projects.0.id', $invitedProjects->get(0)->id)
+            ->where('invitedWorkspaces.0.projects.1.id', $invitedProjects->get(1)->id)
+            ->where('invitedWorkspaces.0.projects.2.id', $invitedProjects->get(2)->id)
+            ->has('projects', 2)
+            ->where('activeProject', null)
+            ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -62,14 +63,15 @@ test('authenticated user with only owned workspaces receives empty invited works
         ->actingAs($user)
         ->get(route('dashboard'));
 
-    $response->assertInertia(fn (Assert $page) => $page
-        ->has('workspaces', 1)
-        ->has('invitedWorkspaces', 0)
-        ->where('workspaces.0.id', $ownedWorkspace->id)
-        ->has('workspaces.0.projects', 2)
-        ->has('projects', 2)
-        ->where('activeProject', null)
-        ->where('cloudProvidersCount', 0)
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->has('workspaces', 1)
+            ->has('invitedWorkspaces', 0)
+            ->where('workspaces.0.id', $ownedWorkspace->id)
+            ->has('workspaces.0.projects', 2)
+            ->has('projects', 2)
+            ->where('activeProject', null)
+            ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -91,14 +93,15 @@ test('authenticated user with only invited workspaces receives empty owned works
         ->actingAs($user)
         ->get(route('dashboard'));
 
-    $response->assertInertia(fn (Assert $page) => $page
-        ->has('workspaces', 0)
-        ->has('invitedWorkspaces', 1)
-        ->where('invitedWorkspaces.0.id', $invitedWorkspace->id)
-        ->has('invitedWorkspaces.0.projects', 2)
-        ->has('projects', 0)
-        ->where('activeProject', null)
-        ->where('cloudProvidersCount', 0)
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->has('workspaces', 0)
+            ->has('invitedWorkspaces', 1)
+            ->where('invitedWorkspaces.0.id', $invitedWorkspace->id)
+            ->has('invitedWorkspaces.0.projects', 2)
+            ->has('projects', 0)
+            ->where('activeProject', null)
+            ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -109,24 +112,26 @@ test('authenticated user with no workspaces receives empty arrays', function () 
         ->actingAs($user)
         ->get(route('dashboard'));
 
-    $response->assertInertia(fn (Assert $page) => $page
-        ->has('workspaces', 0)
-        ->has('invitedWorkspaces', 0)
-        ->has('projects', 0)
-        ->where('activeProject', null)
-        ->where('cloudProvidersCount', 0)
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->has('workspaces', 0)
+            ->has('invitedWorkspaces', 0)
+            ->has('projects', 0)
+            ->where('activeProject', null)
+            ->where('cloudProvidersCount', 0)
     );
 });
 
 test('unauthenticated user receives empty arrays for workspaces', function () {
     $response = $this->get(route('login'));
 
-    $response->assertInertia(fn (Assert $page) => $page
-        ->has('workspaces', 0)
-        ->has('invitedWorkspaces', 0)
-        ->has('projects', 0)
-        ->where('activeProject', null)
-        ->where('cloudProvidersCount', 0)
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->has('workspaces', 0)
+            ->has('invitedWorkspaces', 0)
+            ->has('projects', 0)
+            ->where('activeProject', null)
+            ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -150,14 +155,15 @@ test('workspaces are ordered by latest first', function () {
         ->actingAs($user)
         ->get(route('dashboard'));
 
-    $response->assertInertia(fn (Assert $page) => $page
-        ->has('workspaces', 3)
-        ->where('workspaces.0.id', $thirdWorkspace->id)
-        ->where('workspaces.1.id', $secondWorkspace->id)
-        ->where('workspaces.2.id', $firstWorkspace->id)
-        ->has('projects', 0)
-        ->where('activeProject', null)
-        ->where('cloudProvidersCount', 0)
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->has('workspaces', 3)
+            ->where('workspaces.0.id', $thirdWorkspace->id)
+            ->where('workspaces.1.id', $secondWorkspace->id)
+            ->where('workspaces.2.id', $firstWorkspace->id)
+            ->has('projects', 0)
+            ->where('activeProject', null)
+            ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -192,14 +198,15 @@ test('invited workspaces are ordered by latest first', function () {
         ->actingAs($user)
         ->get(route('dashboard'));
 
-    $response->assertInertia(fn (Assert $page) => $page
-        ->has('invitedWorkspaces', 3)
-        ->where('invitedWorkspaces.0.id', $thirdWorkspace->id)
-        ->where('invitedWorkspaces.1.id', $secondWorkspace->id)
-        ->where('invitedWorkspaces.2.id', $firstWorkspace->id)
-        ->has('projects', 0)
-        ->where('activeProject', null)
-        ->where('cloudProvidersCount', 0)
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->has('invitedWorkspaces', 3)
+            ->where('invitedWorkspaces.0.id', $thirdWorkspace->id)
+            ->where('invitedWorkspaces.1.id', $secondWorkspace->id)
+            ->where('invitedWorkspaces.2.id', $firstWorkspace->id)
+            ->has('projects', 0)
+            ->where('activeProject', null)
+            ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -212,24 +219,26 @@ test('shared data is available across different inertia routes', function () {
         ->actingAs($user)
         ->get(route('dashboard'));
 
-    $dashboardResponse->assertInertia(fn (Assert $page) => $page
-        ->has('workspaces', 1)
-        ->has('invitedWorkspaces', 0)
-        ->has('projects', 2)
-        ->where('activeProject', null)
-        ->where('cloudProvidersCount', 0)
+    $dashboardResponse->assertInertia(
+        fn (Assert $page) => $page
+            ->has('workspaces', 1)
+            ->has('invitedWorkspaces', 0)
+            ->has('projects', 2)
+            ->where('activeProject', null)
+            ->where('cloudProvidersCount', 0)
     );
 
     $profileResponse = $this
         ->actingAs($user)
         ->get(route('profile.edit'));
 
-    $profileResponse->assertInertia(fn (Assert $page) => $page
-        ->has('workspaces', 1)
-        ->has('invitedWorkspaces', 0)
-        ->has('projects', 2)
-        ->where('activeProject', null)
-        ->where('cloudProvidersCount', 0)
+    $profileResponse->assertInertia(
+        fn (Assert $page) => $page
+            ->has('workspaces', 1)
+            ->has('invitedWorkspaces', 0)
+            ->has('projects', 2)
+            ->where('activeProject', null)
+            ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -242,8 +251,9 @@ test('active workspace id is shared when cookie is present', function () {
         ->withCookie('active_workspace_id', $workspace->id)
         ->get(route('dashboard'));
 
-    $response->assertInertia(fn (Assert $page) => $page
-        ->where('activeWorkspaceId', (string) $workspace->id)
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->where('activeWorkspaceId', (string) $workspace->id)
     );
 });
 
@@ -254,16 +264,18 @@ test('active workspace id is null when no cookie is present', function () {
         ->actingAs($user)
         ->get(route('dashboard'));
 
-    $response->assertInertia(fn (Assert $page) => $page
-        ->where('activeWorkspaceId', null)
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->where('activeWorkspaceId', null)
     );
 });
 
 test('active workspace id is null for unauthenticated users', function () {
     $response = $this->get(route('login'));
 
-    $response->assertInertia(fn (Assert $page) => $page
-        ->where('activeWorkspaceId', null)
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->where('activeWorkspaceId', null)
     );
 });
 
@@ -277,13 +289,14 @@ test('projects are loaded for active workspace', function () {
         ->withCookie('active_workspace_id', $workspace->id)
         ->get(route('dashboard'));
 
-    $response->assertInertia(fn (Assert $page) => $page
-        ->has('projects', 3)
-        ->where('projects.0.id', $projects->get(0)->id)
-        ->where('projects.1.id', $projects->get(1)->id)
-        ->where('projects.2.id', $projects->get(2)->id)
-        ->where('activeProject', null)
-        ->where('cloudProvidersCount', 0)
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->has('projects', 3)
+            ->where('projects.0.id', $projects->get(0)->id)
+            ->where('projects.1.id', $projects->get(1)->id)
+            ->where('projects.2.id', $projects->get(2)->id)
+            ->where('activeProject', null)
+            ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -297,12 +310,13 @@ test('active project is extracted from project show route', function () {
         ->withCookie('active_workspace_id', $workspace->id)
         ->get(route('projects.show', $project));
 
-    $response->assertInertia(fn (Assert $page) => $page
-        ->has('projects', 1)
-        ->where('projects.0.id', $project->id)
-        ->where('activeProject.id', $project->id)
-        ->where('activeProject.name', $project->name)
-        ->where('cloudProvidersCount', 0)
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->has('projects', 1)
+            ->where('projects.0.id', $project->id)
+            ->where('activeProject.id', $project->id)
+            ->where('activeProject.name', $project->name)
+            ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -316,10 +330,11 @@ test('active project is null when no project id in url', function () {
         ->withCookie('active_workspace_id', $workspace->id)
         ->get(route('dashboard'));
 
-    $response->assertInertia(fn (Assert $page) => $page
-        ->has('projects', 2)
-        ->where('activeProject', null)
-        ->where('cloudProvidersCount', 0)
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->has('projects', 2)
+            ->where('activeProject', null)
+            ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -332,10 +347,11 @@ test('projects are empty when no active workspace', function () {
         ->actingAs($user)
         ->get(route('dashboard'));
 
-    $response->assertInertia(fn (Assert $page) => $page
-        ->has('projects', 2)
-        ->where('activeProject', null)
-        ->where('cloudProvidersCount', 0)
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->has('projects', 2)
+            ->where('activeProject', null)
+            ->where('cloudProvidersCount', 0)
     );
 });
 
@@ -353,8 +369,9 @@ test('cloud providers count is returned for active workspace', function () {
         ->withCookie('active_workspace_id', $workspace->id)
         ->get(route('dashboard'));
 
-    $response->assertInertia(fn (Assert $page) => $page
-        ->where('cloudProvidersCount', 3)
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->where('cloudProvidersCount', 3)
     );
 });
 
@@ -371,8 +388,9 @@ test('cloud providers count is zero when no active workspace', function () {
         ->actingAs($user)
         ->get(route('dashboard'));
 
-    $response->assertInertia(fn (Assert $page) => $page
-        ->where('cloudProvidersCount', 2)
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->where('cloudProvidersCount', 2)
     );
 });
 
@@ -383,28 +401,29 @@ test('cloud provider regions are shared with frontend grouped by continent', fun
         ->actingAs($user)
         ->get(route('dashboard'));
 
-    $response->assertInertia(fn (Assert $page) => $page
-        ->has('cloudProviderRegions')
-        ->has('cloudProviderRegions.aws')
-        ->has('cloudProviderRegions.hetzner')
-        ->has('cloudProviderRegions.digital_ocean')
-        ->has('cloudProviderRegions.google_cloud')
-        ->has('cloudProviderRegions.vultr')
-        ->has('cloudProviderRegions.linode')
-        ->has('cloudProviderRegions.leaseweb')
-        ->has('cloudProviderRegions.ovh')
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->has('cloudProviderRegions')
+            ->has('cloudProviderRegions.aws')
+            ->has('cloudProviderRegions.hetzner')
+            ->has('cloudProviderRegions.digital_ocean')
+            ->has('cloudProviderRegions.google_cloud')
+            ->has('cloudProviderRegions.vultr')
+            ->has('cloudProviderRegions.linode')
+            ->has('cloudProviderRegions.leaseweb')
+            ->has('cloudProviderRegions.ovh')
         // Check continent grouping for Hetzner
-        ->has('cloudProviderRegions.hetzner.Europe')
-        ->has('cloudProviderRegions.hetzner.North America')
-        ->has('cloudProviderRegions.hetzner.Asia Pacific')
-        ->where('cloudProviderRegions.hetzner.Europe.0.name', 'Falkenstein, Germany')
-        ->where('cloudProviderRegions.hetzner.Europe.0.slug', 'fsn1')
+            ->has('cloudProviderRegions.hetzner.Europe')
+            ->has('cloudProviderRegions.hetzner.North America')
+            ->has('cloudProviderRegions.hetzner.Asia Pacific')
+            ->where('cloudProviderRegions.hetzner.Europe.0.name', 'Falkenstein, Germany')
+            ->where('cloudProviderRegions.hetzner.Europe.0.slug', 'fsn1')
         // Check continent grouping for DigitalOcean
-        ->has('cloudProviderRegions.digital_ocean.North America')
-        ->has('cloudProviderRegions.digital_ocean.Europe')
-        ->has('cloudProviderRegions.digital_ocean.Asia Pacific')
-        ->where('cloudProviderRegions.digital_ocean.North America.0.name', 'New York 1')
-        ->where('cloudProviderRegions.digital_ocean.North America.0.slug', 'nyc1')
+            ->has('cloudProviderRegions.digital_ocean.North America')
+            ->has('cloudProviderRegions.digital_ocean.Europe')
+            ->has('cloudProviderRegions.digital_ocean.Asia Pacific')
+            ->where('cloudProviderRegions.digital_ocean.North America.0.name', 'New York 1')
+            ->where('cloudProviderRegions.digital_ocean.North America.0.slug', 'nyc1')
     );
 });
 
@@ -457,44 +476,61 @@ test('cloud providers data is shared with frontend with correct structure', func
         ->actingAs($user)
         ->get(route('dashboard'));
 
-    $response->assertInertia(fn (Assert $page) => $page
-        ->has('cloudProviders')
-        ->has('cloudProviders.0.type')
-        ->has('cloudProviders.0.name')
-        ->has('cloudProviders.0.implemented')
-        ->has('cloudProviders.0.description')
-        ->has('cloudProviders.0.documentationLink')
-        ->has('cloudProviders.0.credentialFields')
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->has('cloudProviders')
+            ->has('cloudProviders.0.type')
+            ->has('cloudProviders.0.name')
+            ->has('cloudProviders.0.implemented')
+            ->has('cloudProviders.0.description')
+            ->has('cloudProviders.0.documentationLink')
+            ->has('cloudProviders.0.credentialFields')
         // Check that all expected providers are present
-        ->where('cloudProviders.0.type', 'aws')
-        ->where('cloudProviders.0.name', 'Amazon web services')
-        ->where('cloudProviders.0.implemented', false)
+            ->where('cloudProviders.0.type', 'aws')
+            ->where('cloudProviders.0.name', 'Amazon web services')
+            ->where('cloudProviders.0.implemented', false)
         // Check that implemented providers are marked correctly
-        ->whereContains('cloudProviders', fn ($provider) => $provider['type'] === 'hetzner' && $provider['implemented'] === true
-        )
-        ->whereContains('cloudProviders', fn ($provider) => $provider['type'] === 'digital_ocean' && $provider['implemented'] === true
-        )
+            ->whereContains(
+                'cloudProviders',
+                fn ($provider) => $provider['type'] === 'hetzner' && $provider['implemented'] === true
+            )
+            ->whereContains(
+                'cloudProviders',
+                fn ($provider) => $provider['type'] === 'digital_ocean' && $provider['implemented'] === true
+            )
         // Check that OVH is included
-        ->whereContains('cloudProviders', fn ($provider) => $provider['type'] === 'ovh' && $provider['name'] === 'OVH' && $provider['implemented'] === false
-        )
+            ->whereContains(
+                'cloudProviders',
+                fn ($provider) => $provider['type'] === 'ovh' && $provider['name'] === 'OVH' && $provider['implemented'] === false
+            )
         // Check that documentation links are properly structured
-        ->whereContains('cloudProviders', fn ($provider) => $provider['type'] === 'aws' && $provider['documentationLink'] === 'https://kibaops.com/docs/providers/aws'
-        )
-        ->whereContains('cloudProviders', fn ($provider) => $provider['type'] === 'hetzner' && $provider['documentationLink'] === 'https://kibaops.com/docs/providers/hetzner'
-        )
+            ->whereContains(
+                'cloudProviders',
+                fn ($provider) => $provider['type'] === 'aws' && $provider['documentationLink'] === 'https://kibaops.com/docs/providers/aws'
+            )
+            ->whereContains(
+                'cloudProviders',
+                fn ($provider) => $provider['type'] === 'hetzner' && $provider['documentationLink'] === 'https://kibaops.com/docs/providers/hetzner'
+            )
         // Check that descriptions are clean without links
-        ->whereContains('cloudProviders', fn ($provider) => $provider['type'] === 'aws' && ! str_contains($provider['description'], 'kibaops.com')
-        )
+            ->whereContains(
+                'cloudProviders',
+                fn ($provider) => $provider['type'] === 'aws' && ! str_contains($provider['description'], 'kibaops.com')
+            )
         // Check credential fields structure for AWS (multiple fields)
-        ->whereContains('cloudProviders', fn ($provider) => $provider['type'] === 'aws' &&
-            count($provider['credentialFields']) === 2 &&
-            $provider['credentialFields'][0]['name'] === 'access_key' &&
-            $provider['credentialFields'][1]['name'] === 'secret_key'
-        )
+            ->whereContains(
+                'cloudProviders',
+                fn ($provider) => $provider['type'] === 'aws' &&
+                count($provider['credentialFields']) === 2 &&
+                $provider['credentialFields'][0]['name'] === 'access_key' &&
+                $provider['credentialFields'][1]['name'] === 'secret_key'
+            )
         // Check credential fields structure for Hetzner (single field)
-        ->whereContains('cloudProviders', fn ($provider) => $provider['type'] === 'hetzner' &&
-            count($provider['credentialFields']) === 1 &&
-            $provider['credentialFields'][0]['name'] === 'token'
-        )
+            ->whereContains(
+                'cloudProviders',
+                fn ($provider) => $provider['type'] === 'hetzner' &&
+                count($provider['credentialFields']) === 1 &&
+                $provider['credentialFields'][0]['name'] === 'token'
+            )
     );
 });

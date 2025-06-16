@@ -19,10 +19,11 @@ test('workspace membership index page is displayed', function () {
         ->get(route('workspaces.memberships.index', $workspace));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn (Assert $page) => $page
-        ->component('Workspaces/Memberships/Index')
-        ->has('workspace')
-        ->has('memberships', 3)
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->component('Workspaces/Memberships/Index')
+            ->has('workspace')
+            ->has('memberships', 3)
     );
 });
 

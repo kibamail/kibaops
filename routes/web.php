@@ -33,4 +33,4 @@ Route::middleware('auth')->group(function () {
     Route::resource('workspaces.cloud-providers', \App\Http\Controllers\CloudProviders\CloudProviderController::class)->only(['store', 'update', 'destroy']);
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

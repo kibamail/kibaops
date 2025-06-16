@@ -17,7 +17,7 @@ class CreateDefaultWorkspace
         /** @var \App\Models\User|null $user */
         $user = $event->user;
 
-        $workspaceName = $user->name."'s workspace";
+        $workspaceName = $user->name . "'s workspace";
 
         $user->workspaces()->create([
             'name' => $workspaceName,

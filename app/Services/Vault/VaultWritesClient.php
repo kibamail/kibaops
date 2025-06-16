@@ -34,7 +34,7 @@ class VaultWritesClient extends Client
 
     public function store(string $path, string|array $data)
     {
-        $path = $this->basePath.'/'.$path;
+        $path = $this->basePath . '/' . $path;
 
         parent::write($path, [
             'data' => [
@@ -52,7 +52,7 @@ class VaultWritesClient extends Client
      */
     public function remove(string $path): void
     {
-        $path = $this->basePath.'/'.$path;
+        $path = $this->basePath . '/' . $path;
         parent::delete($path);
     }
 }

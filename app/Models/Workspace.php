@@ -32,7 +32,7 @@ class Workspace extends Model
             $count = static::where('slug', 'like', "{$slug}%")->count();
 
             if ($count > 0) {
-                $workspace->slug = $slug.'-'.Str::random(6);
+                $workspace->slug = $slug . '-' . Str::random(6);
             } else {
                 $workspace->slug = $slug;
             }

@@ -32,9 +32,10 @@ test('project show page is displayed', function () {
         ->get(route('projects.show', $project));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn (Assert $page) => $page
-        ->component('Projects/Show')
-        ->has('project')
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->component('Projects/Show')
+            ->has('project')
     );
 });
 

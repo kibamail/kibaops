@@ -2,110 +2,60 @@
 
 namespace App\Services\CloudProviders;
 
+/**
+ * Represents the response from a cloud provider credential verification operation.
+ *
+ * This class provides a simple, standardized way to communicate the result of
+ * cloud provider API operations, particularly credential verification. It contains
+ * only the essential information needed to determine if an operation succeeded
+ * and provides a human-readable message describing the outcome.
+ *
+ * The class is designed to be immutable with readonly properties to ensure
+ * response integrity throughout the application lifecycle.
+ */
 class CloudProviderResponse
 {
+    /**
+     * Create a new cloud provider response.
+     *
+     * @param  bool  $success  Whether the cloud provider operation was successful
+     * @param  string  $message  A descriptive message about the operation result
+     * @param  mixed  $data  Optional data returned from the operation (e.g., for GET requests)
+     */
     public function __construct(
         public readonly bool $success,
         public readonly string $message,
-        public readonly ?array $errors = null,
-        public readonly ?int $httpStatusCode = null,
-        public readonly ?string $providerMessage = null,
-        public readonly ?array $rawResponse = null,
-        public readonly int $attemptCount = 1
+        public readonly mixed $data = null
     ) {}
 
     /**
-     * Create a successful response.
+     * Create a successful response instance.
+     *
+     * This factory method creates a response indicating that the cloud provider
+     * operation completed successfully. Used when credentials are valid and
+     * the provider API responds as expected.
+     *
+     * @param  string  $message  Optional success message (defaults to generic success message)
+     * @param  mixed  $data  Optional data returned from the operation
+     * @return self A new successful CloudProviderResponse instance
      */
-    public static function success(
-        string $message = 'Credentials verified successfully',
-        ?array $rawResponse = null,
-        int $attemptCount = 1
-    ): self {
-        return new self(
-            success: true,
-            message: $message,
-            rawResponse: $rawResponse,
-            attemptCount: $attemptCount
-        );
-    }
-
-    /**
-     * Create a failed response.
-     */
-    public static function failure(
-        string $message,
-        ?array $errors = null,
-        ?int $httpStatusCode = null,
-        ?string $providerMessage = null,
-        ?array $rawResponse = null,
-        int $attemptCount = 1
-    ): self {
-        return new self(
-            success: false,
-            message: $message,
-            errors: $errors,
-            httpStatusCode: $httpStatusCode,
-            providerMessage: $providerMessage,
-            rawResponse: $rawResponse,
-            attemptCount: $attemptCount
-        );
-    }
-
-    /**
-     * Check if this is a retryable error based on HTTP status code.
-     */
-    public function isRetryable(): bool
+    public static function success(string $message = 'Credentials verified successfully', mixed $data = null): self
     {
-        if ($this->success || ! $this->httpStatusCode) {
-            return false;
-        }
-
-        return in_array($this->httpStatusCode, [
-            429, // Too Many Requests
-            500, // Internal Server Error
-            502, // Bad Gateway
-            503, // Service Unavailable
-            504, // Gateway Timeout
-        ]);
+        return new self(true, $message, $data);
     }
 
     /**
-     * Get a user-friendly error message combining our message with provider message.
+     * Create a failure response instance.
+     *
+     * This factory method creates a response indicating that the cloud provider
+     * operation failed. Used when credentials are invalid, API is unreachable,
+     * or any other error condition occurs during verification.
+     *
+     * @param  string  $message  Descriptive error message explaining why the operation failed
+     * @return self A new failed CloudProviderResponse instance
      */
-    public function getDetailedMessage(): string
+    public static function failure(string $message): self
     {
-        if ($this->success) {
-            return $this->message;
-        }
-
-        $message = $this->message;
-
-        if ($this->providerMessage) {
-            $message .= " Provider error: {$this->providerMessage}";
-        }
-
-        if ($this->httpStatusCode) {
-            $message .= " (HTTP {$this->httpStatusCode})";
-        }
-
-        return $message;
-    }
-
-    /**
-     * Convert to array for logging or API responses.
-     */
-    public function toArray(): array
-    {
-        return [
-            'success' => $this->success,
-            'message' => $this->message,
-            'detailed_message' => $this->getDetailedMessage(),
-            'errors' => $this->errors,
-            'http_status_code' => $this->httpStatusCode,
-            'provider_message' => $this->providerMessage,
-            'attempt_count' => $this->attemptCount,
-            'is_retryable' => $this->isRetryable(),
-        ];
+        return new self(false, $message);
     }
 }

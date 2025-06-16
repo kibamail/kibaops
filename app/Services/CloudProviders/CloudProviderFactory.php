@@ -4,6 +4,8 @@ namespace App\Services\CloudProviders;
 
 use App\Contracts\CloudProviderInterface;
 use App\Enums\CloudProviderType;
+use App\Services\CloudProviders\DigitalOcean\DigitalOceanCloudProvider;
+use App\Services\CloudProviders\Hetzner\HetznerCloudProvider;
 use Illuminate\Http\Client\Factory as HttpClient;
 use InvalidArgumentException;
 
@@ -27,8 +29,8 @@ class CloudProviderFactory
     public function create(CloudProviderType $type): CloudProviderInterface
     {
         return match ($type) {
-            CloudProviderType::HETZNER => new HetznerCloudProvider($this->http),
-            CloudProviderType::DIGITAL_OCEAN => new DigitalOceanCloudProvider($this->http),
+            CloudProviderType::HETZNER => new HetznerCloudProvider,
+            CloudProviderType::DIGITAL_OCEAN => new DigitalOceanCloudProvider,
             default => throw new InvalidArgumentException("Cloud provider type '{$type->value}' is not implemented yet."),
         };
     }
