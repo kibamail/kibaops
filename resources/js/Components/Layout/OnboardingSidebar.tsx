@@ -7,7 +7,9 @@ import cn from 'classnames';
 import { CheckIcon } from '../Icons/check.svg';
 import { CloudWaterdropIcon } from '../Icons/cloud-waterdrop.svg';
 import { CodeRepositoryIcon } from '../Icons/code-repository.svg';
+import { ProjectLaunchIcon } from '../Icons/project-launch.svg';
 import { UserIcon } from '../Icons/user.svg';
+import { WorkspaceIcon } from '../Icons/workspace.svg';
 
 interface OnboardingStepProps {
   completed?: boolean;
@@ -64,7 +66,7 @@ export function OnboardingSidebar() {
       title: 'Create your first workspace',
       description: 'A workspace provides a great way to group your projects and team members.',
       completed: true,
-      Icon: CloudWaterdropIcon,
+      Icon: WorkspaceIcon,
     },
     {
       title: 'Connect a cloud provider',
@@ -82,7 +84,7 @@ export function OnboardingSidebar() {
       title: 'Launch your first project',
       description: 'Create your first project and deploy your application.',
       completed: false,
-      Icon: UserIcon,
+      Icon: ProjectLaunchIcon,
     },
   ];
 

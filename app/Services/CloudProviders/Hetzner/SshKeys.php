@@ -16,8 +16,16 @@ class SshKeys implements CloudSshKeysInterface
 
     public function create(string $name, string $publicKey): CloudProviderResponse
     {
-        $hetznerService = app('hetzner-cloud', ['token' => $this->token]);
-        $sshKey = $hetznerService->createSshKey($name, $publicKey, ['kibaops' => 'true']);
+        $safeResult = safe(function () use ($name, $publicKey) {
+            $hetznerService = app('hetzner-cloud', ['token' => $this->token]);
+            return $hetznerService->createSshKey($name, $publicKey, ['kibaops' => 'true']);
+        });
+
+        if ($safeResult['error'] !== null) {
+            return CloudProviderResponse::failure('Failed to create SSH key: ' . $safeResult['error']);
+        }
+
+        $sshKey = $safeResult['data'];
 
         if ($sshKey === null) {
             return CloudProviderResponse::failure('Failed to create SSH key');

@@ -34,7 +34,17 @@ class HetznerCloudProvider implements CloudProviderInterface
 
         $name = 'kibaops-verify-credentials-' . uniqid();
 
-        $result = $this->sshkeys()->create($name, SshKeyGenerator::publicKey());
+        $safeResult = safe(function () use ($name) {
+            return $this->sshkeys()->create($name, SshKeyGenerator::publicKey());
+        });
+
+        if ($safeResult['error'] !== null) {
+            return CloudProviderResponse::failure(
+                'Failed to verify hetzner cloud api keys. Please make sure your token has read and write access. '
+            );
+        }
+
+        $result = $safeResult['data'];
 
         if (! $result->success) {
             return CloudProviderResponse::failure(
