@@ -77,6 +77,17 @@ services:
     command: ["sh", "/vault-setup.sh"]
     restart: "no"
 
+  ngrok:
+    image: ngrok/ngrok:latest
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    command:
+      - "http"
+      - "--domain=fully-notable-fowl.ngrok-free.app"
+      - "host.docker.internal:8000"
+    ports:
+      - "4040:4040"
+
 volumes:
   postgres_data:
     driver: local
