@@ -46,10 +46,6 @@ const sourceProviders: SourceProviderInfo[] = [
 ];
 
 export function NoSourceProviders() {
-  const handleConnectProvider = (providerType: SourceProviderType) => {
-    // Placeholder URL - will be implemented later
-    window.location.href = `/connect/source/${providerType}`;
-  };
 
   const sourceProvidersWithIcons: SourceProviderWithIcon[] = sourceProviders
     .map((provider) => ({
@@ -102,16 +98,28 @@ export function NoSourceProviders() {
                   )}
                 </div>
 
-                <Button
-                  size="sm"
-                  className="pr-1"
-                  variant="secondary"
-                  disabled={!provider.implemented}
-                  onClick={() => handleConnectProvider(provider.type)}
-                >
-                  <PlusIcon />
-                  Connect source
-                </Button>
+                {provider.implemented ? (
+                  <a href={route('source-code.connect', { provider: provider.type, origin: window.location.href })}>
+                    <Button
+                      size="sm"
+                      className="pr-1"
+                      variant="secondary"
+                    >
+                      <PlusIcon />
+                      Connect source
+                    </Button>
+                  </a>
+                ) : (
+                  <Button
+                    size="sm"
+                    className="pr-1"
+                    variant="secondary"
+                    disabled={true}
+                  >
+                    <PlusIcon />
+                    Connect source
+                  </Button>
+                )}
               </div>
             );
           })}

@@ -30,6 +30,7 @@ return new class extends Migration
             $table->boolean('webhook_configured')->default(false);
             $table->timestamp('last_activity_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['source_code_connection_id']);
             $table->index(['external_repository_id', 'source_code_connection_id']);
