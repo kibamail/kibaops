@@ -64,11 +64,5 @@ class WorkspaceController extends Controller
             ->with('success', "Switched to {$workspace->name} workspace.");
     }
 
-    /**
-     * Set the active workspace cookie.
-     */
-    private function setActiveWorkspaceCookie(string $workspaceId): \Symfony\Component\HttpFoundation\Cookie
-    {
-        return cookie('active_workspace_id', $workspaceId, 0, null, null, false, false);
-    }
+
 }
