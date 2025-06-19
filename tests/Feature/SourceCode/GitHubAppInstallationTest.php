@@ -4,30 +4,50 @@ use App\Models\User;
 use App\Models\Workspace;
 
 test('github app installation initiation redirects to github with active workspace in session', function () {
-    config(['services.github.app_id' => 'test-app-id']);
+    config(['services.github.app_name' => 'test-app']);
 
     $user = User::factory()->create();
     $workspace = Workspace::factory()->create(['user_id' => $user->id]);
 
     $response = $this->actingAs($user)
         ->withSession(['active_workspace_id' => $workspace->id])
+        ->withHeaders(['referer' => 'http://localhost:8000/projects'])
         ->get('/workspaces/connections/github/connect');
 
     $response->assertRedirect();
-    expect($response->headers->get('Location'))->toContain('github.com/apps');
+    $redirectUrl = $response->headers->get('Location');
+
+    expect($redirectUrl)->toContain('github.com/apps');
+    expect($redirectUrl)->toContain('state=');
+
+    // Extract and decode the state parameter to verify it contains workspace ID and origin URL
+    parse_str(parse_url($redirectUrl, PHP_URL_QUERY), $queryParams);
+    $stateData = json_decode(base64_decode($queryParams['state']), true);
+
+    expect($stateData)->toHaveKey('workspace_id', $workspace->id);
+    expect($stateData)->toHaveKey('origin_url', 'http://localhost:8000/projects');
 });
 
 test('github app installation initiation falls back to first workspace when no session value', function () {
-    config(['services.github.app_id' => 'test-app-id']);
+    config(['services.github.app_name' => 'test-app']);
 
     $user = User::factory()->create();
-    Workspace::factory()->create(['user_id' => $user->id]);
+    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
 
     $response = $this->actingAs($user)
         ->get('/workspaces/connections/github/connect');
 
     $response->assertRedirect();
-    expect($response->headers->get('Location'))->toContain('github.com/apps');
+    $redirectUrl = $response->headers->get('Location');
+
+    expect($redirectUrl)->toContain('github.com/apps');
+
+    // Extract and decode the state parameter to verify it contains workspace ID and default origin URL
+    parse_str(parse_url($redirectUrl, PHP_URL_QUERY), $queryParams);
+    $stateData = json_decode(base64_decode($queryParams['state']), true);
+
+    expect($stateData)->toHaveKey('workspace_id', $workspace->id);
+    expect($stateData)->toHaveKey('origin_url', route('dashboard'));
 });
 
 test('github app installation callback logs installation details', function () {
@@ -35,6 +55,68 @@ test('github app installation callback logs installation details', function () {
 
     $response->assertRedirect(route('dashboard'));
     $response->assertSessionHas('success', 'Github connection established successfully');
+});
+
+test('github app installation callback redirects to origin url when provided', function () {
+    $originUrl = 'http://localhost:8000/projects';
+    $state = base64_encode(json_encode([
+        'workspace_id' => 'test-workspace-id',
+        'origin_url' => $originUrl,
+    ]));
+
+    $response = $this->get("/workspaces/connections/github/callback?installation_id=12345&state={$state}");
+
+    $response->assertRedirect($originUrl);
+    $response->assertSessionHas('success', 'Github connection established successfully');
+});
+
+test('github app installation callback defaults to dashboard when no origin url', function () {
+    $state = base64_encode(json_encode([
+        'workspace_id' => 'test-workspace-id',
+    ]));
+
+    $response = $this->get("/workspaces/connections/github/callback?installation_id=12345&state={$state}");
+
+    $response->assertRedirect(route('dashboard'));
+    $response->assertSessionHas('success', 'Github connection established successfully');
+});
+
+test('github connection service parses state parameter correctly', function () {
+    $workspaceId = 'test-workspace-id';
+    $originUrl = 'http://localhost:8000/projects';
+
+    $service = new \App\Services\SourceCode\Providers\GitHub\GitHubConnectionService();
+
+    // Test the complete method with encoded state
+    $state = base64_encode(json_encode([
+        'workspace_id' => $workspaceId,
+        'origin_url' => $originUrl,
+    ]));
+
+    $response = $service->complete('12345', $state);
+
+    expect($response->success)->toBeTrue();
+    expect($response->metadata['installation_id'])->toBe('12345');
+    expect($response->metadata['workspace_id'])->toBe($workspaceId);
+    expect($response->metadata['origin_url'])->toBe($originUrl);
+});
+
+test('github connection service handles invalid state gracefully', function () {
+    $service = new \App\Services\SourceCode\Providers\GitHub\GitHubConnectionService();
+
+    // Test with invalid base64
+    $response = $service->complete('12345', 'invalid-state');
+
+    expect($response->success)->toBeTrue();
+    expect($response->metadata['workspace_id'])->toBeNull();
+    expect($response->metadata['origin_url'])->toBeNull();
+
+    // Test with empty state
+    $response = $service->complete('12345', '');
+
+    expect($response->success)->toBeTrue();
+    expect($response->metadata['workspace_id'])->toBeNull();
+    expect($response->metadata['origin_url'])->toBeNull();
 });
 
 test('github webhook receives and validates signature', function () {

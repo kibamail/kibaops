@@ -28,7 +28,7 @@ class SourceCodeConnectionController extends Controller
 
         $response = $providerService->connection()->initiate([
             'workspace_id' => $activeWorkspaceId,
-            'state' => csrf_token(),
+            'origin_url' => $request->headers->get('referer') ?: route('dashboard'),
         ]);
 
         if ($response->success) {
@@ -62,11 +62,13 @@ class SourceCodeConnectionController extends Controller
 
         if ($response->success) {
             $providerName = ucfirst($provider);
+            $redirectUrl = $response->metadata['origin_url'] ?? route('dashboard');
 
-            return redirect()->route('dashboard')->with('success', "{$providerName} connection established successfully");
+            return redirect($redirectUrl)->with('success', "{$providerName} connection established successfully");
         }
 
-        return redirect()->route('dashboard')->with('error', $response->error);
+        $redirectUrl = $response->metadata['origin_url'] ?? route('dashboard');
+        return redirect($redirectUrl)->with('error', $response->error);
     }
 
     /**

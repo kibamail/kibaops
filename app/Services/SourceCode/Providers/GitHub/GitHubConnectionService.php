@@ -23,13 +23,20 @@ class GitHubConnectionService implements ConnectionInterface
     /**
      * Initiate GitHub App installation flow
      *
-     * Generates the redirect URL for GitHub App installation with proper
-     * state parameter for CSRF protection and workspace identification.
+     * Generates the redirect URL for GitHub App installation with workspace
+     * identification and origin URL tracking in the state parameter.
      */
     public function initiate(array $config): SourceCodeConnectionResponse
     {
         $appName = config('services.github.app_name');
-        $state = $config['state'] ?? '';
+        $workspaceId = $config['workspace_id'] ?? '';
+        $originUrl = $config['origin_url'] ?? '';
+
+        // Encode workspace ID and origin URL in the state parameter
+        $state = base64_encode(json_encode([
+            'workspace_id' => $workspaceId,
+            'origin_url' => $originUrl,
+        ]));
 
         $redirectUrl = "https://github.com/apps/{$appName}/installations/new?" . http_build_query([
             'state' => $state,
@@ -53,11 +60,16 @@ class GitHubConnectionService implements ConnectionInterface
             return SourceCodeConnectionResponse::failure('Installation ID is required');
         }
 
+        // Parse the state parameter to extract workspace ID and origin URL
+        $stateData = $this->parseState($state);
+
         return new SourceCodeConnectionResponse(
             success: true,
             metadata: [
                 'installation_id' => $installationId,
                 'connection_id' => null,
+                'workspace_id' => $stateData['workspace_id'] ?? null,
+                'origin_url' => $stateData['origin_url'] ?? null,
             ]
         );
     }
@@ -137,5 +149,31 @@ class GitHubConnectionService implements ConnectionInterface
     protected function makeAuthenticatedRequest(string $method, string $url, array $data = []): array
     {
         return [];
+    }
+
+    /**
+     * Parse the state parameter to extract workspace ID and origin URL
+     *
+     * Decodes the base64-encoded JSON state parameter that contains
+     * the workspace ID and origin URL for connection tracking and redirection.
+     */
+    protected function parseState(string $state): array
+    {
+        if (empty($state)) {
+            return [];
+        }
+
+        $decoded = base64_decode($state, true);
+
+        if ($decoded === false) {
+            return [];
+        }
+
+        $data = json_decode($decoded, true);
+        if (!is_array($data)) {
+            return [];
+        }
+
+        return $data;
     }
 }
