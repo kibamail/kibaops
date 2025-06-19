@@ -295,7 +295,7 @@ if (! function_exists('parseHttpResponseError')) {
 
         // Use raw body if not empty
         if (! empty($body)) {
-            return json_encode($body);
+            return $body;
         }
 
         // Fallback to status code message
