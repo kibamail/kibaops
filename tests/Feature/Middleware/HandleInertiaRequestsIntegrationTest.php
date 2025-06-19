@@ -242,13 +242,13 @@ test('shared data is available across different inertia routes', function () {
     );
 });
 
-test('active workspace id is shared when cookie is present', function () {
+test('active workspace id is shared when session value is present', function () {
     $user = User::factory()->create();
     $workspace = Workspace::factory()->create(['user_id' => $user->id]);
 
     $response = $this
         ->actingAs($user)
-        ->withCookie('active_workspace_id', $workspace->id)
+        ->withSession(['active_workspace_id' => $workspace->id])
         ->get(route('dashboard'));
 
     $response->assertInertia(
@@ -257,7 +257,7 @@ test('active workspace id is shared when cookie is present', function () {
     );
 });
 
-test('active workspace id is null when no cookie is present', function () {
+test('active workspace id is null when no session value is present', function () {
     $user = User::factory()->create();
 
     $response = $this
@@ -286,7 +286,7 @@ test('projects are loaded for active workspace', function () {
 
     $response = $this
         ->actingAs($user)
-        ->withCookie('active_workspace_id', $workspace->id)
+        ->withSession(['active_workspace_id' => $workspace->id])
         ->get(route('dashboard'));
 
     $response->assertInertia(

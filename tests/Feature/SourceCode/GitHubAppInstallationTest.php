@@ -3,25 +3,25 @@
 use App\Models\User;
 use App\Models\Workspace;
 
-test('github app installation initiation redirects to github with active workspace cookie', function () {
+test('github app installation initiation redirects to github with active workspace in session', function () {
     config(['services.github.app_id' => 'test-app-id']);
 
     $user = User::factory()->create();
     $workspace = Workspace::factory()->create(['user_id' => $user->id]);
 
     $response = $this->actingAs($user)
-        ->withCookie('active_workspace_id', $workspace->id)
+        ->withSession(['active_workspace_id' => $workspace->id])
         ->get('/workspaces/connections/github/connect');
 
     $response->assertRedirect();
     expect($response->headers->get('Location'))->toContain('github.com/apps');
 });
 
-test('github app installation initiation falls back to first workspace when no cookie', function () {
+test('github app installation initiation falls back to first workspace when no session value', function () {
     config(['services.github.app_id' => 'test-app-id']);
 
     $user = User::factory()->create();
-    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
+    Workspace::factory()->create(['user_id' => $user->id]);
 
     $response = $this->actingAs($user)
         ->get('/workspaces/connections/github/connect');

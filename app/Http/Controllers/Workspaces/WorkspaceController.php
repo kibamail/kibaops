@@ -22,8 +22,9 @@ class WorkspaceController extends Controller
 
         $workspace = $request->user()->workspaces()->create($request->validated());
 
+        $this->setActiveWorkspaceId($workspace->id);
+
         return redirect()->route('dashboard')
-            ->withCookie($this->setActiveWorkspaceCookie($workspace->id))
             ->with('success', 'Workspace created successfully.');
     }
 
@@ -59,8 +60,9 @@ class WorkspaceController extends Controller
     {
         $this->authorize('view', $workspace);
 
+        $this->setActiveWorkspaceId($workspace->id);
+
         return redirect()->route('dashboard')
-            ->withCookie($this->setActiveWorkspaceCookie($workspace->id))
             ->with('success', "Switched to {$workspace->name} workspace.");
     }
 

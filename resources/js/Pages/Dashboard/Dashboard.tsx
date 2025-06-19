@@ -8,13 +8,13 @@ export default function Dashboard() {
   const { cloudProvidersCount } = usePage<PageProps>().props;
 
   return (
-    <AuthenticatedLayout>
-      <Head title="Dashboard" />
+      <AuthenticatedLayout>
+          <Head title="Dashboard" />
 
-      <div className="w-full h-full">
-        {cloudProvidersCount === 0 && <NoCloudProviders />}
-        <NoSourceProviders />
-      </div>
-    </AuthenticatedLayout>
+          <div className="w-full h-full">
+              {cloudProvidersCount === 0 && <NoCloudProviders />}
+              {cloudProvidersCount > 0 && <NoSourceProviders />}
+          </div>
+      </AuthenticatedLayout>
   );
 }

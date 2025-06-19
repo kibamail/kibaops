@@ -10,7 +10,8 @@ class CreateDefaultWorkspace
     /**
      * Handle user registration events to create a default workspace.
      * This listener automatically creates a workspace with the format
-     * "user's name's workspace" for every newly registered user.
+     * "user's name's workspace" for every newly registered user and
+     * sets it as the active workspace in the session if available.
      */
     public function handle(Registered $event): void
     {
@@ -19,8 +20,13 @@ class CreateDefaultWorkspace
 
         $workspaceName = $user->name . "'s workspace";
 
-        $user->workspaces()->create([
+        $workspace = $user->workspaces()->create([
             'name' => $workspaceName,
         ]);
+
+
+        if (request()->hasSession()) {
+            request()->session()->put('active_workspace_id', $workspace->id);
+        }
     }
 }

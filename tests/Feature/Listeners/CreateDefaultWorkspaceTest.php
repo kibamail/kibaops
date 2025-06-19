@@ -78,4 +78,7 @@ test('workspace creation through registration endpoint creates default workspace
     expect($workspace)->not->toBeNull()
         ->and($workspace->name)->toBe("Test User's workspace")
         ->and($workspace->user_id)->toBe($user->id);
+
+    // Check that the workspace is set as active in the session
+    $response->assertSessionHas('active_workspace_id', $workspace->id);
 });

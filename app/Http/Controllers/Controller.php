@@ -7,24 +7,26 @@ use App\Models\Workspace;
 abstract class Controller
 {
     /**
-     * Get the active workspace ID from session cookie with fallback
+     * Get the active workspace ID from session with fallback
      *
      * Retrieves the active workspace ID using the following priority:
-     * 1. From 'active_workspace_id' cookie if present
-     * 2. Falls back to user's first workspace if no cookie set
+     * 1. From session 'active_workspace_id' if present
+     * 2. Falls back to user's first workspace if no session value set
      * 3. Returns null if user has no workspaces
      */
     protected function getActiveWorkspaceId(): ?string
     {
-        $activeWorkspaceId = request()->cookie('active_workspace_id');
+        $request = request();
 
-        if (!$activeWorkspaceId && request()->user()) {
-            $firstWorkspace = request()->user()->workspaces()->first();
+        return $request->session()->get('active_workspace_id', function () use ($request) {
+            if (!$request->user()) {
+                return null;
+            }
 
-            $activeWorkspaceId = $firstWorkspace ? $firstWorkspace->id : null;
-        }
+            $firstWorkspace = $request->user()->workspaces()->first();
 
-        return $activeWorkspaceId;
+            return $firstWorkspace ? $firstWorkspace->id : null;
+        });
     }
 
     /**
@@ -55,13 +57,14 @@ abstract class Controller
     }
 
     /**
-     * Create cookie for setting active workspace
+     * Set the active workspace ID in session
      *
-     * Generates a session cookie that persists the active workspace
-     * selection across requests. Cookie expires when browser closes.
+     * Stores the workspace ID in the user's session for persistence
+     * across requests. Session data is automatically cleaned up when
+     * the session expires.
      */
-    protected function setActiveWorkspaceCookie(string $workspaceId): \Symfony\Component\HttpFoundation\Cookie
+    protected function setActiveWorkspaceId(string $workspaceId): void
     {
-        return cookie('active_workspace_id', $workspaceId, 0, null, null, false, false);
+        request()->session()->put('active_workspace_id', $workspaceId);
     }
 }

@@ -33,6 +33,13 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Set the user's first workspace as active in the session
+        $user = $request->user();
+        if ($user && $user->workspaces()->exists()) {
+            $firstWorkspace = $user->workspaces()->first();
+            $request->session()->put('active_workspace_id', $firstWorkspace->id);
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

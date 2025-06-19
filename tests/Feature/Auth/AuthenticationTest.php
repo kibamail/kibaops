@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Models\Workspace;
 
 test('login screen can be rendered', function () {
     $response = $this->get('/login');
@@ -38,4 +39,31 @@ test('users can logout', function () {
 
     $this->assertGuest();
     $response->assertRedirect('/');
+});
+
+test('login sets active workspace in session when user has workspaces', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
+
+    $response = $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertAuthenticated();
+    $response->assertRedirect(route('dashboard', absolute: false));
+    $response->assertSessionHas('active_workspace_id', $workspace->id);
+});
+
+test('login does not set active workspace when user has no workspaces', function () {
+    $user = User::factory()->create();
+
+    $response = $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertAuthenticated();
+    $response->assertRedirect(route('dashboard', absolute: false));
+    $response->assertSessionMissing('active_workspace_id');
 });

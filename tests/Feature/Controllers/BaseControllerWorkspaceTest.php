@@ -14,7 +14,7 @@ test('getActiveWorkspace returns owned workspace efficiently', function () {
     $controller = new TestController();
 
     $this->actingAs($user)
-        ->withCookie('active_workspace_id', $workspace->id)
+        ->withSession(['active_workspace_id' => $workspace->id])
         ->get('/');
 
     $activeWorkspace = $controller->testGetActiveWorkspace();
@@ -37,9 +37,9 @@ test('getActiveWorkspace returns invited workspace efficiently', function () {
     Workspace::factory()->count(5)->create();
 
     $controller = new TestController();
-    
+
     $this->actingAs($member)
-        ->withCookie('active_workspace_id', $workspace->id)
+        ->withSession(['active_workspace_id' => $workspace->id])
         ->get('/');
 
     $activeWorkspace = $controller->testGetActiveWorkspace();
@@ -54,21 +54,21 @@ test('getActiveWorkspace returns null for unauthorized workspace', function () {
     $workspace = Workspace::factory()->create(['user_id' => $otherUser->id]);
 
     $controller = new TestController();
-    
+
     $this->actingAs($user)
-        ->withCookie('active_workspace_id', $workspace->id)
+        ->withSession(['active_workspace_id' => $workspace->id])
         ->get('/');
 
     $activeWorkspace = $controller->testGetActiveWorkspace();
     expect($activeWorkspace)->toBeNull();
 });
 
-test('getActiveWorkspace falls back to first workspace when no cookie', function () {
+test('getActiveWorkspace falls back to first workspace when no session value', function () {
     $user = User::factory()->create();
     $workspace = Workspace::factory()->create(['user_id' => $user->id]);
 
     $controller = new TestController();
-    
+
     $this->actingAs($user)->get('/');
 
     $activeWorkspace = $controller->testGetActiveWorkspace();

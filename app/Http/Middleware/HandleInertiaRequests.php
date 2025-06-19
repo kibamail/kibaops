@@ -31,12 +31,15 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        $activeWorkspaceId = $request->cookie('active_workspace_id');
+        $activeWorkspaceId = $request->session()->get('active_workspace_id', function () use ($request) {
+            if (!$request->user()) {
+                return null;
+            }
 
-        if (! $activeWorkspaceId && $request->user()) {
             $firstWorkspace = $request->user()->workspaces()->first();
-            $activeWorkspaceId = $firstWorkspace ? $firstWorkspace->id : null;
-        }
+
+            return $firstWorkspace ? $firstWorkspace->id : null;
+        });
 
         $activeProjectId = $this->extractActiveProjectId($request);
 
