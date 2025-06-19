@@ -21,7 +21,7 @@ class CloudProviderController extends Controller
      */
     public function store(CreateCloudProviderRequest $request, Workspace $workspace): RedirectResponse
     {
-        $cloudProvider = $workspace->createCloudProvider(
+        $workspace->createCloudProvider(
             $request->safe()->except('credentials'),
             $request->validated()['credentials']
         );

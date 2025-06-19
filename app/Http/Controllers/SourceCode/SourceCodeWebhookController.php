@@ -21,7 +21,7 @@ class SourceCodeWebhookController extends Controller
     {
         $providerType = $this->getProviderType($provider);
 
-        if (!$providerType) {
+        if (! $providerType) {
             return response()->json(['error' => 'Unsupported provider'], 400);
         }
 
@@ -31,7 +31,7 @@ class SourceCodeWebhookController extends Controller
 
         $providerService = SourceCodeProviderFactory::create($providerType);
 
-        if (!$providerService->webhooks()->validateSignature($payload, $signature)) {
+        if (! $providerService->webhooks()->validateSignature($payload, $signature)) {
             return response()->json(['error' => 'Invalid signature'], 401);
         }
 

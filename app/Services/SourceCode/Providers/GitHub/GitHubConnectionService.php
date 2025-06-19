@@ -13,11 +13,14 @@ use App\Services\SourceCode\Responses\SourceCodeConnectionResponse;
  */
 class GitHubConnectionService implements ConnectionInterface
 {
+    protected GithubAuth $auth;
+
     /**
      * Initialize GitHub connection service
      */
     public function __construct()
     {
+        $this->auth = new GithubAuth;
     }
 
     /**
@@ -26,17 +29,9 @@ class GitHubConnectionService implements ConnectionInterface
      * Generates the redirect URL for GitHub App installation with workspace
      * identification and origin URL tracking in the state parameter.
      */
-    public function initiate(array $config): SourceCodeConnectionResponse
+    public function initiate(array $config, string $state): SourceCodeConnectionResponse
     {
         $appName = config('services.github.app_name');
-        $workspaceId = $config['workspace_id'] ?? '';
-        $originUrl = $config['origin_url'] ?? '';
-
-        // Encode workspace ID and origin URL in the state parameter
-        $state = base64_encode(json_encode([
-            'workspace_id' => $workspaceId,
-            'origin_url' => $originUrl,
-        ]));
 
         $redirectUrl = "https://github.com/apps/{$appName}/installations/new?" . http_build_query([
             'state' => $state,
@@ -54,22 +49,28 @@ class GitHubConnectionService implements ConnectionInterface
      * Processes the callback from GitHub after user completes the app
      * installation flow. Validates installation and prepares connection data.
      */
-    public function complete(string $installationId, string $state): SourceCodeConnectionResponse
+    public function complete(string $installationId, array $state): SourceCodeConnectionResponse
     {
         if (empty($installationId)) {
             return SourceCodeConnectionResponse::failure('Installation ID is required');
         }
 
-        // Parse the state parameter to extract workspace ID and origin URL
-        $stateData = $this->parseState($state);
+        [$github, $apps, $metadata] = $this->auth->client($installationId);
+
+        if ($github == null) {
+            return new SourceCodeConnectionResponse(
+                success: false,
+                error: 'Failed to authenticate with gitHub. Please ensure our app installation on github was successful.'
+            );
+        }
+
+        $repositories = $apps->allRepositories();
 
         return new SourceCodeConnectionResponse(
             success: true,
             metadata: [
-                'installation_id' => $installationId,
-                'connection_id' => null,
-                'workspace_id' => $stateData['workspace_id'] ?? null,
-                'origin_url' => $stateData['origin_url'] ?? null,
+                'connection' => GitHubInstallationNormalizer::normalize($metadata['installation']),
+                'repositories' => GitHubRepositoryNormalizer::normalizeFromAppsResponse($repositories),
             ]
         );
     }
@@ -149,31 +150,5 @@ class GitHubConnectionService implements ConnectionInterface
     protected function makeAuthenticatedRequest(string $method, string $url, array $data = []): array
     {
         return [];
-    }
-
-    /**
-     * Parse the state parameter to extract workspace ID and origin URL
-     *
-     * Decodes the base64-encoded JSON state parameter that contains
-     * the workspace ID and origin URL for connection tracking and redirection.
-     */
-    protected function parseState(string $state): array
-    {
-        if (empty($state)) {
-            return [];
-        }
-
-        $decoded = base64_decode($state, true);
-
-        if ($decoded === false) {
-            return [];
-        }
-
-        $data = json_decode($decoded, true);
-        if (!is_array($data)) {
-            return [];
-        }
-
-        return $data;
     }
 }

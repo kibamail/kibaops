@@ -11,9 +11,7 @@ use App\Services\SourceCode\Responses\SourceCodeSyncResponse;
 
 class GitHubRepositoryService implements RepositoryInterface
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function get(string $connectionId, ?string $cursor = null): SourceCodeRepositoryListResponse
     {

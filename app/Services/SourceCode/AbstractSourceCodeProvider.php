@@ -9,11 +9,10 @@ use App\Models\SourceCode\SourceCodeConnection;
 abstract class AbstractSourceCodeProvider implements SourceCodeProviderInterface
 {
     protected SourceCodeProviderType $providerType;
+
     protected ?SourceCodeConnection $connection = null;
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function setConnection(SourceCodeConnection $connection): void
     {
@@ -27,7 +26,7 @@ abstract class AbstractSourceCodeProvider implements SourceCodeProviderInterface
 
     protected function getCredentials(): array
     {
-        if (!$this->connection) {
+        if (! $this->connection) {
             return [];
         }
 

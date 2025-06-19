@@ -40,12 +40,12 @@ interface ConnectionInterface
     /**
      * Initiate a new connection with the provider.
      */
-    public function initiate(array $config): SourceCodeConnectionResponse;
+    public function initiate(array $config, string $state): SourceCodeConnectionResponse;
 
     /**
      * Complete the connection process (OAuth callback).
      */
-    public function complete(string $code, string $state): SourceCodeConnectionResponse;
+    public function complete(string $code, array $state): SourceCodeConnectionResponse;
 
     /**
      * Refresh the connection credentials.

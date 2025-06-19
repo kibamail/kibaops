@@ -65,6 +65,4 @@ class WorkspaceController extends Controller
         return redirect()->route('dashboard')
             ->with('success', "Switched to {$workspace->name} workspace.");
     }
-
-
 }

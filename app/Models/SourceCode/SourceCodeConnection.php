@@ -35,7 +35,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon|null $deleted_at
- *
  * @property-read Workspace $workspace
  * @property-read \Illuminate\Database\Eloquent\Collection<SourceCodeRepository> $repositories
  * @property-read \Illuminate\Database\Eloquent\Collection<SourceCodeWebhookEvent> $webhookEvents
@@ -107,7 +106,7 @@ class SourceCodeConnection extends Model
     /**
      * Store authentication credentials securely in Vault.
      *
-     * @param array $credentials The credentials to store (access_token, refresh_token, etc.)
+     * @param  array  $credentials  The credentials to store (access_token, refresh_token, etc.)
      */
     public function storeCredentials(array $credentials): void
     {
@@ -145,9 +144,9 @@ class SourceCodeConnection extends Model
     {
         $credentials = $this->getCredentials();
 
-        return !empty($credentials) &&
+        return ! empty($credentials) &&
                isset($credentials['access_token']) &&
-               !empty($credentials['access_token']);
+               ! empty($credentials['access_token']);
     }
 
     /**
@@ -193,7 +192,7 @@ class SourceCodeConnection extends Model
     /**
      * Scope query to only active connections.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive($query)
@@ -204,8 +203,7 @@ class SourceCodeConnection extends Model
     /**
      * Scope query to connections for a specific provider type.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param SourceCodeProviderType $provider
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeForProvider($query, SourceCodeProviderType $provider)
@@ -216,8 +214,7 @@ class SourceCodeConnection extends Model
     /**
      * Scope query to connections for a specific workspace.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $workspaceId
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeForWorkspace($query, string $workspaceId)

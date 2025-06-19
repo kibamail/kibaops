@@ -7,9 +7,7 @@ use App\Services\SourceCode\Responses\SourceCodeFileResponse;
 
 class GitHubFileService implements FileInterface
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function get(string $connectionId, string $repositoryId, string $path, string $ref): SourceCodeFileResponse
     {
@@ -72,7 +70,7 @@ class GitHubFileService implements FileInterface
         if ($encoding === 'base64') {
             return base64_decode($encodedContent);
         }
-        
+
         return $encodedContent;
     }
 }

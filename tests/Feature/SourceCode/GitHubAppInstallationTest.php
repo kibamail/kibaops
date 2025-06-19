@@ -85,7 +85,7 @@ test('github connection service parses state parameter correctly', function () {
     $workspaceId = 'test-workspace-id';
     $originUrl = 'http://localhost:8000/projects';
 
-    $service = new \App\Services\SourceCode\Providers\GitHub\GitHubConnectionService();
+    $service = new \App\Services\SourceCode\Providers\GitHub\GitHubConnectionService;
 
     // Test the complete method with encoded state
     $state = base64_encode(json_encode([
@@ -102,7 +102,7 @@ test('github connection service parses state parameter correctly', function () {
 });
 
 test('github connection service handles invalid state gracefully', function () {
-    $service = new \App\Services\SourceCode\Providers\GitHub\GitHubConnectionService();
+    $service = new \App\Services\SourceCode\Providers\GitHub\GitHubConnectionService;
 
     // Test with invalid base64
     $response = $service->complete('12345', 'invalid-state');

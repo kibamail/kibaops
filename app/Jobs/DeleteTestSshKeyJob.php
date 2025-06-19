@@ -21,8 +21,7 @@ class DeleteTestSshKeyJob implements ShouldQueue
     public function __construct(
         public string $token,
         public string $keyId
-    ) {
-    }
+    ) {}
 
     public function handle(): void
     {

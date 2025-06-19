@@ -7,8 +7,8 @@ use App\Http\Controllers\Projects\EnvironmentController;
 use App\Http\Controllers\Projects\ProjectController;
 use App\Http\Controllers\SourceCode\SourceCodeConnectionController;
 use App\Http\Controllers\SourceCode\SourceCodeWebhookController;
-use App\Http\Controllers\Workspaces\WorkspaceMembershipController;
 use App\Http\Controllers\Workspaces\WorkspaceController;
+use App\Http\Controllers\Workspaces\WorkspaceMembershipController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -162,4 +162,3 @@ Route::prefix('workspaces/connections')->group(function () {
 */
 
 require __DIR__ . '/auth.php';
-

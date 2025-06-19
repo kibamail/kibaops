@@ -8,7 +8,7 @@ use App\Models\Workspace;
 
 test('source code connection can be created', function () {
     $workspace = Workspace::factory()->create();
-    
+
     $connection = SourceCodeConnection::create([
         'workspace_id' => $workspace->id,
         'provider_type' => SourceCodeProviderType::GITHUB,
@@ -22,7 +22,7 @@ test('source code connection can be created', function () {
         'connection_status' => 'active',
         'metadata' => ['installation_id' => '67890'],
     ]);
-    
+
     expect($connection->workspace_id)->toBe($workspace->id);
     expect($connection->provider_type)->toBe(SourceCodeProviderType::GITHUB);
     expect($connection->connection_name)->toBe('My GitHub Organization');
@@ -37,7 +37,7 @@ test('source code connection has correct vault key', function () {
     $connection = SourceCodeConnection::factory()->create([
         'provider_type' => SourceCodeProviderType::GITHUB,
     ]);
-    
+
     $expectedVaultKey = "source-code/github/{$connection->id}";
     expect($connection->vault_key)->toBe($expectedVaultKey);
 });
@@ -70,10 +70,10 @@ test('source code connection can store and retrieve credentials', function () {
 test('source code connection has relationships', function () {
     $workspace = Workspace::factory()->create();
     $connection = SourceCodeConnection::factory()->create(['workspace_id' => $workspace->id]);
-    
+
     expect($connection->workspace)->toBeInstanceOf(Workspace::class);
     expect($connection->workspace->id)->toBe($workspace->id);
-    
+
     expect($connection->repositories())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class);
     expect($connection->webhookEvents())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class);
 });
@@ -128,7 +128,7 @@ test('source code repository has helper methods', function () {
             'ssh' => 'git@github.com:my-org/my-repo.git',
         ],
     ]);
-    
+
     expect($repository->isPrivate())->toBeTrue();
     expect($repository->isPublic())->toBeFalse();
     expect($repository->isArchived())->toBeFalse();
@@ -141,7 +141,7 @@ test('source code repository has helper methods', function () {
 test('source code webhook event can be created', function () {
     $connection = SourceCodeConnection::factory()->create();
     $repository = SourceCodeRepository::factory()->create(['source_code_connection_id' => $connection->id]);
-    
+
     $webhookEvent = SourceCodeWebhookEvent::create([
         'source_code_connection_id' => $connection->id,
         'source_code_repository_id' => $repository->id,
@@ -154,7 +154,7 @@ test('source code webhook event can be created', function () {
         'normalized_payload' => ['event' => 'push', 'branch' => 'main'],
         'processing_status' => 'pending',
     ]);
-    
+
     expect($webhookEvent->source_code_connection_id)->toBe($connection->id);
     expect($webhookEvent->source_code_repository_id)->toBe($repository->id);
     expect($webhookEvent->event_type)->toBe('push');
@@ -186,11 +186,11 @@ test('source code webhook event has status methods', function () {
 });
 
 test('source code provider factory creates correct providers', function () {
-    $factory = new \App\Services\SourceCode\SourceCodeProviderFactory();
-    
+    $factory = new \App\Services\SourceCode\SourceCodeProviderFactory;
+
     $githubProvider = $factory->create(SourceCodeProviderType::GITHUB);
     expect($githubProvider)->toBeInstanceOf(\App\Services\SourceCode\Providers\GitHubProvider::class);
-    
-    expect(fn() => $factory->create(SourceCodeProviderType::BITBUCKET))
+
+    expect(fn () => $factory->create(SourceCodeProviderType::BITBUCKET))
         ->toThrow(InvalidArgumentException::class, 'Provider bitbucket not implemented yet');
 });

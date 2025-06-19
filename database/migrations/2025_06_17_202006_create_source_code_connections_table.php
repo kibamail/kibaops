@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('external_account_type');
             $table->string('avatar_url')->nullable();
             $table->json('permissions_scope')->nullable();
-            $table->string('vault_credentials_path');
+            $table->string('vault_credentials_path')->nullable();
             $table->string('connection_status')->default('active');
             $table->timestamp('last_sync_at')->nullable();
             $table->json('metadata')->nullable();
@@ -30,6 +30,7 @@ return new class extends Migration
 
             $table->index(['workspace_id', 'provider_type']);
             $table->index(['external_account_id', 'provider_type']);
+            $table->unique(['workspace_id', 'external_account_id']);
         });
     }
 

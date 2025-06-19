@@ -11,7 +11,7 @@ test('getActiveWorkspace returns owned workspace efficiently', function () {
 
     Workspace::factory()->count(5)->create();
 
-    $controller = new TestController();
+    $controller = new TestController;
 
     $this->actingAs($user)
         ->withSession(['active_workspace_id' => $workspace->id])
@@ -36,7 +36,7 @@ test('getActiveWorkspace returns invited workspace efficiently', function () {
 
     Workspace::factory()->count(5)->create();
 
-    $controller = new TestController();
+    $controller = new TestController;
 
     $this->actingAs($member)
         ->withSession(['active_workspace_id' => $workspace->id])
@@ -53,7 +53,7 @@ test('getActiveWorkspace returns null for unauthorized workspace', function () {
     $otherUser = User::factory()->create();
     $workspace = Workspace::factory()->create(['user_id' => $otherUser->id]);
 
-    $controller = new TestController();
+    $controller = new TestController;
 
     $this->actingAs($user)
         ->withSession(['active_workspace_id' => $workspace->id])
@@ -67,7 +67,7 @@ test('getActiveWorkspace falls back to first workspace when no session value', f
     $user = User::factory()->create();
     $workspace = Workspace::factory()->create(['user_id' => $user->id]);
 
-    $controller = new TestController();
+    $controller = new TestController;
 
     $this->actingAs($user)->get('/');
 

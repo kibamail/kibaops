@@ -36,6 +36,7 @@ class ValidCloudProviderCredentials implements ValidationRule
         }
 
         $credentialFields = $this->type->credentialFields();
+
         $requiredFields = collect($credentialFields)->where('required', true);
 
         if (count($value) !== count($credentialFields)) {

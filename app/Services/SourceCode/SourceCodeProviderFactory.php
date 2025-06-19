@@ -11,8 +11,8 @@ class SourceCodeProviderFactory
 {
     public static function create(SourceCodeProviderType $type): SourceCodeProviderInterface
     {
-        return match($type) {
-            SourceCodeProviderType::GITHUB => new GitHubProvider(),
+        return match ($type) {
+            SourceCodeProviderType::GITHUB => new GitHubProvider,
             // TODO: Add other providers as they are implemented
             // SourceCodeProviderType::BITBUCKET => new BitbucketProvider(),
             // SourceCodeProviderType::GITLAB => new GitLabProvider(),

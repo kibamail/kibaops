@@ -35,7 +35,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property \Carbon\Carbon|null $last_activity_at
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- *
  * @property-read SourceCodeConnection $sourceCodeConnection
  * @property-read \Illuminate\Database\Eloquent\Collection<SourceCodeWebhookEvent> $webhookEvents
  * @property-read string $provider_type
@@ -214,7 +213,7 @@ class SourceCodeRepository extends Model
     /**
      * Scope query to only active (non-archived) repositories.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive($query)
@@ -225,7 +224,7 @@ class SourceCodeRepository extends Model
     /**
      * Scope query to only private repositories.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopePrivate($query)
@@ -236,7 +235,7 @@ class SourceCodeRepository extends Model
     /**
      * Scope query to only public repositories.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopePublic($query)
@@ -247,7 +246,7 @@ class SourceCodeRepository extends Model
     /**
      * Scope query to repositories with webhooks configured.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithWebhooks($query)
@@ -258,7 +257,7 @@ class SourceCodeRepository extends Model
     /**
      * Scope query to repositories without webhooks configured.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWithoutWebhooks($query)
@@ -269,8 +268,7 @@ class SourceCodeRepository extends Model
     /**
      * Scope query to repositories for a specific connection.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $connectionId
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeForConnection($query, string $connectionId)
@@ -281,8 +279,7 @@ class SourceCodeRepository extends Model
     /**
      * Scope query to repositories by owner/repo format.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $ownerRepo
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeByOwnerRepo($query, string $ownerRepo)
@@ -293,8 +290,7 @@ class SourceCodeRepository extends Model
     /**
      * Scope query to repositories by programming language.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $language
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeByLanguage($query, string $language)
@@ -305,8 +301,8 @@ class SourceCodeRepository extends Model
     /**
      * Scope query to repositories with recent activity.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $days Number of days to look back (default: 30)
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  int  $days  Number of days to look back (default: 30)
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeRecentActivity($query, int $days = 30)

@@ -8,9 +8,7 @@ use App\Services\SourceCode\Responses\SourceCodeWebhookResponse;
 
 class GitHubWebhookService implements WebhookInterface
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function configure(string $connectionId, array $repositories): SourceCodeWebhookResponse
     {
@@ -34,7 +32,7 @@ class GitHubWebhookService implements WebhookInterface
     {
         $data = json_decode($payload, true);
 
-        if (!$data) {
+        if (! $data) {
             return new SourceCodeNormalizedWebhookEvent(
                 eventType: 'unknown',
                 action: 'unknown',

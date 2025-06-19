@@ -32,7 +32,7 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $activeWorkspaceId = $request->session()->get('active_workspace_id', function () use ($request) {
-            if (!$request->user()) {
+            if (! $request->user()) {
                 return null;
             }
 
@@ -46,17 +46,22 @@ class HandleInertiaRequests extends Middleware
         $workspaces = $request->user()
             ? $request->user()->workspaces()->with('projects')->latest()->get()
             : [];
+
         $invitedWorkspaces = $request->user()
             ? $request->user()->invitedWorkspaces()->with('projects')->latest()->get()
             : [];
 
         $allWorkspaces = collect($workspaces)->concat(collect($invitedWorkspaces));
+
         $activeWorkspace = $allWorkspaces->firstWhere('id', $activeWorkspaceId);
+
         $projects = $activeWorkspace ? $activeWorkspace->projects : collect();
 
         $activeProject = $activeProjectId ? $projects->firstWhere('id', $activeProjectId) : null;
 
         $cloudProvidersCount = $activeWorkspace ? $activeWorkspace->cloudProviders()->count() : 0;
+
+        $sourceCodeConnectionsCount = $activeWorkspace ? $activeWorkspace->sourceCodeConnections()->count() : 0;
 
         return [
             ...parent::share($request),
@@ -68,7 +73,10 @@ class HandleInertiaRequests extends Middleware
             'activeWorkspaceId' => $activeWorkspaceId,
             'projects' => $projects,
             'activeProject' => $activeProject,
+
             'cloudProvidersCount' => $cloudProvidersCount,
+            'sourceCodeConnectionsCount' => $sourceCodeConnectionsCount,
+
             'cloudProviders' => CloudProviderType::allProviders(),
             'cloudProviderRegions' => CloudProviderType::allRegions(),
             'ziggy' => fn () => [

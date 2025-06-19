@@ -23,22 +23,22 @@ class GitHubProvider extends AbstractSourceCodeProvider
 
     public function connection(): ConnectionInterface
     {
-        return new GitHubConnectionService();
+        return new GitHubConnectionService;
     }
 
     public function repositories(): RepositoryInterface
     {
-        return new GitHubRepositoryService();
+        return new GitHubRepositoryService;
     }
 
     public function webhooks(): WebhookInterface
     {
-        return new GitHubWebhookService();
+        return new GitHubWebhookService;
     }
 
     public function files(): FileInterface
     {
-        return new GitHubFileService();
+        return new GitHubFileService;
     }
 
     protected function getApiBaseUrl(): string
@@ -49,6 +49,7 @@ class GitHubProvider extends AbstractSourceCodeProvider
     protected function buildAuthUrl(array $scopes = []): string
     {
         $appName = config('services.github.app_name');
+
         return "https://github.com/apps/{$appName}/installations/new";
     }
 

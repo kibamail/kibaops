@@ -59,33 +59,37 @@ function OnboardingStep({ completed, title, description, Icon }: OnboardingStepP
 }
 
 export function OnboardingSidebar() {
-  const { cloudProvidersCount } = usePage<PageProps>().props;
+  const { cloudProvidersCount, sourceCodeConnectionsCount } =
+      usePage<PageProps>().props;
 
   const onboardingSteps = [
-    {
-      title: 'Create your first workspace',
-      description: 'A workspace provides a great way to group your projects and team members.',
-      completed: true,
-      Icon: WorkspaceIcon,
-    },
-    {
-      title: 'Connect a cloud provider',
-      description: 'Connect the cloud provider on which you want to provision your infrastructure.',
-      completed: cloudProvidersCount > 0,
-      Icon: CloudWaterdropIcon,
-    },
-    {
-      title: 'Link a source code provider',
-      description: 'Link the source code provider from which you want to deploy your applications.',
-      completed: false,
-      Icon: CodeRepositoryIcon,
-    },
-    {
-      title: 'Launch your first project',
-      description: 'Create your first project and deploy your application.',
-      completed: false,
-      Icon: ProjectLaunchIcon,
-    },
+      {
+          title: "Create your first workspace",
+          description:
+              "A workspace provides a great way to group your projects and team members.",
+          completed: true,
+          Icon: WorkspaceIcon,
+      },
+      {
+          title: "Connect a cloud provider",
+          description:
+              "Connect the cloud provider on which you want to provision your infrastructure.",
+          completed: cloudProvidersCount > 0,
+          Icon: CloudWaterdropIcon,
+      },
+      {
+          title: "Link a source code provider",
+          description:
+              "Link the source code provider from which you want to deploy your applications.",
+          completed: sourceCodeConnectionsCount > 0,
+          Icon: CodeRepositoryIcon,
+      },
+      {
+          title: "Launch your first project",
+          description: "Create your first project and deploy your application.",
+          completed: false,
+          Icon: ProjectLaunchIcon,
+      },
   ];
 
   const percentageCompleted = Math.floor(

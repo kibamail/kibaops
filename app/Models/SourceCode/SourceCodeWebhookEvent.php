@@ -30,7 +30,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $processing_attempts
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- *
  * @property-read SourceCodeConnection $sourceCodeConnection
  * @property-read SourceCodeRepository|null $repository
  * @property-read string $provider_type
@@ -190,7 +189,7 @@ class SourceCodeWebhookEvent extends Model
     /**
      * Check if this webhook event has exceeded the maximum processing attempts.
      *
-     * @param int $maxAttempts Maximum allowed attempts (default: 3)
+     * @param  int  $maxAttempts  Maximum allowed attempts (default: 3)
      * @return bool True if max attempts exceeded
      */
     public function hasExceededMaxAttempts(int $maxAttempts = 3): bool
@@ -201,7 +200,7 @@ class SourceCodeWebhookEvent extends Model
     /**
      * Set the normalized payload for this webhook event.
      *
-     * @param array $normalizedPayload The normalized payload data
+     * @param  array  $normalizedPayload  The normalized payload data
      */
     public function setNormalizedPayload(array $normalizedPayload): void
     {
@@ -251,7 +250,7 @@ class SourceCodeWebhookEvent extends Model
     /**
      * Scope query to pending webhook events.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopePending($query)
@@ -262,7 +261,7 @@ class SourceCodeWebhookEvent extends Model
     /**
      * Scope query to webhook events currently being processed.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeProcessing($query)
@@ -273,7 +272,7 @@ class SourceCodeWebhookEvent extends Model
     /**
      * Scope query to completed webhook events.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeCompleted($query)
@@ -284,7 +283,7 @@ class SourceCodeWebhookEvent extends Model
     /**
      * Scope query to failed webhook events.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeFailed($query)
@@ -295,8 +294,7 @@ class SourceCodeWebhookEvent extends Model
     /**
      * Scope query to webhook events for a specific connection.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $connectionId
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeForConnection($query, string $connectionId)
@@ -307,8 +305,7 @@ class SourceCodeWebhookEvent extends Model
     /**
      * Scope query to webhook events for a specific repository.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $repositoryId
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeForRepository($query, string $repositoryId)
@@ -319,8 +316,7 @@ class SourceCodeWebhookEvent extends Model
     /**
      * Scope query to webhook events by event type.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $eventType
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeByEventType($query, string $eventType)
@@ -331,8 +327,7 @@ class SourceCodeWebhookEvent extends Model
     /**
      * Scope query to webhook events by branch name.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $branchName
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeByBranch($query, string $branchName)
@@ -343,8 +338,8 @@ class SourceCodeWebhookEvent extends Model
     /**
      * Scope query to recent webhook events.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $hours Number of hours to look back (default: 24)
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  int  $hours  Number of hours to look back (default: 24)
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeRecentEvents($query, int $hours = 24)
@@ -355,13 +350,13 @@ class SourceCodeWebhookEvent extends Model
     /**
      * Scope query to failed webhook events that can be retried.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $maxAttempts Maximum attempts before giving up (default: 3)
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  int  $maxAttempts  Maximum attempts before giving up (default: 3)
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeRetryable($query, int $maxAttempts = 3)
     {
         return $query->where('processing_status', 'failed')
-                    ->where('processing_attempts', '<', $maxAttempts);
+            ->where('processing_attempts', '<', $maxAttempts);
     }
 }

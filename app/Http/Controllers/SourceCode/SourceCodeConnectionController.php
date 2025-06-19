@@ -14,22 +14,22 @@ class SourceCodeConnectionController extends Controller
     {
         $activeWorkspaceId = $this->getActiveWorkspaceId();
 
-        if (!$activeWorkspaceId) {
+        if (! $activeWorkspaceId) {
             return redirect()->back()->with('error', 'No workspace found');
         }
 
         $providerType = $this->getProviderType($provider);
 
-        if (!$providerType) {
+        if (! $providerType) {
             return redirect()->back()->with('error', 'Unsupported provider');
         }
 
         $providerService = SourceCodeProviderFactory::create($providerType);
 
-        $response = $providerService->connection()->initiate([
+        $response = $providerService->connection()->initiate([], oauth_state_encode([
             'workspace_id' => $activeWorkspaceId,
             'origin_url' => $request->headers->get('referer') ?: route('dashboard'),
-        ]);
+        ]));
 
         if ($response->success) {
             return redirect($response->metadata['redirect_url']);
@@ -49,26 +49,40 @@ class SourceCodeConnectionController extends Controller
     {
         $providerType = $this->getProviderType($provider);
 
-        if (!$providerType) {
+        $workspace = $this->getActiveWorkspace();
+
+        if ($workspace == null) {
+            return redirect()->route('dashboard')->with('error', 'You do not have an active workspace to complete this connection.');
+        }
+
+        if (! $providerType) {
             return redirect()->route('dashboard')->with('error', 'Unsupported provider');
         }
 
         $providerService = SourceCodeProviderFactory::create($providerType);
 
+        $state = oauth_state_decode($request->get('state'));
+
         $response = $providerService->connection()->complete(
             $request->get('installation_id') ?? $request->get('code'),
-            $request->get('state')
+            $state
         );
 
-        if ($response->success) {
-            $providerName = ucfirst($provider);
-            $redirectUrl = $response->metadata['origin_url'] ?? route('dashboard');
+        $origin = $state['origin_url'] ?? route('dashboard');
 
-            return redirect($redirectUrl)->with('success', "{$providerName} connection established successfully");
+        if (! $response->success) {
+            return redirect($origin)->with('error', $response->error);
         }
 
-        $redirectUrl = $response->metadata['origin_url'] ?? route('dashboard');
-        return redirect($redirectUrl)->with('error', $response->error);
+        $connection = $workspace->sourceCodeConnections()->create(
+            $response->metadata['connection']
+        );
+
+        $connection->repositories()->createMany($response->metadata['repositories']);
+
+        $providerName = ucfirst($provider);
+
+        return redirect($origin)->with('success', "{$providerName} connection established successfully.");
     }
 
     /**

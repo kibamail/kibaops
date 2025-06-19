@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\SourceCode\SourceCodeConnection;
 use App\Services\Vault\VaultService;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -52,6 +53,11 @@ class Workspace extends Model
     public function memberships(): HasMany
     {
         return $this->hasMany(WorkspaceMembership::class);
+    }
+
+    public function sourceCodeConnections(): HasMany
+    {
+        return $this->hasMany(SourceCodeConnection::class);
     }
 
     /**

@@ -99,16 +99,17 @@ export function NoSourceProviders() {
                 </div>
 
                 {provider.implemented ? (
-                  <a href={route('source-code.connect', { provider: provider.type, origin: window.location.href })}>
-                    <Button
+                  <Button
                       size="sm"
                       className="pr-1"
                       variant="secondary"
+                      asChild
                     >
+                  <a href={route('source-code.connect', { provider: provider.type, origin: window.location.href })}>
                       <PlusIcon />
                       Connect source
-                    </Button>
                   </a>
+                    </Button>
                 ) : (
                   <Button
                     size="sm"

@@ -24,7 +24,6 @@ class CreateDefaultWorkspace
             'name' => $workspaceName,
         ]);
 
-
         if (request()->hasSession()) {
             request()->session()->put('active_workspace_id', $workspace->id);
         }

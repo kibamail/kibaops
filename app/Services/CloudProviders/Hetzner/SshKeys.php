@@ -18,6 +18,7 @@ class SshKeys implements CloudSshKeysInterface
     {
         $safeResult = safe(function () use ($name, $publicKey) {
             $hetznerService = app('hetzner-cloud', ['token' => $this->token]);
+
             return $hetznerService->createSshKey($name, $publicKey, ['kibaops' => 'true']);
         });
 

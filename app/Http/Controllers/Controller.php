@@ -19,7 +19,7 @@ abstract class Controller
         $request = request();
 
         return $request->session()->get('active_workspace_id', function () use ($request) {
-            if (!$request->user()) {
+            if (! $request->user()) {
                 return null;
             }
 
@@ -40,7 +40,7 @@ abstract class Controller
     {
         $activeWorkspaceId = $this->getActiveWorkspaceId();
 
-        if (!$activeWorkspaceId || !request()->user()) {
+        if (! $activeWorkspaceId || ! request()->user()) {
             return null;
         }
 
@@ -49,9 +49,9 @@ abstract class Controller
         return Workspace::where('id', $activeWorkspaceId)
             ->where(function ($query) use ($user) {
                 $query->where('user_id', $user->id)
-                      ->orWhereHas('memberships', function ($membershipQuery) use ($user) {
-                          $membershipQuery->where('user_id', $user->id);
-                      });
+                    ->orWhereHas('memberships', function ($membershipQuery) use ($user) {
+                        $membershipQuery->where('user_id', $user->id);
+                    });
             })
             ->first();
     }

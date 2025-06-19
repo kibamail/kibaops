@@ -32,7 +32,7 @@ test('safe helper returns array data when callback succeeds', function () {
 test('safe helper catches GuzzleHttp ClientException with JSON response', function () {
     $response = new Response(400, [], json_encode(['message' => 'Bad request error']));
     $request = new Request('GET', 'http://example.com');
-    
+
     $result = safe(function () use ($response, $request) {
         throw new ClientException('Client error', $request, $response);
     });
@@ -46,7 +46,7 @@ test('safe helper catches GuzzleHttp ClientException with JSON response', functi
 test('safe helper catches GuzzleHttp ClientException with error key in JSON', function () {
     $response = new Response(400, [], json_encode(['error' => 'Invalid credentials']));
     $request = new Request('GET', 'http://example.com');
-    
+
     $result = safe(function () use ($response, $request) {
         throw new ClientException('Client error', $request, $response);
     });
@@ -60,7 +60,7 @@ test('safe helper catches GuzzleHttp ClientException with error key in JSON', fu
 test('safe helper catches GuzzleHttp ClientException with plain text response', function () {
     $response = new Response(400, [], 'Plain text error message');
     $request = new Request('GET', 'http://example.com');
-    
+
     $result = safe(function () use ($response, $request) {
         throw new ClientException('Client error', $request, $response);
     });
@@ -74,7 +74,7 @@ test('safe helper catches GuzzleHttp ClientException with plain text response', 
 test('safe helper catches GuzzleHttp ServerException', function () {
     $response = new Response(500, [], json_encode(['message' => 'Internal server error']));
     $request = new Request('GET', 'http://example.com');
-    
+
     $result = safe(function () use ($response, $request) {
         throw new ServerException('Server error', $request, $response);
     });
@@ -87,7 +87,7 @@ test('safe helper catches GuzzleHttp ServerException', function () {
 
 test('safe helper catches GuzzleHttp ConnectException', function () {
     $request = new Request('GET', 'http://example.com');
-    
+
     $result = safe(function () use ($request) {
         throw new ConnectException('Connection timeout', $request);
     });
@@ -124,7 +124,7 @@ test('safe helper catches InvalidArgumentException', function () {
 
 test('safe helper catches generic Exception in local environment', function () {
     app()->instance('env', 'local');
-    
+
     $result = safe(function () {
         throw new Exception('Something went wrong');
     });

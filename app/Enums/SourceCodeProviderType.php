@@ -13,7 +13,7 @@ enum SourceCodeProviderType: string
 
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::GITHUB => 'GitHub',
             self::BITBUCKET => 'Bitbucket',
             self::GITLAB => 'GitLab',
@@ -25,7 +25,7 @@ enum SourceCodeProviderType: string
 
     public function authenticationMethod(): AuthenticationMethod
     {
-        return match($this) {
+        return match ($this) {
             self::GITHUB => AuthenticationMethod::GITHUB_APP,
             self::BITBUCKET => AuthenticationMethod::OAUTH2,
             self::GITLAB => AuthenticationMethod::OAUTH2,
@@ -37,7 +37,7 @@ enum SourceCodeProviderType: string
 
     public function webhookEvents(): array
     {
-        return match($this) {
+        return match ($this) {
             self::GITHUB => ['push', 'pull_request', 'release', 'issues'],
             self::BITBUCKET => ['repo:push', 'pullrequest:created', 'pullrequest:updated'],
             self::GITLAB => ['push', 'merge_requests', 'tag_push', 'releases'],
@@ -57,12 +57,12 @@ enum SourceCodeProviderType: string
 
     public static function implementedProviders(): array
     {
-        return array_filter(self::cases(), fn($case) => $case->implemented());
+        return array_filter(self::cases(), fn ($case) => $case->implemented());
     }
 
     public static function allProviders(): array
     {
-        return array_map(fn($case) => [
+        return array_map(fn ($case) => [
             'type' => $case->value,
             'label' => $case->label(),
             'implemented' => $case->implemented(),
@@ -82,7 +82,7 @@ enum AuthenticationMethod: string
 
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::OAUTH2 => 'OAuth 2.0',
             self::GITHUB_APP => 'GitHub App',
             self::PERSONAL_ACCESS_TOKEN => 'Personal Access Token',
