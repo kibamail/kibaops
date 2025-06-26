@@ -14,7 +14,25 @@ class CreateProjectRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $workspace = Workspace::findOrFail($this->workspace_id);
+        $activeWorkspaceId = $this->session()->get('active_workspace_id', function () {
+            if (! $this->user()) {
+                return null;
+            }
+
+            $firstWorkspace = $this->user()->workspaces()->first();
+
+            return $firstWorkspace ? $firstWorkspace->id : null;
+        });
+
+        if (! $activeWorkspaceId) {
+            return false;
+        }
+
+        $workspace = Workspace::find($activeWorkspaceId);
+
+        if (! $workspace) {
+            return false;
+        }
 
         return Gate::allows('update', $workspace);
     }
@@ -29,7 +47,6 @@ class CreateProjectRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', Rule::unique('projects')],
-            'workspace_id' => ['required', 'exists:workspaces,id'],
         ];
     }
 }

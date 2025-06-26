@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Environment;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Workspace;
@@ -11,15 +12,19 @@ test('project can be created', function () {
 
     $response = $this
         ->actingAs($user)
+        ->withSession(['active_workspace_id' => $workspace->id])
         ->post(route('projects.store'), [
             'name' => 'Test Project',
-            'workspace_id' => $workspace->id,
         ]);
 
     $project = Project::where('name', 'Test Project')->first();
 
     $this->assertModelExists($project);
+    expect($project->workspace_id)->toBe($workspace->id);
     $response->assertRedirect(route('projects.show', $project));
+
+    expect($project->environments)->toHaveCount(2);
+    expect($project->environments->pluck('slug')->sort()->values()->toArray())->toEqual(['production', 'staging']);
 });
 
 test('project show page is displayed', function () {
@@ -110,4 +115,55 @@ test('user cannot delete projects of other users workspaces', function () {
 
     $response->assertForbidden();
     $this->assertModelExists($project);
+});
+
+test('project creation automatically creates staging and production environments', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
+
+    $this
+        ->actingAs($user)
+        ->withSession(['active_workspace_id' => $workspace->id])
+        ->post(route('projects.store'), [
+            'name' => 'Auto Environment Project',
+        ]);
+
+    $project = Project::where('name', 'Auto Environment Project')->first();
+
+    expect($project->environments)->toHaveCount(2);
+
+    $environmentSlugs = $project->environments->pluck('slug')->sort()->values()->toArray();
+    expect($environmentSlugs)->toBe(['production', 'staging']);
+
+    $stagingEnvironment = $project->environments->where('slug', 'staging')->first();
+    $productionEnvironment = $project->environments->where('slug', 'production')->first();
+
+    expect($stagingEnvironment->project_id)->toBe($project->id);
+    expect($productionEnvironment->project_id)->toBe($project->id);
+});
+
+test('project creation requires valid data', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
+
+    $response = $this
+        ->actingAs($user)
+        ->withSession(['active_workspace_id' => $workspace->id])
+        ->post(route('projects.store'), [
+            'name' => '',
+        ]);
+
+    $response->assertSessionHasErrors(['name']);
+});
+
+test('project creation requires active workspace in session', function () {
+    $user = User::factory()->create();
+
+    $response = $this
+        ->actingAs($user)
+        ->post(route('projects.store'), [
+            'name' => 'Test Project',
+        ]);
+
+    $response->assertForbidden();
 });

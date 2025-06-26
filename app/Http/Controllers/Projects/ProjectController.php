@@ -20,7 +20,22 @@ class ProjectController extends Controller
      */
     public function store(CreateProjectRequest $request): RedirectResponse
     {
-        $project = Project::create($request->validated());
+        $activeWorkspaceId = $this->getActiveWorkspaceId();
+
+        if (! $activeWorkspaceId) {
+            return redirect()->route('dashboard')
+                ->with('error', 'No active workspace found.');
+        }
+
+        $project = Project::create([
+            ...$request->validated(),
+            'workspace_id' => $activeWorkspaceId,
+        ]);
+
+        $project->environments()->createMany([
+            ['slug' => 'staging'],
+            ['slug' => 'production'],
+        ]);
 
         return redirect()->route('projects.show', $project)
             ->with('success', 'Project created successfully.');
