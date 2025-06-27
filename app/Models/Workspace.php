@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Jobs\ProvisionCluster;
 use App\Models\SourceCode\SourceCodeConnection;
 use App\Services\Vault\VaultService;
 use App\Traits\HasUuid;
@@ -66,6 +67,14 @@ class Workspace extends Model
     public function cloudProviders(): HasMany
     {
         return $this->hasMany(CloudProvider::class);
+    }
+
+    /**
+     * Get the clusters for the workspace.
+     */
+    public function clusters(): HasMany
+    {
+        return $this->hasMany(Cluster::class);
     }
 
     /**
@@ -144,6 +153,22 @@ class Workspace extends Model
         }
 
         return $cloudProvider->delete();
+    }
+
+    /**
+     * Create a new cluster for this workspace with the specified configuration.
+     * Automatically generates SSH keys, stores them in Vault, creates the
+     * required cluster nodes, and dispatches the provisioning job.
+     */
+    public function createCluster(array $data, int $workerNodesCount, int $storageNodesCount = 0, string $serverType = ''): Cluster
+    {
+        $cluster = $this->clusters()->create($data);
+
+        $cluster->createNodes($workerNodesCount, $storageNodesCount, $serverType);
+
+        ProvisionCluster::dispatch($cluster);
+
+        return $cluster->fresh(['nodes']);
     }
 
     /**

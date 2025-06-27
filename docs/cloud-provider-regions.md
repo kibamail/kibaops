@@ -39,12 +39,12 @@ $regions = CloudProviderType::HETZNER->regions();
 $flatRegions = CloudProviderType::HETZNER->flatRegions();
 // Returns:
 // [
-//     ['name' => 'Falkenstein, Germany', 'slug' => 'fsn1'],
-//     ['name' => 'Nuremberg, Germany', 'slug' => 'nbg1'],
-//     ['name' => 'Helsinki, Finland', 'slug' => 'hel1'],
-//     ['name' => 'Ashburn, VA, USA', 'slug' => 'ash'],
-//     ['name' => 'Hillsboro, OR, USA', 'slug' => 'hil'],
-//     ['name' => 'Singapore', 'slug' => 'sin'],
+//     ['name' => 'Falkenstein, Germany', 'slug' => 'fsn1', 'flag' => '/flags/de.svg'],
+//     ['name' => 'Nuremberg, Germany', 'slug' => 'nbg1', 'flag' => '/flags/de.svg'],
+//     ['name' => 'Helsinki, Finland', 'slug' => 'hel1', 'flag' => '/flags/fi.svg'],
+//     ['name' => 'Ashburn, VA, USA', 'slug' => 'ash', 'flag' => '/flags/us.svg'],
+//     ['name' => 'Hillsboro, OR, USA', 'slug' => 'hil', 'flag' => '/flags/us.svg'],
+//     ['name' => 'Singapore', 'slug' => 'sin', 'flag' => '/flags/sg.svg'],
 // ]
 ```
 
@@ -105,7 +105,14 @@ function MyComponent() {
         <div key={continent}>
           <h3>{continent}</h3>
           {regions.map(region => (
-            <div key={region.slug}>{region.name}</div>
+            <div key={region.slug} className="flex items-center gap-2">
+              <img
+                src={region.flag}
+                alt={`${region.name} flag`}
+                className="w-4 h-3 object-cover rounded-sm"
+              />
+              <span>{region.name}</span>
+            </div>
           ))}
         </div>
       ))}
@@ -143,6 +150,7 @@ All cloud providers have accurate region data:
 interface CloudProviderRegion {
   name: string;
   slug: string;
+  flag: string;
 }
 
 type CloudProviderRegionsByContinent = Record<string, CloudProviderRegion[]>;

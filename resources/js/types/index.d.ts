@@ -78,9 +78,50 @@ export interface CloudProvider {
 export interface CloudProviderRegion {
   name: string;
   slug: string;
+  flag: string;
 }
 
 export type CloudProviderRegionsByContinent = Record<string, CloudProviderRegion[]>;
+
+export type ClusterStatus = 'Healthy' | 'Unhealthy' | 'Pending';
+
+export type ClusterNodeType = 'worker' | 'storage';
+
+export interface Cluster {
+  id: string;
+  name: string;
+  slug: string;
+  status: ClusterStatus;
+  workspace_id: string;
+  cloud_provider_id: string;
+  region: string;
+  shared_storage_worker_nodes: boolean;
+  vault_ssh_key_path: string | null;
+  created_at: string;
+  updated_at: string;
+  nodes?: ClusterNode[];
+  cloud_provider?: CloudProvider;
+}
+
+export interface ClusterNode {
+  id: string;
+  cluster_id: string;
+  node_id: string;
+  type: ClusterNodeType;
+  status: ClusterStatus;
+  public_ip: string | null;
+  private_ip: string | null;
+  public_ipv6: string | null;
+  private_ipv6: string | null;
+  server_type: string | null;
+  cpu_cores: number;
+  ram_gb: number;
+  disk_gb: number;
+  os: string;
+  created_at: string;
+  updated_at: string;
+  cluster?: Cluster;
+}
 
 export interface CloudProviderCredentialField {
   name: string;
@@ -88,6 +129,13 @@ export interface CloudProviderCredentialField {
   type: 'text' | 'password' | 'textarea';
   placeholder: string;
   required: boolean;
+}
+
+export interface CloudProviderServerType {
+  cpu: number;
+  ram: number;
+  disk: number;
+  name: string;
 }
 
 export interface CloudProviderInfo {
@@ -110,7 +158,10 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
   activeProject: Project | null;
   cloudProvidersCount: number;
   sourceCodeConnectionsCount: number;
+  clustersCount: number;
   cloudProviders: CloudProviderInfo[];
+  workspaceCloudProviders: CloudProvider[];
   cloudProviderRegions: Record<CloudProviderType, CloudProviderRegionsByContinent>;
+  cloudProviderServerTypes: Record<CloudProviderType, Record<string, CloudProviderServerType>>;
   ziggy: Config & { location: string };
 };

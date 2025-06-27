@@ -105,6 +105,17 @@ Route::middleware('auth')->group(function () {
     |
     */
     Route::resource('workspaces.cloud-providers', CloudProviderController::class)->only(['store', 'update', 'destroy']);
+
+    /*
+    |----------------------------------------------------------------------
+    | Cluster Management
+    |----------------------------------------------------------------------
+    |
+    | Routes for managing clusters within workspaces, including cluster
+    | creation, configuration updates, and deletion with node management.
+    |
+    */
+    Route::resource('clusters', \App\Http\Controllers\Clusters\ClusterController::class)->only(['store', 'update', 'destroy']);
 });
 
 /*

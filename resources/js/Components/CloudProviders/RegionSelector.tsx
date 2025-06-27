@@ -45,16 +45,23 @@ export function RegionSelector({
   return (
     <SelectField.Root value={selectedRegion} onValueChange={onRegionChange} disabled={disabled}>
       <SelectField.Trigger placeholder={placeholder} />
-      <SelectField.Content>
+      <SelectField.Content className='z-100'>
         {groupByContinent
           ? Object.entries(regionsByContinent).map(([continent, regions]) => (
               <div key={continent}>
-                <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <div className="px-2 py-1.5 text-xs font-semibold kb-content-tertiary uppercase tracking-wider">
                   {continent}
                 </div>
                 {regions.map((region: CloudProviderRegion) => (
                   <SelectField.Item key={region.slug} value={region.slug}>
-                    {region.name}
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={region.flag}
+                        alt={`${region.name} flag`}
+                        className="w-4 h-3 object-cover flex-shrink-0 border kb-border-primary"
+                      />
+                      <span>{region.name}</span>
+                    </div>
                   </SelectField.Item>
                 ))}
               </div>
@@ -64,7 +71,14 @@ export function RegionSelector({
               .flat()
               .map((region: CloudProviderRegion) => (
                 <SelectField.Item key={region.slug} value={region.slug}>
-                  {region.name}
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={region.flag}
+                      alt={`${region.name} flag`}
+                      className="w-4 h-3 object-cover rounded-sm flex-shrink-0"
+                    />
+                    <span>{region.name}</span>
+                  </div>
                 </SelectField.Item>
               ))}
       </SelectField.Content>

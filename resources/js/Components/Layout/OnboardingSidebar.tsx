@@ -6,9 +6,9 @@ import { Text } from '@kibamail/owly/text';
 import cn from 'classnames';
 import { CheckIcon } from '../Icons/check.svg';
 import { CloudWaterdropIcon } from '../Icons/cloud-waterdrop.svg';
+import { ClusterIcon } from '../Icons/cluster.svg';
 import { CodeRepositoryIcon } from '../Icons/code-repository.svg';
 import { ProjectLaunchIcon } from '../Icons/project-launch.svg';
-import { UserIcon } from '../Icons/user.svg';
 import { WorkspaceIcon } from '../Icons/workspace.svg';
 
 interface OnboardingStepProps {
@@ -59,7 +59,7 @@ function OnboardingStep({ completed, title, description, Icon }: OnboardingStepP
 }
 
 export function OnboardingSidebar() {
-  const { cloudProvidersCount, sourceCodeConnectionsCount } =
+  const { cloudProvidersCount, sourceCodeConnectionsCount, clustersCount } =
       usePage<PageProps>().props;
 
   const onboardingSteps = [
@@ -76,6 +76,13 @@ export function OnboardingSidebar() {
               "Connect the cloud provider on which you want to provision your infrastructure.",
           completed: cloudProvidersCount > 0,
           Icon: CloudWaterdropIcon,
+      },
+      {
+          title: "Create your first cluster",
+          description:
+              "Set up a server cluster to run your applications, workloads and services.",
+          completed: clustersCount > 0,
+          Icon: ClusterIcon,
       },
       {
           title: "Link a source code provider",
@@ -102,7 +109,7 @@ export function OnboardingSidebar() {
 
       <Text className="mt-2 kb-content-tertiary">
         To start deploying your applications, you'll need to connect a cloud provider, link a source
-        code provider and launch your first project.
+        code provider, create a cluster, and launch your first project.
       </Text>
 
       <div className="mt-4">

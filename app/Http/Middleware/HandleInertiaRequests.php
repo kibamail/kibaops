@@ -63,6 +63,10 @@ class HandleInertiaRequests extends Middleware
 
         $sourceCodeConnectionsCount = $activeWorkspace ? $activeWorkspace->sourceCodeConnections()->count() : 0;
 
+        $clustersCount = $activeWorkspace ? $activeWorkspace->clusters()->count() : 0;
+
+        $workspaceCloudProviders = $activeWorkspace ? $activeWorkspace->cloudProviders()->get() : collect();
+
         return [
             ...parent::share($request),
             'auth' => [
@@ -76,9 +80,12 @@ class HandleInertiaRequests extends Middleware
 
             'cloudProvidersCount' => $cloudProvidersCount,
             'sourceCodeConnectionsCount' => $sourceCodeConnectionsCount,
+            'clustersCount' => $clustersCount,
 
             'cloudProviders' => CloudProviderType::allProviders(),
+            'workspaceCloudProviders' => $workspaceCloudProviders,
             'cloudProviderRegions' => CloudProviderType::allRegions(),
+            'cloudProviderServerTypes' => CloudProviderType::allServerTypes(),
             'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),

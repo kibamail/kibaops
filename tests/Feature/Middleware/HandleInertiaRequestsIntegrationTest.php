@@ -50,6 +50,7 @@ test('authenticated user receives workspaces and invited workspaces in shared da
             ->has('projects', 2)
             ->where('activeProject', null)
             ->where('cloudProvidersCount', 0)
+            ->where('clustersCount', 0)
     );
 });
 
@@ -72,6 +73,7 @@ test('authenticated user with only owned workspaces receives empty invited works
             ->has('projects', 2)
             ->where('activeProject', null)
             ->where('cloudProvidersCount', 0)
+            ->where('clustersCount', 0)
     );
 });
 
@@ -102,6 +104,7 @@ test('authenticated user with only invited workspaces receives empty owned works
             ->has('projects', 0)
             ->where('activeProject', null)
             ->where('cloudProvidersCount', 0)
+            ->where('clustersCount', 0)
     );
 });
 
@@ -119,6 +122,7 @@ test('authenticated user with no workspaces receives empty arrays', function () 
             ->has('projects', 0)
             ->where('activeProject', null)
             ->where('cloudProvidersCount', 0)
+            ->where('clustersCount', 0)
     );
 });
 
@@ -132,6 +136,7 @@ test('unauthenticated user receives empty arrays for workspaces', function () {
             ->has('projects', 0)
             ->where('activeProject', null)
             ->where('cloudProvidersCount', 0)
+            ->where('clustersCount', 0)
     );
 });
 
@@ -164,6 +169,7 @@ test('workspaces are ordered by latest first', function () {
             ->has('projects', 0)
             ->where('activeProject', null)
             ->where('cloudProvidersCount', 0)
+            ->where('clustersCount', 0)
     );
 });
 
@@ -207,6 +213,7 @@ test('invited workspaces are ordered by latest first', function () {
             ->has('projects', 0)
             ->where('activeProject', null)
             ->where('cloudProvidersCount', 0)
+            ->where('clustersCount', 0)
     );
 });
 
@@ -226,6 +233,7 @@ test('shared data is available across different inertia routes', function () {
             ->has('projects', 2)
             ->where('activeProject', null)
             ->where('cloudProvidersCount', 0)
+            ->where('clustersCount', 0)
     );
 
     $profileResponse = $this
@@ -239,6 +247,7 @@ test('shared data is available across different inertia routes', function () {
             ->has('projects', 2)
             ->where('activeProject', null)
             ->where('cloudProvidersCount', 0)
+            ->where('clustersCount', 0)
     );
 });
 
@@ -297,6 +306,7 @@ test('projects are loaded for active workspace', function () {
             ->where('projects.2.id', $projects->get(2)->id)
             ->where('activeProject', null)
             ->where('cloudProvidersCount', 0)
+            ->where('clustersCount', 0)
     );
 });
 
@@ -317,6 +327,7 @@ test('active project is extracted from project show route', function () {
             ->where('activeProject.id', $project->id)
             ->where('activeProject.name', $project->name)
             ->where('cloudProvidersCount', 0)
+            ->where('clustersCount', 0)
     );
 });
 
@@ -335,6 +346,7 @@ test('active project is null when no project id in url', function () {
             ->has('projects', 2)
             ->where('activeProject', null)
             ->where('cloudProvidersCount', 0)
+            ->where('clustersCount', 0)
     );
 });
 
@@ -352,6 +364,7 @@ test('projects are empty when no active workspace', function () {
             ->has('projects', 2)
             ->where('activeProject', null)
             ->where('cloudProvidersCount', 0)
+            ->where('clustersCount', 0)
     );
 });
 
@@ -391,6 +404,67 @@ test('cloud providers count is zero when no active workspace', function () {
     $response->assertInertia(
         fn (Assert $page) => $page
             ->where('cloudProvidersCount', 2)
+            ->where('clustersCount', 0)
+    );
+});
+
+test('clusters count is returned for active workspace', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
+    $cloudProvider = $workspace->cloudProviders()->create([
+        'name' => 'Test Provider',
+        'type' => 'hetzner',
+    ]);
+
+    // Create some clusters for the workspace
+    $workspace->createCluster([
+        'name' => 'Test Cluster 1',
+        'cloud_provider_id' => $cloudProvider->id,
+        'region' => 'fsn1',
+        'shared_storage_worker_nodes' => false,
+    ], 3, 3, 'cx32');
+
+    $workspace->createCluster([
+        'name' => 'Test Cluster 2',
+        'cloud_provider_id' => $cloudProvider->id,
+        'region' => 'fsn1',
+        'shared_storage_worker_nodes' => true,
+    ], 5, 0, 'cx42');
+
+    $response = $this
+        ->actingAs($user)
+        ->withSession(['active_workspace_id' => $workspace->id])
+        ->get(route('dashboard'));
+
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->where('clustersCount', 2)
+    );
+});
+
+test('clusters count is zero when no active workspace', function () {
+    $user = User::factory()->create();
+    $workspace = Workspace::factory()->create(['user_id' => $user->id]);
+    $cloudProvider = $workspace->cloudProviders()->create([
+        'name' => 'Test Provider',
+        'type' => 'hetzner',
+    ]);
+
+    // Create clusters but don't set active workspace
+    $workspace->createCluster([
+        'name' => 'Test Cluster',
+        'cloud_provider_id' => $cloudProvider->id,
+        'region' => 'fsn1',
+        'shared_storage_worker_nodes' => false,
+    ], 3, 3, 'cx32');
+
+    $response = $this
+        ->actingAs($user)
+        ->get(route('dashboard'));
+
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->where('clustersCount', 1)
     );
 });
 
@@ -418,12 +492,14 @@ test('cloud provider regions are shared with frontend grouped by continent', fun
             ->has('cloudProviderRegions.hetzner.Asia Pacific')
             ->where('cloudProviderRegions.hetzner.Europe.0.name', 'Falkenstein, Germany')
             ->where('cloudProviderRegions.hetzner.Europe.0.slug', 'fsn1')
+            ->has('cloudProviderRegions.hetzner.Europe.0.flag')
         // Check continent grouping for DigitalOcean
             ->has('cloudProviderRegions.digital_ocean.North America')
             ->has('cloudProviderRegions.digital_ocean.Europe')
             ->has('cloudProviderRegions.digital_ocean.Asia Pacific')
             ->where('cloudProviderRegions.digital_ocean.North America.0.name', 'New York 1')
             ->where('cloudProviderRegions.digital_ocean.North America.0.slug', 'nyc1')
+            ->has('cloudProviderRegions.digital_ocean.North America.0.flag')
     );
 });
 
@@ -449,15 +525,19 @@ test('cloud provider regions contain correct continent-grouped structure for all
         $page->has('cloudProviderRegions.hetzner.Europe')
             ->has('cloudProviderRegions.hetzner.Europe.0.name')
             ->has('cloudProviderRegions.hetzner.Europe.0.slug')
+            ->has('cloudProviderRegions.hetzner.Europe.0.flag')
             ->where('cloudProviderRegions.hetzner.Europe.0.name', 'Falkenstein, Germany')
-            ->where('cloudProviderRegions.hetzner.Europe.0.slug', 'fsn1');
+            ->where('cloudProviderRegions.hetzner.Europe.0.slug', 'fsn1')
+            ->where('cloudProviderRegions.hetzner.Europe.0.flag', '/flags/de.svg');
 
         // Check continent-grouped structure for DigitalOcean
         $page->has('cloudProviderRegions.digital_ocean.North America')
             ->has('cloudProviderRegions.digital_ocean.North America.0.name')
             ->has('cloudProviderRegions.digital_ocean.North America.0.slug')
+            ->has('cloudProviderRegions.digital_ocean.North America.0.flag')
             ->where('cloudProviderRegions.digital_ocean.North America.0.name', 'New York 1')
-            ->where('cloudProviderRegions.digital_ocean.North America.0.slug', 'nyc1');
+            ->where('cloudProviderRegions.digital_ocean.North America.0.slug', 'nyc1')
+            ->where('cloudProviderRegions.digital_ocean.North America.0.flag', '/flags/us.svg');
 
         // Check that AWS has multiple continents
         $page->has('cloudProviderRegions.aws.North America')
