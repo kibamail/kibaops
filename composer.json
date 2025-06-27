@@ -7,10 +7,18 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "alextartan/guzzle-psr18-adapter": "^4.0",
+        "csharpru/vault-php": "^4.4",
+        "firebase/php-jwt": "^6.11",
+        "guzzlehttp/guzzle": "^7.0.1",
+        "http-interop/http-factory-guzzle": "^1.0",
         "inertiajs/inertia-laravel": "^2.0",
+        "knplabs/github-api": "^3.0",
+        "laminas/laminas-diactoros": "^3.6",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
+        "lkdevelopment/hetzner-cloud-php-sdk": "^2.8",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {
@@ -25,6 +33,10 @@
         "pestphp/pest-plugin-laravel": "^3.2"
     },
     "autoload": {
+        "files": [
+            "app/helpers/safe.php",
+            "app/helpers/oauth_state.php"
+        ],
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",

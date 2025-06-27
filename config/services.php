@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    'github' => [
+        'app_id' => env('KIBAOPS_GITHUB_APP_ID'),
+        'app_name' => env('KIBAOPS_GITHUB_APP_NAME'),
+        'app_secret' => env('KIBAOPS_GITHUB_APP_SECRET'),
+        'private_key' => env('KIBAOPS_GITHUB_APP_PRIVATE_KEY'),
+        'webhook_secret' => env('KIBAOPS_GITHUB_APP_WEBHOOKS_SECRET'),
+        'callback_url' => env('KIBAOPS_GITHUB_CALLBACK_URL'),
+        'webhook_url' => env('NGROK_URL', env('APP_URL')) . '/workspaces/connections/github/webhooks',
+    ],
+
 ];

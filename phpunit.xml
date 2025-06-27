@@ -5,9 +5,6 @@
          colors="true"
 >
     <testsuites>
-        <testsuite name="Unit">
-            <directory>tests/Unit</directory>
-        </testsuite>
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
         </testsuite>
@@ -22,12 +19,22 @@
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value=":memory:"/>
+        <env name="DB_CONNECTION" value="pgsql"/>
+        <env name="DB_DATABASE" value="kibaops_test"/>
+        <env name="DB_USERNAME" value="kibaops_user"/>
+        <env name="DB_PASSWORD" value="kibaops_password"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+
+        <!-- HashiCorp Vault Configuration for Testing -->
+        <env name="VAULT_ADDR" value="http://127.0.0.1:8200"/>
+        <env name="VAULT_TOKEN" value="myroot"/>
+        <env name="VAULT_READ_ROLE_ID" value="kibaops-reads"/>
+        <env name="VAULT_READ_SECRET_ID" value="7c4a2e8f-9b1d-4a3c-8e5f-2d7b9c1a4e6f"/>
+        <env name="VAULT_WRITE_ROLE_ID" value="kibaops-writes"/>
+        <env name="VAULT_WRITE_SECRET_ID" value="3f8e1c9a-5d2b-4e7f-9a1c-6b8d4f2e7a9c"/>
     </php>
 </phpunit>

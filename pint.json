@@ -1,0 +1,20 @@
+{
+    "preset": "laravel",
+    "rules": {
+        "method_argument_space": {
+            "on_multiline": "ensure_fully_multiline"
+        },
+        "method_chaining_indentation": true,
+        "array_indentation": true,
+        "trailing_comma_in_multiline": true,
+        "concat_space": {
+            "spacing": "one"
+        },
+        "binary_operator_spaces": {
+            "default": "single_space"
+        },
+        "function_declaration": {
+            "closure_function_spacing": "one"
+        }
+    }
+}
