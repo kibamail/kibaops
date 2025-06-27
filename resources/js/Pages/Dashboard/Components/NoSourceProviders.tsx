@@ -46,7 +46,6 @@ const sourceProviders: SourceProviderInfo[] = [
 ];
 
 export function NoSourceProviders() {
-
   const sourceProvidersWithIcons: SourceProviderWithIcon[] = sourceProviders
     .map((provider) => ({
       ...provider,
@@ -99,24 +98,19 @@ export function NoSourceProviders() {
                 </div>
 
                 {provider.implemented ? (
-                  <Button
-                      size="sm"
-                      className="pr-1"
-                      variant="secondary"
-                      asChild
+                  <Button size="sm" className="pr-1" variant="secondary" asChild>
+                    <a
+                      href={route('source-code.connect', {
+                        provider: provider.type,
+                        origin: window.location.href,
+                      })}
                     >
-                  <a href={route('source-code.connect', { provider: provider.type, origin: window.location.href })}>
                       <PlusIcon />
                       Connect source
-                  </a>
-                    </Button>
+                    </a>
+                  </Button>
                 ) : (
-                  <Button
-                    size="sm"
-                    className="pr-1"
-                    variant="secondary"
-                    disabled={true}
-                  >
+                  <Button size="sm" className="pr-1" variant="secondary" disabled={true}>
                     <PlusIcon />
                     Connect source
                   </Button>

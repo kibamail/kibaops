@@ -12,6 +12,7 @@ export function PlusCircleIcon(props: SVGProps<SVGSVGElement>) {
       color="currentColor"
       {...props}
     >
+      <title>Plus Circle</title>
       <path
         d="M8 12H12M16 12H12M12 12V8M12 12V16"
         stroke="currentColor"

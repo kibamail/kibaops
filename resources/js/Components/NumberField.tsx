@@ -150,7 +150,7 @@ const NumberFieldField = React.forwardRef<
       disabled={disabled}
       value={value.toString()}
       onChange={onInputChange}
-      className='!grid !grid-cols-[max-content_1fr_max-content]'
+      className="!grid !grid-cols-[max-content_1fr_max-content]"
       {...textFieldProps}
     >
       {children}
@@ -243,7 +243,7 @@ const NumberFieldHint = React.forwardRef<
   React.ElementRef<typeof TextField.Hint>,
   React.ComponentPropsWithoutRef<typeof TextField.Hint>
 >((props, ref) => {
-  return <TextField.Hint className='!col-span-full !row-start-2' ref={ref} {...props} />;
+  return <TextField.Hint className="!col-span-full !row-start-2" ref={ref} {...props} />;
 });
 
 NumberFieldHint.displayName = 'NumberField.Hint';

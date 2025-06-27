@@ -23,42 +23,12 @@ export function ClusterIcon(props: SVGProps<SVGSVGElement>) {
         stroke="currentColor"
         strokeWidth="1.5"
       />
-      <path
-        d="M13.5 6L18 6"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      <path
-        d="M6 7L6 5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      <path
-        d="M9 7L9 5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      <path
-        d="M13.5 17H18"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      <path
-        d="M6 18L6 16"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      <path
-        d="M9 18L9 16"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
+      <path d="M13.5 6L18 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M6 7L6 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M9 7L9 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M13.5 17H18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M6 18L6 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M9 18L9 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   );
 }

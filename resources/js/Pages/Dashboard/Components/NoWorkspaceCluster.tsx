@@ -1,17 +1,16 @@
 import { ClusterIcon } from '@/Components/Icons/cluster.svg';
+import { CreateClusterModal } from '@/Pages/Dashboard/Components/CreateClusterModal';
 import { Button } from '@kibamail/owly';
 import { Heading } from '@kibamail/owly/heading';
 import { Text } from '@kibamail/owly/text';
 import { useState } from 'react';
-import { CreateClusterModal } from '@/Pages/Dashboard/Components/CreateClusterModal';
-
 
 export function NoWorkspaceCluster() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   function onCreateCluster() {
     setIsModalOpen(true);
-  };
+  }
 
   return (
     <>
@@ -27,24 +26,21 @@ export function NoWorkspaceCluster() {
             </Heading>
 
             <Text className="text-center kb-content-tertiary mt-4">
-              You have not created any clusters in this workspace yet. A cluster is a group of 
-              servers that work together to run your applications. Once you create a cluster, 
-              you'll be able to deploy and manage your applications on it.
+              You have not created any clusters in this workspace yet. A cluster is a group of
+              servers that work together to run your applications. Once you create a cluster, you'll
+              be able to deploy and manage your applications on it.
             </Text>
           </div>
 
-        <div className="mt-6">
-          <Button variant="primary" onClick={onCreateCluster}>
-            Create cluster
-          </Button>
-        </div>
+          <div className="mt-6">
+            <Button variant="primary" onClick={onCreateCluster}>
+              Create cluster
+            </Button>
+          </div>
         </div>
       </div>
 
-      <CreateClusterModal
-        isOpen={isModalOpen}
-        onOpenChange={setIsModalOpen}
-      />
+      <CreateClusterModal isOpen={isModalOpen} onOpenChange={setIsModalOpen} />
     </>
   );
 }

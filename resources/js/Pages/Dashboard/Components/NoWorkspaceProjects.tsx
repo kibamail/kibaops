@@ -21,8 +21,8 @@ export function NoWorkspaceProjects({ onCreateProjectClick }: NoWorkspaceProject
           </Heading>
 
           <Text className="text-center kb-content-tertiary mt-4">
-            You haven't created any projects in this workspace yet. Projects help you organize 
-            and manage your application environments, deployments, infrastructure and resources.
+            You haven't created any projects in this workspace yet. Projects help you organize and
+            manage your application environments, deployments, infrastructure and resources.
           </Text>
         </div>
 

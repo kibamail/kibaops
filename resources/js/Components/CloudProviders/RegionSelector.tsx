@@ -45,7 +45,7 @@ export function RegionSelector({
   return (
     <SelectField.Root value={selectedRegion} onValueChange={onRegionChange} disabled={disabled}>
       <SelectField.Trigger placeholder={placeholder} />
-      <SelectField.Content className='z-100'>
+      <SelectField.Content className="z-100">
         {groupByContinent
           ? Object.entries(regionsByContinent).map(([continent, regions]) => (
               <div key={continent}>

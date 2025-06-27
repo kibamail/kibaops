@@ -12,6 +12,7 @@ export function MinusCircleIcon(props: SVGProps<SVGSVGElement>) {
       color="currentColor"
       {...props}
     >
+      <title>Minus Circle</title>
       <path
         d="M8 12H16"
         stroke="currentColor"
