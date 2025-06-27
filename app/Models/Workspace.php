@@ -85,8 +85,9 @@ class Workspace extends Model
     public function createMemberships(array $emails, array $projectIds, string $role): \Illuminate\Database\Eloquent\Collection
     {
         $usersByEmail = User::whereIn('email', $emails)->get()->keyBy('email');
+        $createdMemberships = collect();
 
-        DB::transaction(function () use ($emails, $usersByEmail, $projectIds, $role) {
+        DB::transaction(function () use ($emails, $usersByEmail, $projectIds, $role, &$createdMemberships) {
             foreach ($emails as $email) {
                 $membership = WorkspaceMembership::updateOrCreate(
                     ['workspace_id' => $this->id, 'email' => $email],
@@ -94,6 +95,7 @@ class Workspace extends Model
                 );
 
                 $membership->projects()->sync($projectIds);
+                $createdMemberships->push($membership);
             }
         });
 
@@ -102,7 +104,9 @@ class Workspace extends Model
             ->with(['user', 'projects'])
             ->get();
 
-        $this->sendInvitationNotifications($createdMemberships);
+        DB::afterCommit(function () use ($createdMemberships) {
+            $this->sendInvitationNotifications($createdMemberships);
+        });
 
         return $createdMemberships;
     }

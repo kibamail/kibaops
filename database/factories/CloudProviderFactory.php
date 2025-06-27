@@ -14,7 +14,7 @@ class CloudProviderFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->company(),
+            'name' => substr($this->faker->company(), 0, 32),
             'type' => $this->faker->randomElement(CloudProviderType::implemented()),
             'workspace_id' => Workspace::factory(),
         ];
